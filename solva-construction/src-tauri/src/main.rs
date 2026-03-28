@@ -59,7 +59,11 @@ fn db_path(app: &AppHandle) -> Result<PathBuf, String> {
     Ok(app_data_dir.join("construction-planner.db"))
 }
 
-fn storage_status(app: &AppHandle, storage_mode: &str, message: &str) -> Result<StorageStatusRecord, String> {
+fn storage_status(
+    app: &AppHandle,
+    storage_mode: &str,
+    message: &str,
+) -> Result<StorageStatusRecord, String> {
     let path = db_path(app)?;
     let data_dir = path
         .parent()
@@ -101,7 +105,9 @@ fn ensure_optional_columns(conn: &Connection) -> Result<(), String> {
             Err(SqliteError::SqliteFailure(_, Some(message)))
                 if message.contains("duplicate column name") => {}
             Err(error) => {
-                return Err(format!("Failed to ensure optional column via '{statement}': {error}"));
+                return Err(format!(
+                    "Failed to ensure optional column via '{statement}': {error}"
+                ));
             }
         }
     }
@@ -153,7 +159,8 @@ fn ensure_schema(conn: &Connection) -> Result<(), String> {
 
 fn open_db(app: &AppHandle) -> Result<Connection, String> {
     let path = db_path(app)?;
-    let conn = Connection::open(path).map_err(|e| format!("Failed to open SQLite database: {e}"))?;
+    let conn =
+        Connection::open(path).map_err(|e| format!("Failed to open SQLite database: {e}"))?;
     ensure_schema(&conn)?;
     Ok(conn)
 }
@@ -191,8 +198,7 @@ fn open_data_folder(app: AppHandle) -> Result<String, String> {
         .map(PathBuf::from)
         .ok_or_else(|| "Failed to resolve database parent directory".to_string())?;
 
-    fs::create_dir_all(&data_dir)
-        .map_err(|e| format!("Failed to create data directory: {e}"))?;
+    fs::create_dir_all(&data_dir).map_err(|e| format!("Failed to create data directory: {e}"))?;
 
     #[cfg(target_os = "windows")]
     let mut command = {
@@ -248,13 +254,16 @@ fn list_projects(app: AppHandle) -> Result<Vec<ProjectRecord>, String> {
         })
         .map_err(|e| format!("Failed to query projects: {e}"))?;
 
-    rows
-        .collect::<Result<Vec<_>, _>>()
+    rows.collect::<Result<Vec<_>, _>>()
         .map_err(|e| format!("Failed to read projects: {e}"))
 }
 
 #[tauri::command]
-fn create_project(app: AppHandle, name: String, description: Option<String>) -> Result<ProjectRecord, String> {
+fn create_project(
+    app: AppHandle,
+    name: String,
+    description: Option<String>,
+) -> Result<ProjectRecord, String> {
     let trimmed_name = name.trim();
     if trimmed_name.is_empty() {
         return Err("Project name is required".to_string());
@@ -308,10 +317,7 @@ fn import_project_with_id(
     }
 
     let now = Utc::now().to_rfc3339();
-    let created = created_at
-        .unwrap_or_else(|| now.clone())
-        .trim()
-        .to_string();
+    let created = created_at.unwrap_or_else(|| now.clone()).trim().to_string();
     let updated = updated_at
         .unwrap_or_else(|| created.clone())
         .trim()
@@ -446,7 +452,10 @@ fn delete_project(app: AppHandle, project_id: String) -> Result<(), String> {
 }
 
 #[tauri::command]
-fn get_project_schedule(app: AppHandle, project_id: String) -> Result<ProjectScheduleRecord, String> {
+fn get_project_schedule(
+    app: AppHandle,
+    project_id: String,
+) -> Result<ProjectScheduleRecord, String> {
     let trimmed_project_id = project_id.trim();
     if trimmed_project_id.is_empty() {
         return Err("Project ID is required".to_string());
@@ -477,11 +486,17 @@ fn get_project_schedule(app: AppHandle, project_id: String) -> Result<ProjectSch
 
     match row {
         Some(record) => {
-            eprintln!("[schedule] Loaded schedule row for project_id={}", trimmed_project_id);
+            eprintln!(
+                "[schedule] Loaded schedule row for project_id={}",
+                trimmed_project_id
+            );
             Ok(record)
         }
         None => {
-            eprintln!("[schedule] No schedule row found for project_id={}, returning empty schedule", trimmed_project_id);
+            eprintln!(
+                "[schedule] No schedule row found for project_id={}, returning empty schedule",
+                trimmed_project_id
+            );
             Ok(ProjectScheduleRecord {
                 project_id: trimmed_project_id.to_string(),
                 tasks_json: "[]".to_string(),
@@ -536,7 +551,10 @@ fn save_project_schedule(
         )
         .map_err(|e| format!("Failed to read saved project schedule timestamp: {e}"))?;
 
-    eprintln!("[schedule] Saved schedule row for project_id={}", trimmed_project_id);
+    eprintln!(
+        "[schedule] Saved schedule row for project_id={}",
+        trimmed_project_id
+    );
 
     Ok(ProjectScheduleRecord {
         project_id: trimmed_project_id.to_string(),
@@ -572,7 +590,6 @@ fn clear_project_people(app: AppHandle, project_id: String) -> Result<(), String
 
     Ok(())
 }
-
 
 #[tauri::command]
 fn save_project_snapshot(
@@ -631,7 +648,10 @@ fn save_project_snapshot(
 }
 
 #[tauri::command]
-fn list_project_snapshots(app: AppHandle, project_id: String) -> Result<Vec<ScheduleSnapshotRecord>, String> {
+fn list_project_snapshots(
+    app: AppHandle,
+    project_id: String,
+) -> Result<Vec<ScheduleSnapshotRecord>, String> {
     let trimmed_project_id = project_id.trim();
     if trimmed_project_id.is_empty() {
         return Err("Project ID is required".to_string());
@@ -669,7 +689,10 @@ fn list_project_snapshots(app: AppHandle, project_id: String) -> Result<Vec<Sche
 }
 
 #[tauri::command]
-fn get_project_snapshot(app: AppHandle, snapshot_id: String) -> Result<ScheduleSnapshotRecord, String> {
+fn get_project_snapshot(
+    app: AppHandle,
+    snapshot_id: String,
+) -> Result<ScheduleSnapshotRecord, String> {
     let trimmed_snapshot_id = snapshot_id.trim();
     if trimmed_snapshot_id.is_empty() {
         return Err("Snapshot ID is required".to_string());
@@ -746,6 +769,7 @@ fn clear_project_snapshots(app: AppHandle, project_id: String) -> Result<(), Str
 }
 fn main() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .invoke_handler(tauri::generate_handler![
             init_database,
             open_data_folder,
@@ -766,9 +790,3 @@ fn main() {
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
-
-
-
-
-
-

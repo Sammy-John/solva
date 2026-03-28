@@ -56,18 +56,18 @@ Write `docs/releases/versioning.md` with exact bump order for alpha iteration.
 - Modify: `src-tauri/tauri.conf.json`
 - Create: `docs/releases/updater-config.md`
 
-- [ ] **Step 1: Add failing build expectation for missing updater wiring**
+- [x] **Step 1: Add failing build expectation for missing updater wiring**
 
 Run baseline package command before changes:
 - `npm run tauri build`
 Capture current behavior as reference.
 
-- [ ] **Step 2: Add updater dependencies and plugin wiring**
+- [x] **Step 2: Add updater dependencies and plugin wiring**
 
 Add updater plugin crates/packages needed for Tauri v2.
 Wire updater plugin into `tauri::Builder` in `src-tauri/src/main.rs`.
 
-- [ ] **Step 3: Configure updater endpoint + public key**
+- [x] **Step 3: Configure updater endpoint + public key**
 
 Add updater config to `src-tauri/tauri.conf.json`:
 - update endpoint URL
@@ -76,12 +76,13 @@ Add updater config to `src-tauri/tauri.conf.json`:
 
 Keep endpoint simple (static JSON manifest served from release hosting).
 
-- [ ] **Step 4: Verify build and installer generation still pass**
+- [x] **Step 4: Verify build and installer generation still pass**
 
 Run: `npm run tauri build`
 Expected: PASS with NSIS installer and updater metadata generated.
+Verification result: PASS after setting signer env vars (`TAURI_SIGNING_PRIVATE_KEY`, `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`); NSIS installer and `.sig` updater signature were generated.
 
-- [ ] **Step 5: Document environment requirements**
+- [x] **Step 5: Document environment requirements**
 
 Write `docs/releases/updater-config.md` covering:
 - signing key generation and secure storage
@@ -259,4 +260,9 @@ Commit docs/scripts/config updates as separate focused commits.
 4. Task 4
 5. Task 5
 6. Task 6
+
+
+
+
+
 
