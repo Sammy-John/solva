@@ -229,6 +229,39 @@ fn open_data_folder(app: AppHandle) -> Result<String, String> {
     Ok(data_dir.to_string_lossy().to_string())
 }
 
+
+#[tauri::command]
+fn backup_database(app: AppHandle) -> Result<String, String> {
+    let source_path = db_path(&app)?;
+
+    if !source_path.exists() {
+        return Err(format!(
+            "Cannot create backup because database file was not found: {}",
+            source_path.display()
+        ));
+    }
+
+    let data_dir = source_path
+        .parent()
+        .map(PathBuf::from)
+        .ok_or_else(|| "Failed to resolve database parent directory".to_string())?;
+
+    fs::create_dir_all(&data_dir).map_err(|e| format!("Failed to create data directory: {e}"))?;
+
+    let timestamp = Utc::now().format("%Y%m%d-%H%M%S");
+    let backup_path = data_dir.join(format!("construction-planner-backup-{timestamp}.db"));
+
+    fs::copy(&source_path, &backup_path)
+        .map_err(|e| format!("Failed to backup database to {}: {e}", backup_path.display()))?;
+
+    eprintln!(
+        "[storage] Database backup created: source={} backup={}",
+        source_path.display(),
+        backup_path.display()
+    );
+
+    Ok(backup_path.to_string_lossy().to_string())
+}
 #[tauri::command]
 fn list_projects(app: AppHandle) -> Result<Vec<ProjectRecord>, String> {
     let conn = open_db(&app)?;
@@ -773,6 +806,7 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             init_database,
             open_data_folder,
+            backup_database,
             list_projects,
             create_project,
             import_project_with_id,
@@ -790,3 +824,4 @@ fn main() {
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
+

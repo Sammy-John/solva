@@ -186,17 +186,17 @@ Current evidence recorded for packaging + manifest path; full in-app vN->vN+1 va
 - Modify: `src-tauri/src/main.rs`
 - Create: `docs/releases/data-preservation.md`
 
-- [ ] **Step 1: Add pre-update storage health probe**
+- [x] **Step 1: Add pre-update storage health probe**
 
 Before install action, verify `init_database` works and `list_projects` returns successfully.
 If probe fails, block update and show actionable message.
 
-- [ ] **Step 2: Add lightweight backup command in Rust**
+- [x] **Step 2: Add lightweight backup command in Rust**
 
 Add a Tauri command in `main.rs` to copy `construction-planner.db` to a timestamped backup in app data dir.
 Expose it for pre-install use only.
 
-- [ ] **Step 3: Wire optional backup-before-install toggle**
+- [x] **Step 3: Wire optional backup-before-install toggle**
 
 In `projectsDb.ts`/updater flow, trigger backup prior to install; if backup fails, continue only with explicit user confirmation (alpha-safe default: block).
 
@@ -208,8 +208,9 @@ Manual test:
 - corrupt/replace DB intentionally in test machine
 - restore from backup file
 - verify project/schedule integrity
+Status: pending manual execution on a live installed app machine.
 
-- [ ] **Step 5: Document operator runbook**
+- [x] **Step 5: Document operator runbook**
 
 Create `docs/releases/data-preservation.md` with:
 - data folder path
@@ -261,6 +262,8 @@ Commit docs/scripts/config updates as separate focused commits.
 4. Task 4
 5. Task 5
 6. Task 6
+
+
 
 
 

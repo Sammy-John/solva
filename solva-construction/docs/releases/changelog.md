@@ -129,3 +129,28 @@ Copy this block for each completed release/task:
 ### Follow-ups
 - Execute full in-app update validation with two versions (`vN` installed, then `vN+1` update) on a separate machine.
 - Verify data-preservation checks during that end-to-end run.
+
+## 2026-03-28 - Block1 Task 5 In Progress (Step 4 Pending)
+
+**Version:** `1.0.0`
+**Plan Task:** `Task 5 - Data Preservation Hardening (Minimal)`
+
+### Completed
+- Added update preflight gate in `src/lib/projectsDb.ts` (`prepareForUpdateInstall`):
+  - verifies `init_database`
+  - verifies `list_projects`
+  - creates DB backup before install when enabled
+- Added Rust backup command in `src-tauri/src/main.rs`:
+  - `backup_database`
+  - creates timestamped `construction-planner-backup-YYYYMMDD-HHMMSS.db`
+- Wired backup safety flow into install handler in `src/App.tsx`.
+- Added backup-before-install toggle (default on) in storage panel UI.
+- Added runbook: `docs/releases/data-preservation.md`.
+
+### Verification Notes
+- `npm run test` passed.
+- `npm run build` passed.
+- Signed `npm run tauri build` passed.
+
+### Pending
+- Manual backup + restore drill (Step 4) on a live installed app machine.

@@ -9,6 +9,7 @@ import {
   listProjects,
   migrateLocalStorageToSqlite,
   openDataFolder,
+  prepareForUpdateInstall,
   updateProject,
 } from '@/lib/projectsDb'
 import type { Project } from '@/lib/projectsDb'
@@ -64,6 +65,7 @@ function App() {
   const [updateInstall, setUpdateInstall] = useState<UpdateInstallResult | null>(null)
   const [isCheckingUpdates, setIsCheckingUpdates] = useState(false)
   const [isInstallingUpdate, setIsInstallingUpdate] = useState(false)
+  const [backupBeforeInstall, setBackupBeforeInstall] = useState(true)
 
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [projectName, setProjectName] = useState('')
@@ -212,6 +214,25 @@ function App() {
     setIsInstallingUpdate(true)
 
     try {
+      const preflight = await prepareForUpdateInstall({
+        requireBackup: backupBeforeInstall,
+      })
+
+      if (!preflight.ok) {
+        setUpdateInstall({
+          status: 'error',
+          code: 'unknown',
+          message: (preflight as { message?: string }).message ?? 'Update blocked by storage safety checks.',
+        })
+        return
+      }
+
+      if (preflight.backupPath) {
+        console.info(
+          `[update] pre-install checks passed: projects=${preflight.projectCount}, backup=${preflight.backupPath}`,
+        )
+      }
+
       const result = await downloadAndInstallUpdate(updateCheck.update)
       setUpdateInstall(result)
     } finally {
@@ -414,6 +435,16 @@ function App() {
       ) : null}
 
       <div className="storage-panel-actions">
+        <label className="storage-checkbox-row">
+          <input
+            type="checkbox"
+            checked={backupBeforeInstall}
+            onChange={(event) => setBackupBeforeInstall(event.target.checked)}
+            disabled={isInstallingUpdate}
+          />
+          <span>Create DB backup before installing update</span>
+        </label>
+
         <button
           type="button"
           className="secondary-button storage-panel-button"
@@ -825,5 +856,9 @@ function App() {
 }
 
 export default App
+
+
+
+
 
 

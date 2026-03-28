@@ -174,6 +174,52 @@ export const openDataFolder = async (): Promise<string> => {
   return openedPath
 }
 
+
+export type UpdateInstallPreflightResult =
+  | {
+      ok: true
+      projectCount: number
+      backupPath: string | null
+    }
+  | {
+      ok: false
+      message: string
+    }
+
+export const prepareForUpdateInstall = async (
+  options?: { requireBackup?: boolean },
+): Promise<UpdateInstallPreflightResult> => {
+  if (!detectTauriRuntime()) {
+    return {
+      ok: false,
+      message: 'Update install safety checks are available only in the installed desktop app.',
+    }
+  }
+
+  const requireBackup = options?.requireBackup ?? true
+
+  try {
+    await tauriInvoke<StorageStatusRow>('init_database')
+    const rows = await tauriInvoke<ProjectRow[]>('list_projects')
+
+    let backupPath: string | null = null
+    if (requireBackup) {
+      backupPath = await tauriInvoke<string>('backup_database')
+    }
+
+    return {
+      ok: true,
+      projectCount: rows.length,
+      backupPath,
+    }
+  } catch (error) {
+    const message = formatError(error)
+    return {
+      ok: false,
+      message: `Update blocked by storage safety checks: ${message}`,
+    }
+  }
+}
 export const migrateLocalStorageToSqlite = async (): Promise<void> => {
   const fallbackProjects = loadFallbackProjects()
   const fallbackScheduleMap = loadFallbackScheduleMap()
@@ -362,3 +408,4 @@ export const deleteProject = async (projectId: string): Promise<void> => {
 }
 
 export const toProjectRow = fromProject
+
