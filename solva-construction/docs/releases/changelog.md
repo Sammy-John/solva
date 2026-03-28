@@ -154,3 +154,27 @@ Copy this block for each completed release/task:
 
 ### Pending
 - Manual backup + restore drill (Step 4) on a live installed app machine.
+
+## 2026-03-29 - Block1 Task 6 In Progress (Live Acceptance Pending)
+
+**Version:** `1.0.2`
+**Plan Task:** `Task 6 - Final Block1 Acceptance Gate`
+
+### Completed
+- Created acceptance gate doc: `docs/releases/block1-acceptance.md`.
+- Defined pass/fail mapping directly to roadmap Block1 criteria.
+- Produced founder handoff checklist and release commands.
+- Executed two consecutive version progression runs:
+  - `1.0.0 -> 1.0.1`
+  - `1.0.1 -> 1.0.2`
+- Generated signed artifacts and manifests for both versions.
+
+### Verification Notes
+- `npm version patch --no-git-tag-version` (twice)
+- `npm run release:version:sync` (twice)
+- `npm run release:alpha` (twice) passed with signed `.exe` + `.sig`
+- `npm run release:manifest -- --base-url https://updates.solva.app --notes "Alpha acceptance pass <version>"` (twice) passed
+
+### Pending
+- Full installed-app in-place updater validation (`vN -> vN+1`) against hosted endpoint.
+- Final manual data-preservation drill on installed app machine.

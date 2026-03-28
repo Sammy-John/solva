@@ -223,7 +223,7 @@ Create `docs/releases/data-preservation.md` with:
 **Files:**
 - Create: `docs/releases/block1-acceptance.md`
 
-- [ ] **Step 1: Define pass/fail checklist against roadmap requirements**
+- [x] **Step 1: Define pass/fail checklist against roadmap requirements**
 
 Map directly to Block1 “Done when”:
 - update applied without clean reinstall workflow
@@ -234,8 +234,9 @@ Map directly to Block1 “Done when”:
 
 Test sequence: `vA -> vB -> vC` on same machine.
 Expected: all updates apply and data remains intact across each update.
+Current status: version progression release-path verification completed for vA->vB->vC (1.0.0->1.0.1->1.0.2); live in-app update/data integrity validation still pending installed-machine run.
 
-- [ ] **Step 3: Produce founder handoff notes**
+- [x] **Step 3: Produce founder handoff notes**
 
 Record in `docs/releases/block1-acceptance.md`:
 - commands used
@@ -262,6 +263,8 @@ Commit docs/scripts/config updates as separate focused commits.
 4. Task 4
 5. Task 5
 6. Task 6
+
+
 
 
 
