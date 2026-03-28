@@ -24,6 +24,13 @@ import {
   type ScheduleTemplateSeed,
 } from '@/lib/templatesDb'
 import { getStorageStatus, type StorageStatus } from '@/lib/storageRuntime'
+import {
+  checkForAppUpdate,
+  downloadAndInstallUpdate,
+  getCurrentAppVersion,
+  type AppUpdateCheckResult,
+  type UpdateInstallResult,
+} from '@/lib/updater'
 import './App.css'
 
 const formatError = (error: unknown): string => {
@@ -52,6 +59,11 @@ function App() {
   const [storageStatus, setStorageStatus] = useState<StorageStatus>(getStorageStatus())
   const [storageError, setStorageError] = useState<string | null>(null)
   const [openFolderError, setOpenFolderError] = useState<string | null>(null)
+  const [appVersion, setAppVersion] = useState<string>('unknown')
+  const [updateCheck, setUpdateCheck] = useState<AppUpdateCheckResult | null>(null)
+  const [updateInstall, setUpdateInstall] = useState<UpdateInstallResult | null>(null)
+  const [isCheckingUpdates, setIsCheckingUpdates] = useState(false)
+  const [isInstallingUpdate, setIsInstallingUpdate] = useState(false)
 
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [projectName, setProjectName] = useState('')
@@ -115,6 +127,15 @@ function App() {
     void load()
   }, [])
 
+  useEffect(() => {
+    const loadVersion = async () => {
+      const version = await getCurrentAppVersion()
+      setAppVersion(version)
+    }
+
+    void loadVersion()
+  }, [])
+
   const closeCreateModal = () => {
     setIsCreateOpen(false)
     setProjectName('')
@@ -168,6 +189,33 @@ function App() {
       const message = formatError(error)
       setOpenFolderError(message)
       console.error('Failed to open data folder:', error)
+    }
+  }
+
+  const handleCheckForUpdates = async () => {
+    setIsCheckingUpdates(true)
+    setUpdateInstall(null)
+
+    try {
+      const result = await checkForAppUpdate()
+      setUpdateCheck(result)
+    } finally {
+      setIsCheckingUpdates(false)
+    }
+  }
+
+  const handleInstallUpdate = async () => {
+    if (!updateCheck || updateCheck.status !== 'update-available') {
+      return
+    }
+
+    setIsInstallingUpdate(true)
+
+    try {
+      const result = await downloadAndInstallUpdate(updateCheck.update)
+      setUpdateInstall(result)
+    } finally {
+      setIsInstallingUpdate(false)
     }
   }
 
@@ -328,6 +376,7 @@ function App() {
 
   const activeProject = projects.find((project) => project.id === activeProjectId) ?? null
   const canOpenDataFolder = storageStatus.runtime === 'tauri'
+  const canInstallUpdate = updateCheck?.status === 'update-available' && !isInstallingUpdate
 
   const storagePanel = (
     <aside className="storage-panel" aria-label="Storage diagnostics">
@@ -339,6 +388,8 @@ function App() {
           {storageStatus.runtime} {storageStatus.isPackaged ? 'installed' : 'dev'}
         </span>
       </div>
+      <p className="storage-panel-label">Current App Version</p>
+      <p className="storage-panel-value" title={appVersion}>{appVersion}</p>
       <p className="storage-panel-label">Current Database Path</p>
       <p className="storage-panel-value" title={storageStatus.dbPath || 'Not available'}>
         {storageStatus.dbPath || 'Not available'}
@@ -348,6 +399,42 @@ function App() {
         {storageStatus.dataDir || 'Not available'}
       </p>
       <p className="storage-panel-hint">{storageStatus.message}</p>
+
+      {updateCheck ? (
+        <p className={`storage-update-status storage-update-status-${updateCheck.status}`}>
+          {updateCheck.message}
+          {updateCheck.status === 'update-available' ? ` (${updateCheck.currentVersion} -> ${updateCheck.latestVersion})` : ''}
+        </p>
+      ) : null}
+
+      {updateInstall ? (
+        <p className={`storage-update-status storage-update-status-${updateInstall.status}`}>
+          {updateInstall.message}
+        </p>
+      ) : null}
+
+      <div className="storage-panel-actions">
+        <button
+          type="button"
+          className="secondary-button storage-panel-button"
+          onClick={handleCheckForUpdates}
+          disabled={isCheckingUpdates || isInstallingUpdate}
+        >
+          {isCheckingUpdates ? 'Checking...' : 'Check for Updates'}
+        </button>
+
+        {canInstallUpdate ? (
+          <button
+            type="button"
+            className="secondary-button storage-panel-button"
+            onClick={handleInstallUpdate}
+            disabled={!canInstallUpdate}
+          >
+            {isInstallingUpdate ? 'Installing...' : 'Install Update'}
+          </button>
+        ) : null}
+      </div>
+
       {canOpenDataFolder ? (
         <button type="button" className="secondary-button storage-panel-button" onClick={handleOpenDataFolder}>
           Open Data Folder
@@ -356,7 +443,6 @@ function App() {
       {openFolderError ? <p className="inline-error">{openFolderError}</p> : null}
     </aside>
   )
-
   if (activeProjectId) {
     return (
       <TooltipProvider>
@@ -739,4 +825,5 @@ function App() {
 }
 
 export default App
+
 

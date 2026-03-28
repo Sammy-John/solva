@@ -349,6 +349,41 @@
   width: 100%;
 }
 
+.storage-panel-actions {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.storage-update-status {
+  margin: 0 0 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.storage-update-status-up-to-date,
+.storage-update-status-not-tauri {
+  background: #eff6ff;
+  color: #1e3a8a;
+}
+
+.storage-update-status-update-available {
+  background: #fff7ed;
+  color: #9a3412;
+}
+
+.storage-update-status-installed {
+  background: #ecfdf5;
+  color: #166534;
+}
+
+.storage-update-status-error {
+  background: #fef2f2;
+  color: #991b1b;
+}
+
 @media (max-width: 900px) {
   .dashboard-shell,
   .workspace-shell {
@@ -366,3 +401,4 @@
     width: 100%;
   }
 }
+

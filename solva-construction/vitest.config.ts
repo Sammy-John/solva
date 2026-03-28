@@ -4,7 +4,7 @@ import path from 'node:path';
 export default defineConfig({
   test: {
     environment: 'node',
-    include: ['construction-planner-desktop/src/**/*.{test,spec}.ts'],
+    include: ['src/**/*.{test,spec}.ts'],
   },
   resolve: {
     alias: {
@@ -12,3 +12,4 @@ export default defineConfig({
     },
   },
 });
+

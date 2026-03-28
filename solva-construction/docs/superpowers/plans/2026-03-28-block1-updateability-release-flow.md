@@ -97,7 +97,7 @@ Write `docs/releases/updater-config.md` covering:
 - Modify: `src/App.css`
 - Create: `src/lib/updater.test.ts`
 
-- [ ] **Step 1: Write failing tests for updater state transitions**
+- [x] **Step 1: Write failing tests for updater state transitions**
 
 In `src/lib/updater.test.ts`, add tests for:
 - no update available
@@ -105,12 +105,12 @@ In `src/lib/updater.test.ts`, add tests for:
 - download/install success
 - network/signature failure state mapping
 
-- [ ] **Step 2: Run tests to confirm failures**
+- [x] **Step 2: Run tests to confirm failures**
 
 Run: `npm run test -- src/lib/updater.test.ts`
 Expected: FAIL (new module not implemented yet).
 
-- [ ] **Step 3: Implement updater service wrapper**
+- [x] **Step 3: Implement updater service wrapper**
 
 Create `src/lib/updater.ts`:
 - `checkForAppUpdate()`
@@ -119,7 +119,7 @@ Create `src/lib/updater.ts`:
 
 Keep module isolated so App UI stays simple.
 
-- [ ] **Step 4: Integrate update controls into storage panel**
+- [x] **Step 4: Integrate update controls into storage panel**
 
 In `src/App.tsx` add:
 - current app version label
@@ -129,7 +129,7 @@ In `src/App.tsx` add:
 
 In `src/App.css` add scoped styles matching existing storage panel visual language.
 
-- [ ] **Step 5: Verify tests + app build**
+- [x] **Step 5: Verify tests + app build**
 
 Run:
 - `npm run test -- src/lib/updater.test.ts`
@@ -260,6 +260,7 @@ Commit docs/scripts/config updates as separate focused commits.
 4. Task 4
 5. Task 5
 6. Task 6
+
 
 
 

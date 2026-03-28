@@ -75,3 +75,27 @@ Copy this block for each completed release/task:
 - Configure signing env vars in CI for release builds.
 
 
+
+## 2026-03-28 - Block1 Task 3 Complete
+
+**Version:** `1.0.0`
+**Plan Task:** `Task 3 - Add Minimal In-App Update UX`
+
+### Completed
+- Added updater wrapper module: `src/lib/updater.ts`.
+- Added updater tests: `src/lib/updater.test.ts`.
+- Integrated update controls into storage panel in `src/App.tsx`:
+  - Current app version display
+  - Check for updates action
+  - Install update action when an update is available
+  - Status messaging for check/install outcomes
+- Added updater panel styles in `src/App.css`.
+- Fixed pre-existing Vitest include path in `vitest.config.ts` from legacy path to `src/**/*.{test,spec}.ts` so tests are discoverable.
+
+### Verification Notes
+- RED: `npm run test -- src/lib/updater.test.ts` failed initially (`Cannot find package '@/lib/updater'`).
+- GREEN tests: `npm run test -- src/lib/updater.test.ts` passed (`4 passed`).
+- Build: `npm run build` passed.
+
+### Follow-ups
+- Wire optional auto-check-on-launch behavior after manual flow is validated with clients.
