@@ -11,7 +11,9 @@
     "tauri": "tauri",
     "test": "vitest run",
     "release:version:check": "node scripts/release/sync-version.mjs --check",
-    "release:version:sync": "node scripts/release/sync-version.mjs --write"
+    "release:version:sync": "node scripts/release/sync-version.mjs --write",
+    "release:alpha": "pwsh -NoProfile -File scripts/release/build-alpha.ps1",
+    "release:manifest": "node scripts/release/publish-manifest.mjs"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",

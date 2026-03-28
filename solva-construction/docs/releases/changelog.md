@@ -99,3 +99,33 @@ Copy this block for each completed release/task:
 
 ### Follow-ups
 - Wire optional auto-check-on-launch behavior after manual flow is validated with clients.
+
+## 2026-03-28 - Block1 Task 4 Complete
+
+**Version:** `1.0.0`
+**Plan Task:** `Task 4 - Create Repeatable Release + Update Smoke Path`
+
+### Completed
+- Added alpha build script: `scripts/release/build-alpha.ps1`.
+- Added manifest generator: `scripts/release/publish-manifest.mjs`.
+- Added npm scripts:
+  - `release:alpha`
+  - `release:manifest`
+- Added smoke test runbook: `docs/releases/update-smoke-test.md`.
+- Executed first scripted release + manifest run and recorded evidence.
+
+### Verification Notes
+- `npm run release:alpha` passed, including:
+  - version check
+  - test run
+  - app build
+  - signed Tauri bundle (`.exe` + `.sig`)
+  - artifact copy to `artifacts/1.0.0/`
+- `npm run release:manifest -- --base-url https://updates.solva.app --notes "Alpha smoke run 1.0.0"` passed.
+- Manifest files produced:
+  - `artifacts/1.0.0/latest.json`
+  - `artifacts/latest.json`
+
+### Follow-ups
+- Execute full in-app update validation with two versions (`vN` installed, then `vN+1` update) on a separate machine.
+- Verify data-preservation checks during that end-to-end run.

@@ -144,7 +144,7 @@ Expected: PASS.
 - Create: `docs/releases/update-smoke-test.md`
 - Modify: `package.json`
 
-- [ ] **Step 1: Script local alpha build command**
+- [x] **Step 1: Script local alpha build command**
 
 Create `scripts/release/build-alpha.ps1` to:
 - run version check
@@ -152,19 +152,19 @@ Create `scripts/release/build-alpha.ps1` to:
 - run `tauri build`
 - copy release outputs to a deterministic folder (`artifacts/<version>/`)
 
-- [ ] **Step 2: Script update manifest generation/publish prep**
+- [x] **Step 2: Script update manifest generation/publish prep**
 
 Create `scripts/release/publish-manifest.mjs` to:
 - generate/update manifest JSON pointing to installer/update artifacts
 - validate required signature fields are present
 
-- [ ] **Step 3: Add npm scripts for one-command release flow**
+- [x] **Step 3: Add npm scripts for one-command release flow**
 
 In `package.json` add:
 - `release:alpha`
 - `release:manifest`
 
-- [ ] **Step 4: Write smoke-test checklist (vN -> vN+1)**
+- [x] **Step 4: Write smoke-test checklist (vN -> vN+1)**
 
 Create `docs/releases/update-smoke-test.md` with exact procedure:
 1. Install vN clean
@@ -174,9 +174,10 @@ Create `docs/releases/update-smoke-test.md` with exact procedure:
 5. Verify same data remains and app version changed
 6. Verify rollback path if update fails
 
-- [ ] **Step 5: Execute first smoke run and record evidence**
+- [x] **Step 5: Execute first smoke run and record evidence**
 
 Store results in the checklist doc (date, versions tested, pass/fail, notes).
+Current evidence recorded for packaging + manifest path; full in-app vN->vN+1 validation is tracked as follow-up in the smoke-test doc.
 
 ### Task 5: Data Preservation Hardening (Minimal)
 
@@ -260,6 +261,8 @@ Commit docs/scripts/config updates as separate focused commits.
 4. Task 4
 5. Task 5
 6. Task 6
+
+
 
 
 
