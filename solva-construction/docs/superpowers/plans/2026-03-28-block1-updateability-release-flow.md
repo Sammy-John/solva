@@ -18,33 +18,33 @@
 - Create: `scripts/release/sync-version.mjs`
 - Create: `docs/releases/versioning.md`
 
-- [ ] **Step 1: Write failing guard script (version mismatch should fail)**
+- [x] **Step 1: Write failing guard script (version mismatch should fail)**
 
 Create `scripts/release/sync-version.mjs` with a check mode:
 - read `package.json.version`
 - read `src-tauri/tauri.conf.json.version`
 - exit non-zero with clear message if mismatch
 
-- [ ] **Step 2: Run guard to verify current mismatch fails**
+- [x] **Step 2: Run guard to verify current mismatch fails**
 
 Run: `node scripts/release/sync-version.mjs --check`
 Expected: FAIL if versions differ (currently likely `0.0.0` vs `1.0.0`).
 
-- [ ] **Step 3: Implement sync mode and align versions**
+- [x] **Step 3: Implement sync mode and align versions**
 
 Update script to support `--write` and set `tauri.conf.json.version` from `package.json.version`.
 Update `package.json` scripts:
 - `release:version:check`
 - `release:version:sync`
 
-- [ ] **Step 4: Verify sync + check pass**
+- [x] **Step 4: Verify sync + check pass**
 
 Run:
 - `npm run release:version:sync`
 - `npm run release:version:check`
 Expected: PASS with identical versions.
 
-- [ ] **Step 5: Document version bump workflow**
+- [x] **Step 5: Document version bump workflow**
 
 Write `docs/releases/versioning.md` with exact bump order for alpha iteration.
 
@@ -259,3 +259,4 @@ Commit docs/scripts/config updates as separate focused commits.
 4. Task 4
 5. Task 5
 6. Task 6
+

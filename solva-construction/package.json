@@ -1,7 +1,7 @@
 {
   "name": "construction-planner-desktop",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,7 +9,9 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "tauri": "tauri",
-    "test": "vitest run"
+    "test": "vitest run",
+    "release:version:check": "node scripts/release/sync-version.mjs --check",
+    "release:version:sync": "node scripts/release/sync-version.mjs --write"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",
