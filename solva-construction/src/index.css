@@ -1,0 +1,183 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Code+Pro:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 14% 96%;
+    --foreground: 220 20% 14%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 14%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 14%;
+
+    --primary: 220 72% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 14% 92%;
+    --secondary-foreground: 220 20% 14%;
+
+    --muted: 220 14% 92%;
+    --muted-foreground: 220 10% 46%;
+
+    --accent: 220 14% 95%;
+    --accent-foreground: 220 20% 14%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 13% 87%;
+    --input: 220 13% 87%;
+    --ring: 220 72% 50%;
+
+    --radius: 0.5rem;
+
+    /* Urgency tokens */
+    --urgency-red: 0 84% 60%;
+    --urgency-red-bg: 0 93% 94%;
+    --urgency-orange: 25 95% 53%;
+    --urgency-orange-bg: 29 100% 92%;
+    --urgency-green: 142 71% 45%;
+    --urgency-green-bg: 138 76% 93%;
+
+    /* Task type tokens */
+    --task-internal: 220 72% 50%;
+    --task-internal-bg: 0 0% 100%;
+    --task-delivery: 270 84% 28%;
+    --task-delivery-bg: 270 75% 83%;
+    --task-ordering: 198 95% 26%;
+    --task-ordering-bg: 198 88% 82%;
+    --task-inspection: 170 84% 22%;
+    --task-inspection-bg: 170 62% 76%;
+
+    /* Status tokens */
+    --status-planned: 220 14% 70%;
+    --status-planned-bg: 220 14% 95%;
+    --status-booked: 220 72% 50%;
+    --status-booked-bg: 220 72% 95%;
+    --status-inprogress: 142 71% 45%;
+    --status-inprogress-bg: 138 76% 93%;
+    --status-completed: 214 84% 45%;
+    --status-completed-bg: 214 95% 93%;
+    --status-delayed: 0 84% 55%;
+    --status-delayed-bg: 0 93% 94%;
+
+    /* Sidebar */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+@layer components {
+  .urgency-red {
+    background-color: hsl(var(--urgency-red-bg));
+    color: hsl(var(--urgency-red));
+  }
+  .urgency-orange {
+    background-color: hsl(var(--urgency-orange-bg));
+    color: hsl(var(--urgency-orange));
+  }
+  .urgency-green {
+    background-color: hsl(var(--urgency-green-bg));
+    color: hsl(var(--urgency-green));
+  }
+
+  .task-type-internal {
+    background-color: hsl(var(--task-internal-bg));
+    color: hsl(var(--task-internal));
+  }
+  .task-type-delivery {
+    background-color: hsl(var(--task-delivery-bg));
+    color: hsl(var(--task-delivery));
+  }
+  .task-type-ordering {
+    background-color: hsl(var(--task-ordering-bg));
+    color: hsl(var(--task-ordering));
+  }
+  .task-type-inspection {
+    background-color: hsl(var(--task-inspection-bg));
+    color: hsl(var(--task-inspection));
+    font-weight: 600;
+  }
+
+
+  .task-row-internal {
+    background-color: hsl(var(--card));
+    color: hsl(var(--foreground));
+  }
+  .task-row-delivery {
+    background-color: hsl(var(--task-delivery-bg) / 0.92);
+    color: hsl(var(--foreground));
+  }
+  .task-row-ordering {
+    background-color: hsl(var(--task-ordering-bg) / 0.92);
+    color: hsl(var(--foreground));
+  }
+  .task-row-inspection {
+    background-color: hsl(var(--task-inspection-bg) / 0.97);
+    color: hsl(var(--foreground));
+    box-shadow: inset 3px 0 0 hsl(var(--task-inspection));
+  }
+  .status-planned {
+    background-color: hsl(var(--status-planned-bg));
+    color: hsl(var(--status-planned));
+  }
+  .status-booked {
+    background-color: hsl(var(--status-booked-bg));
+    color: hsl(var(--status-booked));
+  }
+  .status-inprogress {
+    background-color: hsl(var(--status-inprogress-bg));
+    color: hsl(var(--status-inprogress));
+  }
+  .status-completed {
+    background-color: hsl(var(--status-completed-bg));
+    color: hsl(var(--status-completed));
+  }
+  .status-delayed {
+    background-color: hsl(var(--status-delayed-bg));
+    color: hsl(var(--status-delayed));
+  }
+
+  .cascade-highlight {
+    animation: cascade-shimmer 2s ease-out forwards;
+  }
+
+  @keyframes cascade-shimmer {
+    0% { box-shadow: inset 0 0 0 2px hsl(var(--primary)); }
+    100% { box-shadow: inset 0 0 0 0px hsl(var(--primary) / 0); }
+  }
+}
+
+
+@layer utilities {
+  .txt-sm {
+    font-size: 0.625rem;
+  }
+}
+
+
+
+
+

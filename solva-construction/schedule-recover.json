@@ -1,0 +1,3262 @@
+[
+{
+    "tasks": [
+        {
+            "id": "t1773700396023",
+            "name": "Pre Start Meeting with Builder",
+            "taskType": "Inspection",
+            "sectionId": "sec-1773700369126",
+            "startDate": "2025-12-01",
+            "endDate": "2025-12-01",
+            "duration": 0,
+            "assignedTo": [],
+            "userGroup": "Internal",
+            "status": "In Progress",
+            "comments": []
+        },
+        {
+            "id": "t1773700405531",
+            "name": "Mark out for the frames and steel",
+            "taskType": "Internal",
+            "sectionId": "sec-1773700369126",
+            "startDate": "",
+            "endDate": "",
+            "duration": 0,
+            "assignedTo": [],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773700417996",
+            "name": "GF Frames install / brace + straighten",
+            "taskType": "Internal",
+            "sectionId": "sec-1773700369126",
+            "startDate": "",
+            "endDate": "",
+            "duration": 0,
+            "assignedTo": [],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773700428244",
+            "name": "Container Delivery",
+            "taskType": "Delivery",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-03-11",
+            "endDate": "2026-03-11",
+            "duration": 1,
+            "assignedTo": [],
+            "userGroup": "Suppliers",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773700443356",
+            "name": "Steel Portal + Steel Delivery / Install",
+            "taskType": "Delivery",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-02-23",
+            "endDate": "2026-02-23",
+            "duration": 1,
+            "assignedTo": [
+                "p1773788923059",
+                "p1773788932319"
+            ],
+            "userGroup": "Suppliers",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773700447420",
+            "name": "Scaffolding First Lift",
+            "taskType": "Internal",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-02-23",
+            "endDate": "2026-02-23",
+            "duration": 1,
+            "assignedTo": [
+                "p1773788923059"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773700451550",
+            "name": "Flooring Delivery",
+            "taskType": "Delivery",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-02-24",
+            "endDate": "2026-02-24",
+            "duration": 1,
+            "assignedTo": [
+                "p1773788938915"
+            ],
+            "userGroup": "Suppliers",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773700461433",
+            "name": "Order fixings for mid floors and delivery",
+            "taskType": "Ordering",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-02-24",
+            "endDate": "2026-02-28",
+            "duration": 5,
+            "assignedTo": [
+                "p1773788970410"
+            ],
+            "userGroup": "Suppliers",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773700468878",
+            "name": "Midfloor framing install",
+            "taskType": "Internal",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-02-24",
+            "endDate": "2026-02-26",
+            "duration": 3,
+            "assignedTo": [
+                "p1773788923059"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773700477261",
+            "name": "Site Nets - Lower Roof Areas",
+            "taskType": "Internal",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-03-26",
+            "endDate": "2026-03-27",
+            "duration": 2,
+            "assignedTo": [
+                "p1773788970410"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773700485976",
+            "name": "Flooring Install + Mark out for frames",
+            "taskType": "Internal",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-02-27",
+            "endDate": "2026-02-28",
+            "duration": 2,
+            "assignedTo": [
+                "p1773788975941"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773700502701",
+            "name": "1st Floor Frame Delivery + Lower & Middle Roof Trusses",
+            "taskType": "Delivery",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-03-10",
+            "endDate": "2026-03-10",
+            "duration": 1,
+            "assignedTo": [
+                "p1773788948573"
+            ],
+            "userGroup": "Suppliers",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773700510759",
+            "name": "First Floor Fames Install",
+            "taskType": "Internal",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-03-10",
+            "endDate": "2026-03-10",
+            "duration": 0,
+            "assignedTo": [
+                "p1773788932319"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773700569624",
+            "name": "Scaffolding 2nd lift + Truss across Lower Roof",
+            "taskType": "Internal",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-03-02",
+            "endDate": "2026-03-04",
+            "duration": 3,
+            "assignedTo": [
+                "p1773788923059"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773700581296",
+            "name": "Upper Roof Truss Delivery",
+            "taskType": "Delivery",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-03-04",
+            "endDate": "2026-03-04",
+            "duration": 1,
+            "assignedTo": [
+                "p1773788948573"
+            ],
+            "userGroup": "Suppliers",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773700644478",
+            "name": "Delivery of fascia blocking and fixings",
+            "taskType": "Delivery",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-03-05",
+            "endDate": "2026-03-05",
+            "duration": 1,
+            "assignedTo": [
+                "p1773788923059"
+            ],
+            "userGroup": "Suppliers",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773700651176",
+            "name": "Site Nets - First Floor",
+            "taskType": "Internal",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-03-06",
+            "endDate": "2026-03-06",
+            "duration": 1,
+            "assignedTo": [
+                "p1773788948573"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773700678342",
+            "name": "Lower + Upper Roof Trussels and rafter install + Purlins and hold downs",
+            "taskType": "Internal",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-03-06",
+            "endDate": "2026-03-10",
+            "duration": 5,
+            "assignedTo": [
+                "p1773788923059"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773700685515",
+            "name": "Internal Stair Measure",
+            "taskType": "Internal",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-03-10",
+            "endDate": "2026-03-10",
+            "duration": 1,
+            "assignedTo": [
+                "p1773788975941"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773700692188",
+            "name": "Aluminium Joinery Measure",
+            "taskType": "Internal",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-03-10",
+            "endDate": "2026-03-10",
+            "duration": 1,
+            "assignedTo": [
+                "p1773788948573"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773700696872",
+            "name": "GIB Measure",
+            "taskType": "Internal",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-03-10",
+            "endDate": "2026-03-10",
+            "duration": 1,
+            "assignedTo": [
+                "p1773788932319"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773700703723",
+            "name": "Fascia Flashing Measure + Order",
+            "taskType": "Internal",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-03-11",
+            "endDate": "2026-03-11",
+            "duration": 1,
+            "assignedTo": [
+                "p1773788985855"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773700712962",
+            "name": "BLC - Recission plane Inspection",
+            "taskType": "Inspection",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-03-11",
+            "endDate": "2026-03-19",
+            "duration": 9,
+            "assignedTo": [
+                "p1773788923059"
+            ],
+            "userGroup": "Internal",
+            "status": "In Progress",
+            "comments": []
+        },
+        {
+            "id": "t1773700725847",
+            "name": "Sky Light Install",
+            "taskType": "Internal",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-03-12",
+            "endDate": "2026-03-12",
+            "duration": 1,
+            "assignedTo": [],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773700737363",
+            "name": "Check Timber and stell connections, fire blocking",
+            "taskType": "Internal",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-03-12",
+            "endDate": "2026-03-12",
+            "duration": 1,
+            "assignedTo": [
+                "p1773788995695"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773700747338",
+            "name": "Engineers Inspection - Pre Roof",
+            "taskType": "Inspection",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-03-12",
+            "endDate": "2026-03-12",
+            "duration": 1,
+            "assignedTo": [
+                "p1773790732545"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773700757819",
+            "name": "CCC - Pre Roof Inspection",
+            "taskType": "Inspection",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-04-01",
+            "endDate": "2026-04-01",
+            "duration": 1,
+            "assignedTo": [
+                "p1773790739791"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773700762432",
+            "name": "Internal Door Measure",
+            "taskType": "Internal",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-03-19",
+            "endDate": "2026-03-19",
+            "duration": 1,
+            "assignedTo": [
+                "p1773790745171"
+            ],
+            "userGroup": "Internal",
+            "status": "Planned",
+            "comments": []
+        },
+        {
+            "id": "t1773700777326",
+            "name": "Scaffolding - Gable Hop Ups/edge protection",
+            "taskType": "Internal",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-03-19",
+            "endDate": "2026-03-19",
+            "duration": 1,
+            "assignedTo": [
+                "p1773788923059"
+            ],
+            "userGroup": "Internal",
+            "status": "Planned",
+            "comments": []
+        },
+        {
+            "id": "t1773700795506",
+            "name": "Straighten Walls  - Check Window Depth after this + Confirm",
+            "taskType": "Internal",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-03-18",
+            "endDate": "2026-03-18",
+            "duration": 1,
+            "assignedTo": [
+                "p1773788923059"
+            ],
+            "userGroup": "Internal",
+            "status": "In Progress",
+            "comments": []
+        },
+        {
+            "id": "t1773700823292",
+            "name": "Building Wrap, Soffit insulation + Linings + Frame blocking for fascia",
+            "taskType": "Internal",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-03-19",
+            "endDate": "2026-03-19",
+            "duration": 1,
+            "assignedTo": [
+                "p1773790750995"
+            ],
+            "userGroup": "Internal",
+            "status": "Planned",
+            "comments": []
+        },
+        {
+            "id": "t1773700831482",
+            "name": "Roofing measure + order",
+            "taskType": "Ordering",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-03-20",
+            "endDate": "2026-03-20",
+            "duration": 1,
+            "assignedTo": [
+                "p1773790753075"
+            ],
+            "userGroup": "Suppliers",
+            "status": "Planned",
+            "comments": []
+        },
+        {
+            "id": "t1773700840580",
+            "name": "Fascia + Gutter install - Upper Roof (3 Days Min after Measure)",
+            "taskType": "Internal",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-03-19",
+            "endDate": "2026-03-19",
+            "duration": 1,
+            "assignedTo": [
+                "p1773790760205"
+            ],
+            "userGroup": "Internal",
+            "status": "Planned",
+            "comments": []
+        },
+        {
+            "id": "t1773700884594",
+            "name": "Roof Install - Upper Roof",
+            "taskType": "Internal",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-03-20",
+            "endDate": "2026-03-20",
+            "duration": 1,
+            "assignedTo": [
+                "p1773788975941"
+            ],
+            "userGroup": "Internal",
+            "status": "Planned",
+            "comments": []
+        },
+        {
+            "id": "t1773700891033",
+            "name": "Safety Nets Removal",
+            "taskType": "Internal",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-03-20",
+            "endDate": "2026-03-21",
+            "duration": 2,
+            "assignedTo": [
+                "p1773788923059"
+            ],
+            "userGroup": "Internal",
+            "status": "Planned",
+            "comments": []
+        },
+        {
+            "id": "t1773700925576",
+            "name": "Install Protection on Roof",
+            "taskType": "Internal",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-03-23",
+            "endDate": "2026-03-31",
+            "duration": 9,
+            "assignedTo": [
+                "p1773788923059"
+            ],
+            "userGroup": "Internal",
+            "status": "Planned",
+            "comments": []
+        },
+        {
+            "id": "t1773700946315",
+            "name": "Plumber + Sparky Cavity Penetrations Installed",
+            "taskType": "Internal",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-03-31",
+            "endDate": "2026-03-31",
+            "duration": 0,
+            "assignedTo": [],
+            "userGroup": "Internal",
+            "status": "Planned",
+            "comments": []
+        },
+        {
+            "id": "t1773700951110",
+            "name": "Stair Delivery",
+            "taskType": "Delivery",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-04-01",
+            "endDate": "2026-04-01",
+            "duration": 1,
+            "assignedTo": [],
+            "userGroup": "Suppliers",
+            "status": "Planned",
+            "comments": []
+        },
+        {
+            "id": "t1773700955021",
+            "name": "Stair Install",
+            "taskType": "Internal",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-04-02",
+            "endDate": "2026-04-03",
+            "duration": 2,
+            "assignedTo": [],
+            "userGroup": "Internal",
+            "status": "Planned",
+            "comments": []
+        },
+        {
+            "id": "t1773700958547",
+            "name": "Window Delivery",
+            "taskType": "Delivery",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-04-06",
+            "endDate": "2026-04-06",
+            "duration": 1,
+            "assignedTo": [
+                "p1773788985855"
+            ],
+            "userGroup": "Suppliers",
+            "status": "Planned",
+            "comments": []
+        },
+        {
+            "id": "t1773700965824",
+            "name": "Window Install + Headflashing",
+            "taskType": "Internal",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-04-06",
+            "endDate": "2026-04-06",
+            "duration": 1,
+            "assignedTo": [
+                "p1773788932319"
+            ],
+            "userGroup": "Internal",
+            "status": "Planned",
+            "comments": []
+        },
+        {
+            "id": "t1773700976458",
+            "name": "Order Cavity Flashings",
+            "taskType": "Ordering",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-04-06",
+            "endDate": "2026-04-06",
+            "duration": 1,
+            "assignedTo": [
+                "p1773790793691",
+                "p1773790799693"
+            ],
+            "userGroup": "Suppliers",
+            "status": "Planned",
+            "comments": []
+        },
+        {
+            "id": "t1773700981811",
+            "name": "Order Brick Lintels",
+            "taskType": "Ordering",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-04-07",
+            "endDate": "2026-04-07",
+            "duration": 1,
+            "assignedTo": [
+                "p1773804661751"
+            ],
+            "userGroup": "Suppliers",
+            "status": "Planned",
+            "comments": []
+        },
+        {
+            "id": "t1773700988838",
+            "name": "Apron Flashing Install",
+            "taskType": "Internal",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-04-07",
+            "endDate": "2026-04-07",
+            "duration": 1,
+            "assignedTo": [
+                "p1773788923059"
+            ],
+            "userGroup": "Internal",
+            "status": "Planned",
+            "comments": [
+                "Or BTB"
+            ]
+        },
+        {
+            "id": "t1773701017319",
+            "name": "Cedar Cavity batten + Garage Reveal Install + DPC around Windows",
+            "taskType": "Internal",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-04-08",
+            "endDate": "2026-04-08",
+            "duration": 1,
+            "assignedTo": [
+                "p1773788995695"
+            ],
+            "userGroup": "Internal",
+            "status": "Planned",
+            "comments": []
+        },
+        {
+            "id": "t1773701025526",
+            "name": "Front door soffit",
+            "taskType": "Internal",
+            "sectionId": "sec-1773700422092",
+            "startDate": "2026-04-08",
+            "endDate": "2026-04-14",
+            "duration": 7,
+            "assignedTo": [
+                "p1773788923059"
+            ],
+            "userGroup": "Internal",
+            "status": "Planned",
+            "comments": []
+        },
+        {
+            "id": "t1773701033781",
+            "name": "Acc Panel Cladding Delivery",
+            "taskType": "Delivery",
+            "sectionId": "sec-1773700422092",
+            "startDate": "",
+            "endDate": "",
+            "duration": 1,
+            "assignedTo": [],
+            "userGroup": "Suppliers",
+            "status": "Planned",
+            "comments": []
+        },
+        {
+            "id": "t1773774493262",
+            "name": "Order Clavity Flashings",
+            "taskType": "Ordering",
+            "sectionId": "sec-1773774477784",
+            "startDate": "2025-12-01",
+            "endDate": "2025-12-01",
+            "duration": 1,
+            "assignedTo": [
+                "p1773790819288"
+            ],
+            "userGroup": "Suppliers",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773774500878",
+            "name": "Order Brick Lintels",
+            "taskType": "Ordering",
+            "sectionId": "sec-1773774477784",
+            "startDate": "2025-12-02",
+            "endDate": "2025-12-02",
+            "duration": 1,
+            "assignedTo": [
+                "p1773790819288"
+            ],
+            "userGroup": "Suppliers",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773774510068",
+            "name": "Apron Flashing Install",
+            "taskType": "Internal",
+            "sectionId": "sec-1773774477784",
+            "startDate": "2025-12-12",
+            "endDate": "2025-12-12",
+            "duration": 1,
+            "assignedTo": [
+                "p1773790819288",
+                "p1773790739791"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773774575199",
+            "name": "Cedar Cavity Batten + Garage Reveal Install + DPC around windows",
+            "taskType": "Internal",
+            "sectionId": "sec-1773774477784",
+            "startDate": "2025-12-11",
+            "endDate": "2025-12-13",
+            "duration": 3,
+            "assignedTo": [
+                "p1773790819288"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773774911638",
+            "name": "James Hardie Cavity Install",
+            "taskType": "Internal",
+            "sectionId": "sec-1773774477784",
+            "startDate": "2025-12-15",
+            "endDate": "2025-12-15",
+            "duration": 1,
+            "assignedTo": [
+                "p1773790811817"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773774921856",
+            "name": "Brick Cladding Delivery",
+            "taskType": "Delivery",
+            "sectionId": "sec-1773774477784",
+            "startDate": "2025-12-13",
+            "endDate": "2025-12-13",
+            "duration": 1,
+            "assignedTo": [
+                "p1773804952247"
+            ],
+            "userGroup": "Suppliers",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773774939270",
+            "name": "Install Brick Lintels",
+            "taskType": "Internal",
+            "sectionId": "sec-1773774477784",
+            "startDate": "2025-12-16",
+            "endDate": "2025-12-16",
+            "duration": 1,
+            "assignedTo": [
+                "p1773790819288"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773774970018",
+            "name": "ACC Batton Install - After Garage Door revel",
+            "taskType": "Internal",
+            "sectionId": "sec-1773774477784",
+            "startDate": "",
+            "endDate": "",
+            "duration": 1,
+            "assignedTo": [
+                "p1773790819288"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773774990183",
+            "name": "Saddle & Transition Flashing Int/Ext Corners",
+            "taskType": "Internal",
+            "sectionId": "sec-1773774477784",
+            "startDate": "",
+            "endDate": "",
+            "duration": 1,
+            "assignedTo": [],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773775010888",
+            "name": "CCC - Pre Cladding Inspection - Brick + ACC Panel",
+            "taskType": "Inspection",
+            "sectionId": "sec-1773774477784",
+            "startDate": "2025-12-16",
+            "endDate": "2025-12-16",
+            "duration": 1,
+            "assignedTo": [],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": [
+                "Booked PM"
+            ]
+        },
+        {
+            "id": "t1773775662295",
+            "name": "Bo",
+            "taskType": "Inspection",
+            "sectionId": "sec-1773774477784",
+            "startDate": "2025-12-16",
+            "endDate": "2025-12-16",
+            "duration": 1,
+            "assignedTo": [],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": [
+                "Booked PM"
+            ]
+        },
+        {
+            "id": "t1773775036027",
+            "name": "Garage Door Measure - after garage door revel",
+            "taskType": "Internal",
+            "sectionId": "sec-1773774477784",
+            "startDate": "2025-12-17",
+            "endDate": "2025-12-17",
+            "duration": 1,
+            "assignedTo": [
+                "p1773790827349"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773775076990",
+            "name": "Brick Cladding Install",
+            "taskType": "Internal",
+            "sectionId": "sec-1773774477784",
+            "startDate": "2025-12-17",
+            "endDate": "2025-12-26",
+            "duration": 10,
+            "assignedTo": [
+                "p1773790835173"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773775088555",
+            "name": "James Hardie Cladding Delivery",
+            "taskType": "Delivery",
+            "sectionId": "sec-1773774477784",
+            "startDate": "2025-12-17",
+            "endDate": "2025-12-17",
+            "duration": 1,
+            "assignedTo": [
+                "p1773788948573"
+            ],
+            "userGroup": "Suppliers",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773775107767",
+            "name": "Engineers Inspection - Brinck Lintels (after intstall brick lintel)",
+            "taskType": "Inspection",
+            "sectionId": "sec-1773774477784",
+            "startDate": "2025-12-17",
+            "endDate": "2025-12-17",
+            "duration": 1,
+            "assignedTo": [
+                "p1773790841503"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": [
+                "Booked AM"
+            ]
+        },
+        {
+            "id": "t1773775124600",
+            "name": "James Hardie Cladding Install - After ACC Panel",
+            "taskType": "Internal",
+            "sectionId": "sec-1773774477784",
+            "startDate": "2025-12-22",
+            "endDate": "2025-12-26",
+            "duration": 5,
+            "assignedTo": [
+                "p1773790811817"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773775151578",
+            "name": "CCC- Brick Half High Inspection - 3 days after brick starts",
+            "taskType": "Inspection",
+            "sectionId": "sec-1773774477784",
+            "startDate": "2025-12-26",
+            "endDate": "2025-12-26",
+            "duration": 1,
+            "assignedTo": [],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": [
+                "Booked PM"
+            ]
+        },
+        {
+            "id": "t1773775181709",
+            "name": "CCC - Brick Lintel Inspection - 3 Days after brick starts",
+            "taskType": "Inspection",
+            "sectionId": "sec-1773774477784",
+            "startDate": "2025-12-26",
+            "endDate": "2025-12-26",
+            "duration": 1,
+            "assignedTo": [],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": [
+                "Booked PM"
+            ]
+        },
+        {
+            "id": "t1773775209949",
+            "name": "Parapet + Barge Flashing Measure",
+            "taskType": "Internal",
+            "sectionId": "sec-1773774477784",
+            "startDate": "2026-01-21",
+            "endDate": "2026-01-21",
+            "duration": 0,
+            "assignedTo": [
+                "p1773790739791"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773775216307",
+            "name": "Cedar Cladding Delivery",
+            "taskType": "Delivery",
+            "sectionId": "sec-1773774477784",
+            "startDate": "2026-01-12",
+            "endDate": "2026-01-12",
+            "duration": 1,
+            "assignedTo": [
+                "p1773788948573"
+            ],
+            "userGroup": "Suppliers",
+            "status": "Completed",
+            "comments": [
+                "Booked"
+            ]
+        },
+        {
+            "id": "t1773775222350",
+            "name": "Cedar Cladding Install",
+            "taskType": "Internal",
+            "sectionId": "sec-1773774477784",
+            "startDate": "2026-01-12",
+            "endDate": "2026-01-21",
+            "duration": 10,
+            "assignedTo": [
+                "p1773790811817"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773775248345",
+            "name": "Parapet + Barge Flashing Install",
+            "taskType": "Internal",
+            "sectionId": "sec-1773774477784",
+            "startDate": "2026-01-19",
+            "endDate": "2026-01-19",
+            "duration": 1,
+            "assignedTo": [
+                "p1773790739791"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773775268137",
+            "name": "External painting/staining - Cedar / James Hardie Panel",
+            "taskType": "Internal",
+            "sectionId": "sec-1773774477784",
+            "startDate": "2026-01-26",
+            "endDate": "2026-01-29",
+            "duration": 4,
+            "assignedTo": [
+                "p1773790850209"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773775294110",
+            "name": "Install any vents / aerial /plumbing outlet to roof - Upper exterior Lights",
+            "taskType": "Internal",
+            "sectionId": "sec-1773774477784",
+            "startDate": "2026-01-29",
+            "endDate": "2026-01-30",
+            "duration": 2,
+            "assignedTo": [
+                "p1773790858743"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773775342947",
+            "name": "Down pipe + rainwater head install",
+            "taskType": "Internal",
+            "sectionId": "sec-1773774477784",
+            "startDate": "2026-01-30",
+            "endDate": "2026-01-30",
+            "duration": 1,
+            "assignedTo": [
+                "p1773790739791"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773775351772",
+            "name": "Windows cleaned Externally",
+            "taskType": "Internal",
+            "sectionId": "sec-1773774477784",
+            "startDate": "2026-02-02",
+            "endDate": "2026-02-02",
+            "duration": 1,
+            "assignedTo": [
+                "p1773790866418"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773775361944",
+            "name": "Scaffolding Removal",
+            "taskType": "Internal",
+            "sectionId": "sec-1773774477784",
+            "startDate": "2026-02-03",
+            "endDate": "2026-02-04",
+            "duration": 2,
+            "assignedTo": [
+                "p1773790877405"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773775374219",
+            "name": "Garage Door Delivery + Install",
+            "taskType": "Delivery",
+            "sectionId": "sec-1773774477784",
+            "startDate": "2026-02-09",
+            "endDate": "2026-02-10",
+            "duration": 2,
+            "assignedTo": [
+                "p1773790827349"
+            ],
+            "userGroup": "Suppliers",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773775381078",
+            "name": "ONT Fibre Install",
+            "taskType": "Internal",
+            "sectionId": "sec-1773774477784",
+            "startDate": "2026-02-13",
+            "endDate": "2026-02-13",
+            "duration": 1,
+            "assignedTo": [
+                "p1773790880747"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": [
+                "Once internal painting is completed"
+            ]
+        },
+        {
+            "id": "t1773777347531",
+            "name": "Deck Install (piles, bearer, joists + decking",
+            "taskType": "Internal",
+            "sectionId": "sec-1773777328164",
+            "startDate": "2026-05-02",
+            "endDate": "2026-05-11",
+            "duration": 10,
+            "assignedTo": [
+                "p1773790819288"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773777352461",
+            "name": "Soil Prep",
+            "taskType": "Internal",
+            "sectionId": "sec-1773777328164",
+            "startDate": "2026-02-20",
+            "endDate": "2026-02-21",
+            "duration": 2,
+            "assignedTo": [],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": [
+                "TBC"
+            ]
+        },
+        {
+            "id": "t1773777364841",
+            "name": "Install External Power + Warer feeds in correct locations",
+            "taskType": "Internal",
+            "sectionId": "sec-1773777328164",
+            "startDate": "2026-03-11",
+            "endDate": "2026-03-12",
+            "duration": 2,
+            "assignedTo": [
+                "p1773790858743"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773777373977",
+            "name": "Concrete Paths + Driveway Install",
+            "taskType": "Internal",
+            "sectionId": "sec-1773777328164",
+            "startDate": "2026-03-13",
+            "endDate": "2026-03-24",
+            "duration": 12,
+            "assignedTo": [
+                "p1773790887414"
+            ],
+            "userGroup": "Internal",
+            "status": "In Progress",
+            "comments": [
+                "Will commence towards end of the job"
+            ]
+        },
+        {
+            "id": "t1773777382476",
+            "name": "Fencing - Post Install",
+            "taskType": "Internal",
+            "sectionId": "sec-1773777328164",
+            "startDate": "2026-03-31",
+            "endDate": "2026-03-31",
+            "duration": 1,
+            "assignedTo": [],
+            "userGroup": "Internal",
+            "status": "Planned",
+            "comments": [
+                "TBC"
+            ]
+        },
+        {
+            "id": "t1773777394858",
+            "name": "Surveyor - 224 Application",
+            "taskType": "Internal",
+            "sectionId": "sec-1773777328164",
+            "startDate": "2026-04-01",
+            "endDate": "2026-04-01",
+            "duration": 1,
+            "assignedTo": [
+                "p1773790899013"
+            ],
+            "userGroup": "Internal",
+            "status": "Planned",
+            "comments": [
+                "Dependant on back house as well"
+            ]
+        },
+        {
+            "id": "t1773777400286",
+            "name": "Soft Landscaping",
+            "taskType": "Internal",
+            "sectionId": "sec-1773777328164",
+            "startDate": "2026-04-01",
+            "endDate": "2026-04-05",
+            "duration": 5,
+            "assignedTo": [],
+            "userGroup": "Internal",
+            "status": "Planned",
+            "comments": [
+                "TBC"
+            ]
+        },
+        {
+            "id": "t1773777412556",
+            "name": "External Power + Water fit off",
+            "taskType": "Internal",
+            "sectionId": "sec-1773777328164",
+            "startDate": "2026-04-10",
+            "endDate": "2026-04-11",
+            "duration": 2,
+            "assignedTo": [
+                "p1773790858743"
+            ],
+            "userGroup": "Internal",
+            "status": "Planned",
+            "comments": []
+        },
+        {
+            "id": "t1773777420832",
+            "name": "Fencing Install",
+            "taskType": "Internal",
+            "sectionId": "sec-1773777328164",
+            "startDate": "2026-04-10",
+            "endDate": "2026-04-10",
+            "duration": 1,
+            "assignedTo": [],
+            "userGroup": "Internal",
+            "status": "Planned",
+            "comments": [
+                "TBC"
+            ]
+        },
+        {
+            "id": "t1773777426724",
+            "name": "Fence Painting",
+            "taskType": "Internal",
+            "sectionId": "sec-1773777328164",
+            "startDate": "2026-04-13",
+            "endDate": "2026-04-14",
+            "duration": 2,
+            "assignedTo": [
+                "p1773790850209"
+            ],
+            "userGroup": "Internal",
+            "status": "Planned",
+            "comments": []
+        },
+        {
+            "id": "t1773777438639",
+            "name": "Clothes Line + Letter Box Install",
+            "taskType": "Internal",
+            "sectionId": "sec-1773777328164",
+            "startDate": "2026-04-15",
+            "endDate": "2026-04-15",
+            "duration": 1,
+            "assignedTo": [
+                "p1773790819288"
+            ],
+            "userGroup": "Internal",
+            "status": "Planned",
+            "comments": []
+        },
+        {
+            "id": "t1773783716101",
+            "name": "Plumber pre pipe - stack install (after window install)",
+            "taskType": "Internal",
+            "sectionId": "sec-1773783692727",
+            "startDate": "2025-11-28",
+            "endDate": "2025-11-29",
+            "duration": 2,
+            "assignedTo": [
+                "p1773790799693"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773783721701",
+            "name": "Rondo Install",
+            "taskType": "Internal",
+            "sectionId": "sec-1773783692727",
+            "startDate": "2025-12-02",
+            "endDate": "2025-12-04",
+            "duration": 3,
+            "assignedTo": [
+                "p1773788948573"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773783729760",
+            "name": "Meeting with Owner for Pre Line Ideas",
+            "taskType": "Internal",
+            "sectionId": "sec-1773783692727",
+            "startDate": "2025-12-04",
+            "endDate": "2025-12-04",
+            "duration": 1,
+            "assignedTo": [
+                "p1773790819288"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773783739621",
+            "name": "Tile Layout Meeting",
+            "taskType": "Internal",
+            "sectionId": "sec-1773783692727",
+            "startDate": "2025-12-05",
+            "endDate": "2025-12-05",
+            "duration": 1,
+            "assignedTo": [
+                "p1773790819288"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773783746075",
+            "name": "Plumber Pre-Pipe",
+            "taskType": "Internal",
+            "sectionId": "sec-1773783692727",
+            "startDate": "2025-12-05",
+            "endDate": "2025-12-11",
+            "duration": 7,
+            "assignedTo": [
+                "p1773790799693"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": [
+                "Shower mixes delivered"
+            ]
+        },
+        {
+            "id": "t1773783749246",
+            "name": "Gas Pre-Pipe",
+            "taskType": "Internal",
+            "sectionId": "sec-1773783692727",
+            "startDate": "2025-12-05",
+            "endDate": "2025-12-05",
+            "duration": 1,
+            "assignedTo": [
+                "p1773790799693"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773783753950",
+            "name": "Sparky Pre-Wire",
+            "taskType": "Internal",
+            "sectionId": "sec-1773783692727",
+            "startDate": "2025-12-11",
+            "endDate": "2025-12-18",
+            "duration": 8,
+            "assignedTo": [
+                "p1773790858743"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773783761927",
+            "name": "Internal door delivery",
+            "taskType": "Delivery",
+            "sectionId": "sec-1773783692727",
+            "startDate": "2025-12-12",
+            "endDate": "2025-12-12",
+            "duration": 1,
+            "assignedTo": [
+                "p1773788948573"
+            ],
+            "userGroup": "Suppliers",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773783773640",
+            "name": "Gas Fire Delivery",
+            "taskType": "Delivery",
+            "sectionId": "sec-1773783692727",
+            "startDate": "2025-12-15",
+            "endDate": "2025-12-15",
+            "duration": 1,
+            "assignedTo": [
+                "p1773790909489"
+            ],
+            "userGroup": "Suppliers",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773783778725",
+            "name": "Gas Fire Install",
+            "taskType": "Internal",
+            "sectionId": "sec-1773783692727",
+            "startDate": "2025-12-16",
+            "endDate": "2025-12-17",
+            "duration": 2,
+            "assignedTo": [
+                "p1773790909489"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773783795448",
+            "name": "Straightening framing + install Internal doors",
+            "taskType": "Internal",
+            "sectionId": "sec-1773783692727",
+            "startDate": "2025-12-17",
+            "endDate": "2025-12-22",
+            "duration": 6,
+            "assignedTo": [
+                "p1773790819288"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773783830785",
+            "name": "Blocking - Handrails, vanities, man hole framing/install. Shower Metal Corners",
+            "taskType": "Internal",
+            "sectionId": "sec-1773783692727",
+            "startDate": "2025-12-17",
+            "endDate": "2025-12-22",
+            "duration": 6,
+            "assignedTo": [
+                "p1773790819288"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773783838470",
+            "name": "Meter Install",
+            "taskType": "Internal",
+            "sectionId": "sec-1773783692727",
+            "startDate": "2025-12-18",
+            "endDate": "2025-12-18",
+            "duration": 1,
+            "assignedTo": [
+                "p1773790858743"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773783849194",
+            "name": "Engineers Inspection - Pre Line",
+            "taskType": "Inspection",
+            "sectionId": "sec-1773783692727",
+            "startDate": "2025-12-17",
+            "endDate": "2025-12-17",
+            "duration": 1,
+            "assignedTo": [
+                "p1773790841503"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": [
+                "Booked AM"
+            ]
+        },
+        {
+            "id": "t1773783856333",
+            "name": "Insulation  Delivery/Install",
+            "taskType": "Delivery",
+            "sectionId": "sec-1773783692727",
+            "startDate": "2025-12-18",
+            "endDate": "2025-12-20",
+            "duration": 3,
+            "assignedTo": [
+                "p1773790927139"
+            ],
+            "userGroup": "Suppliers",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773783862956",
+            "name": "GIB Delivery",
+            "taskType": "Delivery",
+            "sectionId": "sec-1773783692727",
+            "startDate": "2025-12-23",
+            "endDate": "2025-12-23",
+            "duration": 1,
+            "assignedTo": [
+                "p1773790932977"
+            ],
+            "userGroup": "Suppliers",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773783877005",
+            "name": "CCC - Pre Line (Including Plumbing) Inspection",
+            "taskType": "Inspection",
+            "sectionId": "sec-1773783692727",
+            "startDate": "2025-12-23",
+            "endDate": "2025-12-23",
+            "duration": 1,
+            "assignedTo": [],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": [
+                "Booked PM"
+            ]
+        },
+        {
+            "id": "t1773783884879",
+            "name": "GIB fixing",
+            "taskType": "Internal",
+            "sectionId": "sec-1773783692727",
+            "startDate": "2025-12-24",
+            "endDate": "2025-12-29",
+            "duration": 6,
+            "assignedTo": [
+                "p1773790732545"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773783892591",
+            "name": "CCC - Pre-Stopping Inspection",
+            "taskType": "Inspection",
+            "sectionId": "sec-1773783692727",
+            "startDate": "2026-01-16",
+            "endDate": "2026-01-16",
+            "duration": 1,
+            "assignedTo": [],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": [
+                "Not Booked PM"
+            ]
+        },
+        {
+            "id": "t1773783905732",
+            "name": "Tile Strip Drain Measure + Order",
+            "taskType": "Ordering",
+            "sectionId": "sec-1773783692727",
+            "startDate": "2026-01-19",
+            "endDate": "2026-01-19",
+            "duration": 1,
+            "assignedTo": [
+                "p1773790938751"
+            ],
+            "userGroup": "Suppliers",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773783912440",
+            "name": "Internal Plastering",
+            "taskType": "Internal",
+            "sectionId": "sec-1773783692727",
+            "startDate": "2026-01-16",
+            "endDate": "2026-01-24",
+            "duration": 9,
+            "assignedTo": [
+                "p1773790732545"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773783927826",
+            "name": "Tile - Form Shower Base + Water Proof membrane Install",
+            "taskType": "Internal",
+            "sectionId": "sec-1773783692727",
+            "startDate": "2026-01-29",
+            "endDate": "2026-02-01",
+            "duration": 4,
+            "assignedTo": [
+                "p1773790938751"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773783940746",
+            "name": "Iniiate Eletrical Livening date procedure",
+            "taskType": "Ordering",
+            "sectionId": "sec-1773783692727",
+            "startDate": "2026-01-24",
+            "endDate": "2026-01-24",
+            "duration": 1,
+            "assignedTo": [
+                "p1773790943813"
+            ],
+            "userGroup": "Suppliers",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773783957152",
+            "name": "Skirting install + Door Hardware Check In",
+            "taskType": "Internal",
+            "sectionId": "sec-1773783692727",
+            "startDate": "2026-04-16",
+            "endDate": "2026-04-17",
+            "duration": 2,
+            "assignedTo": [
+                "p1773790819288"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": [
+                "Exc Timber floor area"
+            ]
+        },
+        {
+            "id": "t1773783966113",
+            "name": "Internal Painting",
+            "taskType": "Internal",
+            "sectionId": "sec-1773783692727",
+            "startDate": "2026-04-17",
+            "endDate": "2026-04-23",
+            "duration": 7,
+            "assignedTo": [
+                "p1773790850209"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773783979787",
+            "name": "CCC  - Internal Tanking (Pre-Tile) Inspection",
+            "taskType": "Inspection",
+            "sectionId": "sec-1773783692727",
+            "startDate": "2026-02-04",
+            "endDate": "2026-02-04",
+            "duration": 1,
+            "assignedTo": [],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": [
+                "Not booked PM"
+            ]
+        },
+        {
+            "id": "t1773783991443",
+            "name": "Wardrobe Door Delivery",
+            "taskType": "Delivery",
+            "sectionId": "sec-1773783692727",
+            "startDate": "2026-02-11",
+            "endDate": "2026-02-11",
+            "duration": 1,
+            "assignedTo": [
+                "p1773788948573"
+            ],
+            "userGroup": "Suppliers",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773783998374",
+            "name": "Wardrobe Door Install",
+            "taskType": "Internal",
+            "sectionId": "sec-1773783692727",
+            "startDate": "2026-02-12",
+            "endDate": "2026-02-13",
+            "duration": 2,
+            "assignedTo": [
+                "p1773790819288"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773785236776",
+            "name": "Kitchen Delivery (Day after paint finish)",
+            "taskType": "Delivery",
+            "sectionId": "sec-1773785217488",
+            "startDate": "2026-02-12",
+            "endDate": "2026-02-12",
+            "duration": 1,
+            "assignedTo": [],
+            "userGroup": "Suppliers",
+            "status": "Completed",
+            "comments": [
+                "TBC"
+            ]
+        },
+        {
+            "id": "t1773785254270",
+            "name": "TB",
+            "taskType": "Internal",
+            "sectionId": "sec-1773785217488",
+            "startDate": "2026-04-16",
+            "endDate": "2026-04-16",
+            "duration": 1,
+            "assignedTo": [],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": [
+                "TBC"
+            ]
+        },
+        {
+            "id": "t1773785276328",
+            "name": "Sparky Fit off incl. Heat pump (day after painter finished)",
+            "taskType": "Internal",
+            "sectionId": "sec-1773785217488",
+            "startDate": "2026-02-13",
+            "endDate": "2026-03-06",
+            "duration": 22,
+            "assignedTo": [
+                "p1773790858743"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773785292177",
+            "name": "Kitchen Joinery Install + Benchtop Measure",
+            "taskType": "Internal",
+            "sectionId": "sec-1773785217488",
+            "startDate": "2026-02-13",
+            "endDate": "2026-02-16",
+            "duration": 4,
+            "assignedTo": [],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": [
+                "TBC"
+            ]
+        },
+        {
+            "id": "t1773785306975",
+            "name": "Wardrobe Joinery Delivery + Install",
+            "taskType": "Delivery",
+            "sectionId": "sec-1773785217488",
+            "startDate": "2026-02-13",
+            "endDate": "2026-02-16",
+            "duration": 4,
+            "assignedTo": [],
+            "userGroup": "Suppliers",
+            "status": "Completed",
+            "comments": [
+                "TBC"
+            ]
+        },
+        {
+            "id": "t1773785311197",
+            "name": "Rangehood Delivery",
+            "taskType": "Delivery",
+            "sectionId": "sec-1773785217488",
+            "startDate": "2026-02-16",
+            "endDate": "2026-02-16",
+            "duration": 1,
+            "assignedTo": [],
+            "userGroup": "Suppliers",
+            "status": "Completed",
+            "comments": [
+                "TBC"
+            ]
+        },
+        {
+            "id": "t1773785348880",
+            "name": "Tiler - Floor + Shower Walls (After CCC Interior Tanking Inspection)",
+            "taskType": "Inspection",
+            "sectionId": "sec-1773785217488",
+            "startDate": "2026-02-16",
+            "endDate": "2026-02-28",
+            "duration": 13,
+            "assignedTo": [
+                "p1773790938751"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": [
+                "Poweder Coat Times + Tile Inserts"
+            ]
+        },
+        {
+            "id": "t1773785362064",
+            "name": "Kitchen Benchtop Delivery + Install",
+            "taskType": "Delivery",
+            "sectionId": "sec-1773785217488",
+            "startDate": "2026-02-26",
+            "endDate": "2026-02-26",
+            "duration": 1,
+            "assignedTo": [],
+            "userGroup": "Suppliers",
+            "status": "Completed",
+            "comments": [
+                "Could be +10 days if stone benchtop"
+            ]
+        },
+        {
+            "id": "t1773785369830",
+            "name": "Eletrical Livening Date",
+            "taskType": "Delivery",
+            "sectionId": "sec-1773785217488",
+            "startDate": "2026-02-27",
+            "endDate": "2026-02-27",
+            "duration": 1,
+            "assignedTo": [
+                "p1773790943813"
+            ],
+            "userGroup": "Suppliers",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773785376613",
+            "name": "HWC Delivery",
+            "taskType": "Delivery",
+            "sectionId": "sec-1773785217488",
+            "startDate": "2026-03-03",
+            "endDate": "2026-03-03",
+            "duration": 1,
+            "assignedTo": [],
+            "userGroup": "Suppliers",
+            "status": "Completed",
+            "comments": [
+                "TBC"
+            ]
+        },
+        {
+            "id": "t1773785387716",
+            "name": "Plumbing Fit off delivery",
+            "taskType": "Delivery",
+            "sectionId": "sec-1773785217488",
+            "startDate": "2026-03-03",
+            "endDate": "2026-03-03",
+            "duration": 1,
+            "assignedTo": [],
+            "userGroup": "Suppliers",
+            "status": "Completed",
+            "comments": [
+                "TBC"
+            ]
+        },
+        {
+            "id": "t1773785403113",
+            "name": "Builders fit off - Vanity fit-off/door hardware",
+            "taskType": "Internal",
+            "sectionId": "sec-1773785217488",
+            "startDate": "2026-03-03",
+            "endDate": "2026-03-05",
+            "duration": 3,
+            "assignedTo": [
+                "p1773790819288"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773785412341",
+            "name": "Bathroom Heater Delivery",
+            "taskType": "Delivery",
+            "sectionId": "sec-1773785217488",
+            "startDate": "2025-03-05",
+            "endDate": "2025-03-05",
+            "duration": 1,
+            "assignedTo": [],
+            "userGroup": "Suppliers",
+            "status": "Completed",
+            "comments": [
+                "TBC"
+            ]
+        },
+        {
+            "id": "t1773785421377",
+            "name": "Plumber fit off",
+            "taskType": "Internal",
+            "sectionId": "sec-1773785217488",
+            "startDate": "2026-03-05",
+            "endDate": "2026-03-12",
+            "duration": 8,
+            "assignedTo": [
+                "p1773790799693"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773785427705",
+            "name": "Flooring Delivery",
+            "taskType": "Delivery",
+            "sectionId": "sec-1773785217488",
+            "startDate": "2026-02-18",
+            "endDate": "2026-02-18",
+            "duration": 1,
+            "assignedTo": [
+                "p1773790951505"
+            ],
+            "userGroup": "Suppliers",
+            "status": "Completed",
+            "comments": [
+                "Booked"
+            ]
+        },
+        {
+            "id": "t1773785438560",
+            "name": "Floor Prep + Timber Flooring Install",
+            "taskType": "Internal",
+            "sectionId": "sec-1773785217488",
+            "startDate": "2026-03-05",
+            "endDate": "2026-03-08",
+            "duration": 4,
+            "assignedTo": [],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773785445581",
+            "name": "Hand Rail Install",
+            "taskType": "Internal",
+            "sectionId": "sec-1773785217488",
+            "startDate": "2026-03-09",
+            "endDate": "2026-03-09",
+            "duration": 1,
+            "assignedTo": [
+                "p1773790956183"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773785470059",
+            "name": "Skirting Install (after flooring) + protect flooring",
+            "taskType": "Internal",
+            "sectionId": "sec-1773785217488",
+            "startDate": "2026-03-11",
+            "endDate": "2026-03-11",
+            "duration": 1,
+            "assignedTo": [
+                "p1773790819288"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773785474709",
+            "name": "Paint Skirtings",
+            "taskType": "Internal",
+            "sectionId": "sec-1773785217488",
+            "startDate": "2026-03-12",
+            "endDate": "2026-03-13",
+            "duration": 2,
+            "assignedTo": [
+                "p1773790850209"
+            ],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": []
+        },
+        {
+            "id": "t1773785479956",
+            "name": "Appliances Delivery",
+            "taskType": "Delivery",
+            "sectionId": "sec-1773785217488",
+            "startDate": "2026-03-12",
+            "endDate": "2026-03-12",
+            "duration": 1,
+            "assignedTo": [],
+            "userGroup": "Suppliers",
+            "status": "Completed",
+            "comments": [
+                "TBC"
+            ]
+        },
+        {
+            "id": "t1773785493788",
+            "name": "Silicon Skirtings to Timber Flooring + Joinery",
+            "taskType": "Internal",
+            "sectionId": "sec-1773785217488",
+            "startDate": "2026-03-16",
+            "endDate": "2026-03-16",
+            "duration": 1,
+            "assignedTo": [],
+            "userGroup": "Internal",
+            "status": "Completed",
+            "comments": [
+                "TBC"
+            ]
+        },
+        {
+            "id": "t1773785504308",
+            "name": "Shower Glass Delivery + Install",
+            "taskType": "Delivery",
+            "sectionId": "sec-1773785217488",
+            "startDate": "2026-03-17",
+            "endDate": "2026-03-17",
+            "duration": 1,
+            "assignedTo": [],
+            "userGroup": "Suppliers",
+            "status": "Completed",
+            "comments": [
+                "TBC"
+            ]
+        },
+        {
+            "id": "t1773785507615",
+            "name": "Carpet",
+            "taskType": "Internal",
+            "sectionId": "sec-1773785217488",
+            "startDate": "2026-03-17",
+            "endDate": "2026-03-19",
+            "duration": 3,
+            "assignedTo": [],
+            "userGroup": "Internal",
+            "status": "In Progress",
+            "comments": [
+                "TBC"
+            ]
+        },
+        {
+            "id": "t1773788375064",
+            "name": "First Clean",
+            "taskType": "Internal",
+            "sectionId": "sec-1773788367671",
+            "startDate": "2026-03-20",
+            "endDate": "2026-03-21",
+            "duration": 2,
+            "assignedTo": [
+                "p1773790866418"
+            ],
+            "userGroup": "Internal",
+            "status": "Planned",
+            "comments": []
+        },
+        {
+            "id": "t1773788383357",
+            "name": "Blind + Curtain Install",
+            "taskType": "Internal",
+            "sectionId": "sec-1773788367671",
+            "startDate": "2026-03-24",
+            "endDate": "2026-03-24",
+            "duration": 1,
+            "assignedTo": [],
+            "userGroup": "Internal",
+            "status": "Planned",
+            "comments": [
+                "TBC"
+            ]
+        },
+        {
+            "id": "t1773788389192",
+            "name": "CCC - Final Inspection",
+            "taskType": "Inspection",
+            "sectionId": "sec-1773788367671",
+            "startDate": "2026-03-31",
+            "endDate": "2026-03-31",
+            "duration": 1,
+            "assignedTo": [],
+            "userGroup": "Internal",
+            "status": "Planned",
+            "comments": [
+                "Not Booked PM"
+            ]
+        },
+        {
+            "id": "t1773788406351",
+            "name": "Builders defects inspection (SNAGS LIST)",
+            "taskType": "Inspection",
+            "sectionId": "sec-1773788367671",
+            "startDate": "2026-03-24",
+            "endDate": "2026-03-25",
+            "duration": 2,
+            "assignedTo": [
+                "p1773790819288"
+            ],
+            "userGroup": "Internal",
+            "status": "Planned",
+            "comments": []
+        },
+        {
+            "id": "t1773788413597",
+            "name": "Code of Compliance Issued",
+            "taskType": "Internal",
+            "sectionId": "sec-1773788367671",
+            "startDate": "2026-04-08",
+            "endDate": "2026-04-08",
+            "duration": 1,
+            "assignedTo": [],
+            "userGroup": "Internal",
+            "status": "Planned",
+            "comments": []
+        },
+        {
+            "id": "t1773788422789",
+            "name": "Snags and Paint Touch Ups - Internal + External",
+            "taskType": "Internal",
+            "sectionId": "sec-1773788367671",
+            "startDate": "2026-03-26",
+            "endDate": "2026-04-01",
+            "duration": 7,
+            "assignedTo": [
+                "p1773790850209"
+            ],
+            "userGroup": "Internal",
+            "status": "Planned",
+            "comments": [
+                "Dependant on Backhouse as well"
+            ]
+        },
+        {
+            "id": "t1773788424699",
+            "name": "Final Clean",
+            "taskType": "Internal",
+            "sectionId": "sec-1773788367671",
+            "startDate": "2026-04-23",
+            "endDate": "2026-04-23",
+            "duration": 1,
+            "assignedTo": [
+                "p1773790866418"
+            ],
+            "userGroup": "Internal",
+            "status": "Planned",
+            "comments": []
+        },
+        {
+            "id": "t1773788429046",
+            "name": "Handover to Owners",
+            "taskType": "Internal",
+            "sectionId": "sec-1773788367671",
+            "startDate": "2026-04-24",
+            "endDate": "2026-04-24",
+            "duration": 1,
+            "assignedTo": [
+                "p1773790850209"
+            ],
+            "userGroup": "Internal",
+            "status": "Planned",
+            "comments": []
+        },
+        {
+            "id": "t1773788442661",
+            "name": "224 Received from Council + Lodged to LINZ",
+            "taskType": "Internal",
+            "sectionId": "sec-1773788367671",
+            "startDate": "2026-04-28",
+            "endDate": "2026-04-28",
+            "duration": 1,
+            "assignedTo": [
+                "p1773790899013"
+            ],
+            "userGroup": "Internal",
+            "status": "Planned",
+            "comments": [
+                "Dependant on Back house as well"
+            ]
+        },
+        {
+            "id": "t1773788446676",
+            "name": "Titles Issued",
+            "taskType": "Internal",
+            "sectionId": "sec-1773788367671",
+            "startDate": "2026-05-20",
+            "endDate": "2026-05-20",
+            "duration": 0,
+            "assignedTo": [],
+            "userGroup": "Internal",
+            "status": "Planned",
+            "comments": [
+                "Dependant on Back house as well"
+            ]
+        }
+    ],
+    "sections": [
+        {
+            "id": "sec-1773700369126",
+            "name": "Pre-Build",
+            "order": 0
+        },
+        {
+            "id": "sec-1773700422092",
+            "name": "General",
+            "order": 1
+        },
+        {
+            "id": "sec-1773774477784",
+            "name": "Cladding",
+            "order": 2
+        },
+        {
+            "id": "sec-1773777328164",
+            "name": "External Works - Landscaping + Fencing",
+            "order": 3
+        },
+        {
+            "id": "sec-1773783692727",
+            "name": "Interior",
+            "order": 4
+        },
+        {
+            "id": "sec-1773785217488",
+            "name": "Internal Fit Off",
+            "order": 5
+        },
+        {
+            "id": "sec-1773788367671",
+            "name": "Completion Items",
+            "order": 6
+        }
+    ],
+    "dependencies": [
+        {
+            "id": "d1773772689863",
+            "predecessorId": "t1773700405531",
+            "successorId": "t1773700417996",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773772949711",
+            "predecessorId": "t1773700443356",
+            "successorId": "t1773700461433",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773773155979",
+            "predecessorId": "t1773700447420",
+            "successorId": "t1773700468878",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773773166129",
+            "predecessorId": "t1773700447420",
+            "successorId": "t1773700451550",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773773180255",
+            "predecessorId": "t1773700468878",
+            "successorId": "t1773700477261",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773773189201",
+            "predecessorId": "t1773700468878",
+            "successorId": "t1773700485976",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773773209371",
+            "predecessorId": "t1773700485976",
+            "successorId": "t1773700502701",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773773226377",
+            "predecessorId": "t1773700502701",
+            "successorId": "t1773700510759",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773773262259",
+            "predecessorId": "t1773700510759",
+            "successorId": "t1773700581296",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773773270661",
+            "predecessorId": "t1773700510759",
+            "successorId": "t1773700644478",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773773279801",
+            "predecessorId": "t1773700510759",
+            "successorId": "t1773700569624",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773773308695",
+            "predecessorId": "t1773700510759",
+            "successorId": "t1773700651176",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773773320751",
+            "predecessorId": "t1773700510759",
+            "successorId": "t1773700685515",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773773329525",
+            "predecessorId": "t1773700510759",
+            "successorId": "t1773700692188",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773773343899",
+            "predecessorId": "t1773700510759",
+            "successorId": "t1773700762432",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773773364731",
+            "predecessorId": "t1773700651176",
+            "successorId": "t1773700678342",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773773377833",
+            "predecessorId": "t1773700678342",
+            "successorId": "t1773700795506",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773773385439",
+            "predecessorId": "t1773700678342",
+            "successorId": "t1773700757819",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773773393859",
+            "predecessorId": "t1773700678342",
+            "successorId": "t1773700725847",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773773401365",
+            "predecessorId": "t1773700678342",
+            "successorId": "t1773700747338",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773773423307",
+            "predecessorId": "t1773700678342",
+            "successorId": "t1773700777326",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773773438981",
+            "predecessorId": "t1773700678342",
+            "successorId": "t1773700737363",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773773461307",
+            "predecessorId": "t1773700678342",
+            "successorId": "t1773700696872",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773773476579",
+            "predecessorId": "t1773700678342",
+            "successorId": "t1773700703723",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773773480623",
+            "predecessorId": "t1773700678342",
+            "successorId": "t1773700712962",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773773498585",
+            "predecessorId": "t1773700795506",
+            "successorId": "t1773700823292",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773773552847",
+            "predecessorId": "t1773700823292",
+            "successorId": "t1773700840580",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773773563651",
+            "predecessorId": "t1773700823292",
+            "successorId": "t1773700831482",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773773589665",
+            "predecessorId": "t1773700840580",
+            "successorId": "t1773700884594",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773773597957",
+            "predecessorId": "t1773700884594",
+            "successorId": "t1773700925576",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773773605019",
+            "predecessorId": "t1773700884594",
+            "successorId": "t1773700891033",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773773621953",
+            "predecessorId": "t1773700925576",
+            "successorId": "t1773700946315",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773773872333",
+            "predecessorId": "t1773700958547",
+            "successorId": "t1773700965824",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773773884303",
+            "predecessorId": "t1773700965824",
+            "successorId": "t1773700981811",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773773890221",
+            "predecessorId": "t1773700965824",
+            "successorId": "t1773700976458",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773773897943",
+            "predecessorId": "t1773700965824",
+            "successorId": "t1773700988838",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773773909785",
+            "predecessorId": "t1773700965824",
+            "successorId": "t1773701017319",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773774253223",
+            "predecessorId": "t1773701017319",
+            "successorId": "t1773701033781",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773774261215",
+            "predecessorId": "t1773701017319",
+            "successorId": "t1773701025526",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773775515281",
+            "predecessorId": "t1773774575199",
+            "successorId": "t1773774921856",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773775611632",
+            "predecessorId": "t1773774990183",
+            "successorId": "t1773775010888",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773775715083",
+            "predecessorId": "t1773774990183",
+            "successorId": "t1773775662295",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773775742171",
+            "predecessorId": "t1773775076990",
+            "successorId": "t1773775222350",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773775752477",
+            "predecessorId": "t1773775076990",
+            "successorId": "t1773775151578",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773775770027",
+            "predecessorId": "t1773775076990",
+            "successorId": "t1773775181709",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773776183655",
+            "predecessorId": "t1773775181709",
+            "successorId": "t1773775216307",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773776205691",
+            "predecessorId": "t1773775222350",
+            "successorId": "t1773775209949",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773776216521",
+            "predecessorId": "t1773775222350",
+            "successorId": "t1773775268137",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773776237580",
+            "predecessorId": "t1773775268137",
+            "successorId": "t1773775294110",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773776260883",
+            "predecessorId": "t1773775268137",
+            "successorId": "t1773775342947",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773776309313",
+            "predecessorId": "t1773775342947",
+            "successorId": "t1773775351772",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773776341443",
+            "predecessorId": "t1773775342947",
+            "successorId": "t1773775361944",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773776369751",
+            "predecessorId": "t1773775361944",
+            "successorId": "t1773775374219",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773776376465",
+            "predecessorId": "t1773775361944",
+            "successorId": "t1773775381078",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773784703065",
+            "predecessorId": "t1773783716101",
+            "successorId": "t1773783721701",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773784717741",
+            "predecessorId": "t1773783716101",
+            "successorId": "t1773783795448",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773784724891",
+            "predecessorId": "t1773783716101",
+            "successorId": "t1773783830785",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773784747815",
+            "predecessorId": "t1773783721701",
+            "successorId": "t1773783739621",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773784770395",
+            "predecessorId": "t1773783729760",
+            "successorId": "t1773783739621",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773784797705",
+            "predecessorId": "t1773783739621",
+            "successorId": "t1773783746075",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773784811067",
+            "predecessorId": "t1773783739621",
+            "successorId": "t1773783749246",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773784836511",
+            "predecessorId": "t1773783746075",
+            "successorId": "t1773783753950",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773784849715",
+            "predecessorId": "t1773783746075",
+            "successorId": "t1773783773640",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773784867591",
+            "predecessorId": "t1773783746075",
+            "successorId": "t1773783849194",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773784889029",
+            "predecessorId": "t1773783753950",
+            "successorId": "t1773783838470",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773784922249",
+            "predecessorId": "t1773783849194",
+            "successorId": "t1773783856333",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773784935979",
+            "predecessorId": "t1773783856333",
+            "successorId": "t1773783862956",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773784952994",
+            "predecessorId": "t1773783856333",
+            "successorId": "t1773783877005",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773785029529",
+            "predecessorId": "t1773783877005",
+            "successorId": "t1773783884879",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773785051261",
+            "predecessorId": "t1773783884879",
+            "successorId": "t1773783892591",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773785071917",
+            "predecessorId": "t1773783892591",
+            "successorId": "t1773783905732",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773785080921",
+            "predecessorId": "t1773783892591",
+            "successorId": "t1773783912440",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773785114364",
+            "predecessorId": "t1773783912440",
+            "successorId": "t1773783927826",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773785119821",
+            "predecessorId": "t1773783912440",
+            "successorId": "t1773783940746",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773785128469",
+            "predecessorId": "t1773783912440",
+            "successorId": "t1773783957152",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773785155465",
+            "predecessorId": "t1773783927826",
+            "successorId": "t1773783979787",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773785175951",
+            "predecessorId": "t1773783957152",
+            "successorId": "t1773783966113",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773785193248",
+            "predecessorId": "t1773783991443",
+            "successorId": "t1773783998374",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773785617697",
+            "predecessorId": "t1773785236776",
+            "successorId": "t1773785311197",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773785623881",
+            "predecessorId": "t1773785236776",
+            "successorId": "t1773785292177",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773785644978",
+            "predecessorId": "t1773785236776",
+            "successorId": "t1773785306975",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773785668135",
+            "predecessorId": "t1773785348880",
+            "successorId": "t1773785254270",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773785680853",
+            "predecessorId": "t1773785348880",
+            "successorId": "t1773785403113",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773785687203",
+            "predecessorId": "t1773785348880",
+            "successorId": "t1773785421377",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773785692720",
+            "predecessorId": "t1773785348880",
+            "successorId": "t1773785438560",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773785703899",
+            "predecessorId": "t1773785348880",
+            "successorId": "t1773785376613",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773785712603",
+            "predecessorId": "t1773785348880",
+            "successorId": "t1773785387716",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773785730943",
+            "predecessorId": "t1773785362064",
+            "successorId": "t1773785369830",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773785742949",
+            "predecessorId": "t1773785438560",
+            "successorId": "t1773785445581",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773785750071",
+            "predecessorId": "t1773785438560",
+            "successorId": "t1773783957152",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773785765505",
+            "predecessorId": "t1773785470059",
+            "successorId": "t1773785474709",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773785778996",
+            "predecessorId": "t1773785470059",
+            "successorId": "t1773785479956",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773785796271",
+            "predecessorId": "t1773785493788",
+            "successorId": "t1773785504308",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773785811983",
+            "predecessorId": "t1773785504308",
+            "successorId": "t1773785507615",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773788503971",
+            "predecessorId": "t1773785507615",
+            "successorId": "t1773788375064",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773788513933",
+            "predecessorId": "t1773788375064",
+            "successorId": "t1773788383357",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773788534783",
+            "predecessorId": "t1773788383357",
+            "successorId": "t1773788406351",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773788549147",
+            "predecessorId": "t1773788406351",
+            "successorId": "t1773788422789",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773788566659",
+            "predecessorId": "t1773788422789",
+            "successorId": "t1773788424699",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        },
+        {
+            "id": "d1773788578993",
+            "predecessorId": "t1773788424699",
+            "successorId": "t1773788429046",
+            "lagDays": 0,
+            "autoShift": true,
+            "notes": ""
+        }
+    ],
+    "people": [
+        {
+            "id": "p1773788923059",
+            "userGroup": "Suppliers",
+            "name": "Mcins"
+        },
+        {
+            "id": "p1773788932319",
+            "userGroup": "Suppliers",
+            "name": "BTB"
+        },
+        {
+            "id": "p1773788938915",
+            "userGroup": "Suppliers",
+            "name": "HIAB"
+        },
+        {
+            "id": "p1773788948573",
+            "userGroup": "Suppliers",
+            "name": "VIP Frames"
+        },
+        {
+            "id": "p1773788970410",
+            "userGroup": "Suppliers",
+            "name": "VIP Steel"
+        },
+        {
+            "id": "p1773788975941",
+            "userGroup": "Suppliers",
+            "name": "Secure Scaffold"
+        },
+        {
+            "id": "p1773788985855",
+            "userGroup": "Suppliers",
+            "name": "Safety Nets NZ"
+        },
+        {
+            "id": "p1773788995695",
+            "userGroup": "Suppliers",
+            "name": "First Windows"
+        },
+        {
+            "id": "p1773790732545",
+            "userGroup": "Suppliers",
+            "name": "Otautahi Interior Liners"
+        },
+        {
+            "id": "p1773790739791",
+            "userGroup": "Suppliers",
+            "name": "Onsite Solutions"
+        },
+        {
+            "id": "p1773790745171",
+            "userGroup": "Suppliers",
+            "name": "Mainland"
+        },
+        {
+            "id": "p1773790750995",
+            "userGroup": "Suppliers",
+            "name": "Tindis"
+        },
+        {
+            "id": "p1773790753075",
+            "userGroup": "Suppliers",
+            "name": "CCC"
+        },
+        {
+            "id": "p1773790760205",
+            "userGroup": "Suppliers",
+            "name": "Independant Doors"
+        },
+        {
+            "id": "p1773790793691",
+            "userGroup": "Suppliers",
+            "name": "Moods"
+        },
+        {
+            "id": "p1773790799693",
+            "userGroup": "Suppliers",
+            "name": "Instant Plumbing"
+        },
+        {
+            "id": "p1773790811817",
+            "userGroup": "Suppliers",
+            "name": "Cutting Above Cladding"
+        },
+        {
+            "id": "p1773790819288",
+            "userGroup": "Suppliers",
+            "name": "MHC"
+        },
+        {
+            "id": "p1773790827349",
+            "userGroup": "Suppliers",
+            "name": "Windsor Doors"
+        },
+        {
+            "id": "p1773790835173",
+            "userGroup": "Suppliers",
+            "name": "Apex Trade Ltd"
+        },
+        {
+            "id": "p1773790841503",
+            "userGroup": "Suppliers",
+            "name": "Tertrad"
+        },
+        {
+            "id": "p1773790850209",
+            "userGroup": "Suppliers",
+            "name": "Dondon"
+        },
+        {
+            "id": "p1773790858743",
+            "userGroup": "Suppliers",
+            "name": "Amped Electrical"
+        },
+        {
+            "id": "p1773790866418",
+            "userGroup": "Suppliers",
+            "name": "Clean Right Ltd"
+        },
+        {
+            "id": "p1773790877405",
+            "userGroup": "Suppliers",
+            "name": "Corporate Scaffold"
+        },
+        {
+            "id": "p1773790880747",
+            "userGroup": "Suppliers",
+            "name": "Enable"
+        },
+        {
+            "id": "p1773790887414",
+            "userGroup": "Suppliers",
+            "name": "Diggers NZ"
+        },
+        {
+            "id": "p1773790899013",
+            "userGroup": "Suppliers",
+            "name": "Square Peg Surveying"
+        },
+        {
+            "id": "p1773790909489",
+            "userGroup": "Suppliers",
+            "name": "Simply Heat"
+        },
+        {
+            "id": "p1773790927139",
+            "userGroup": "Suppliers",
+            "name": "SI Insulation"
+        },
+        {
+            "id": "p1773790932977",
+            "userGroup": "Suppliers",
+            "name": "Trade Direct"
+        },
+        {
+            "id": "p1773790938751",
+            "userGroup": "Suppliers",
+            "name": "Hilo Tiling"
+        },
+        {
+            "id": "p1773790943813",
+            "userGroup": "Suppliers",
+            "name": "Safepower"
+        },
+        {
+            "id": "p1773790951505",
+            "userGroup": "Suppliers",
+            "name": "Forte"
+        },
+        {
+            "id": "p1773790956183",
+            "userGroup": "Suppliers",
+            "name": "Specfab"
+        },
+        {
+            "id": "p1773790964297",
+            "userGroup": "Suppliers",
+            "name": "Clean Right Ltd"
+        },
+        {
+            "id": "p1773804661751",
+            "userGroup": "Suppliers",
+            "name": "MCK"
+        },
+        {
+            "id": "p1773804952247",
+            "userGroup": "Suppliers",
+            "name": "Canterbury Clay Bricks"
+        }
+    ]
+}
+]
