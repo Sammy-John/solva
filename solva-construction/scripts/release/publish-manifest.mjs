@@ -78,6 +78,7 @@ const main = async () => {
   const pubDate = args['pub-date'] ?? new Date().toISOString()
   const installerPattern = (args['installer-pattern'] ?? '').trim() || null
   const omitVersionDir = String(args['omit-version-dir'] ?? 'false').toLowerCase() === 'true'
+  const urlFilenameMode = String(args['url-filename-mode'] ?? 'raw').toLowerCase()
 
   const artifactsRoot = path.join(rootDir, args['artifacts-root'] ?? 'artifacts')
   const latestManifestPath = path.join(rootDir, args['latest-manifest'] ?? 'artifacts/latest.json')
@@ -90,9 +91,10 @@ const main = async () => {
   )
 
   const platformKey = 'windows-x86_64'
+  const urlInstallerName = urlFilenameMode === 'github-dot' ? installerName.replace(/ /g, '.') : installerName
   const installerUrl = omitVersionDir
-    ? `${baseUrl}/${encodeURIComponent(installerName)}`
-    : `${baseUrl}/${version}/${encodeURIComponent(installerName)}`
+    ? `${baseUrl}/${encodeURIComponent(urlInstallerName)}`
+    : `${baseUrl}/${version}/${encodeURIComponent(urlInstallerName)}`
 
   const manifest = {
     version,
@@ -123,3 +125,4 @@ main().catch((error) => {
   console.error(error instanceof Error ? error.message : String(error))
   process.exit(1)
 })
+

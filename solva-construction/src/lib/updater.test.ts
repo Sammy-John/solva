@@ -65,7 +65,7 @@ describe('downloadAndInstallUpdate', () => {
     expect(result.status).toBe('installed')
   })
 
-  it('maps network and signature errors to friendly codes', async () => {
+  it('maps network, signature, and stale-resource errors to friendly messages', async () => {
     const networkUpdate = makeUpdate({
       downloadAndInstall: vi.fn(async () => {
         throw new Error('network timeout while downloading')
@@ -78,8 +78,15 @@ describe('downloadAndInstallUpdate', () => {
       }),
     })
 
+    const staleResourceUpdate = makeUpdate({
+      downloadAndInstall: vi.fn(async () => {
+        throw new Error('The resource id 2011843205 is invalid.')
+      }),
+    })
+
     const networkResult = await downloadAndInstallUpdate(networkUpdate)
     const signatureResult = await downloadAndInstallUpdate(signatureUpdate)
+    const staleResourceResult = await downloadAndInstallUpdate(staleResourceUpdate)
 
     expect(networkResult.status).toBe('error')
     if (networkResult.status === 'error') {
@@ -90,5 +97,12 @@ describe('downloadAndInstallUpdate', () => {
     if (signatureResult.status === 'error') {
       expect(signatureResult.code).toBe('signature')
     }
+
+    expect(staleResourceResult.status).toBe('error')
+    if (staleResourceResult.status === 'error') {
+      expect(staleResourceResult.code).toBe('unknown')
+      expect(staleResourceResult.message).toContain('Check for Updates again')
+    }
   })
 })
+
