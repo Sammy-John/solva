@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useScheduleStore } from '@/store/scheduleStore';
 import {
   Dialog,
@@ -26,10 +26,18 @@ import {
   X,
 } from 'lucide-react';
 import { createsDependencyCycle } from '@/lib/scheduling';
+import {
+  dependencyUxLabels,
+  formatAutoMoveSummary,
+  formatAutoMoveTag,
+  formatDependencyRule,
+} from '@/lib/dependencyUx';
 
 interface LinkTasksModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  initialTaskId?: string | null;
+  initialRole?: 'predecessor' | 'successor';
 }
 
 const parseLagDays = (value: string): number => {
@@ -47,7 +55,12 @@ const computeEarliestStartFromPredecessor = (
   return format(addDays(parsed, lagDays), 'yyyy-MM-dd');
 };
 
-export function LinkTasksModal({ open, onOpenChange }: LinkTasksModalProps) {
+export function LinkTasksModal({
+  open,
+  onOpenChange,
+  initialTaskId = null,
+  initialRole = 'predecessor',
+}: LinkTasksModalProps) {
   const {
     tasks,
     sections,
@@ -69,6 +82,9 @@ export function LinkTasksModal({ open, onOpenChange }: LinkTasksModalProps) {
     null,
   );
   const [formError, setFormError] = useState<string>('');
+
+  const predecessorQueryRef = useRef<HTMLInputElement | null>(null);
+  const successorQueryRef = useRef<HTMLInputElement | null>(null);
 
   const lagDays = parseLagDays(lagDaysInput);
 
@@ -170,6 +186,21 @@ export function LinkTasksModal({ open, onOpenChange }: LinkTasksModalProps) {
     setFormError('');
   };
 
+  useEffect(() => {
+    if (!open || !initialTaskId) return;
+
+    clearForm();
+
+    if (initialRole === 'successor') {
+      setSuccessorId(initialTaskId);
+      setTimeout(() => predecessorQueryRef.current?.focus(), 0);
+      return;
+    }
+
+    setPredecessorId(initialTaskId);
+    setTimeout(() => successorQueryRef.current?.focus(), 0);
+  }, [open, initialRole, initialTaskId]);
+
   const loadDependencyForEdit = (depId: string) => {
     const dep = dependencies.find((item) => item.id === depId);
     if (!dep) return;
@@ -250,7 +281,7 @@ export function LinkTasksModal({ open, onOpenChange }: LinkTasksModalProps) {
         <DialogHeader>
           <DialogTitle className="text-sm font-semibold tracking-wide flex items-center gap-2">
             <Link2 className="h-4 w-4" />
-            Task Dependencies
+            Task Links
           </DialogTitle>
         </DialogHeader>
 
@@ -286,10 +317,11 @@ export function LinkTasksModal({ open, onOpenChange }: LinkTasksModalProps) {
               </div>
 
               <div>
-                <Label className="text-xs text-muted-foreground">Predecessor (must finish first)</Label>
+                <Label className="text-xs text-muted-foreground">{dependencyUxLabels.firstTask}</Label>
                 <div className="relative mt-1">
                   <Search className="h-3.5 w-3.5 absolute left-2 top-2.5 text-muted-foreground" />
                   <input
+                    ref={predecessorQueryRef}
                     className="w-full border rounded-md pl-7 pr-2 py-1.5 text-xs bg-card outline-none focus:ring-1 focus:ring-primary"
                     placeholder="Search tasks"
                     value={predecessorQuery}
@@ -304,7 +336,7 @@ export function LinkTasksModal({ open, onOpenChange }: LinkTasksModalProps) {
                   }}
                 >
                   <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Choose predecessor task" />
+                    <SelectValue placeholder="Choose first task" />
                   </SelectTrigger>
                   <SelectContent>
                     {predecessorOptions.length === 0 ? (
@@ -325,10 +357,11 @@ export function LinkTasksModal({ open, onOpenChange }: LinkTasksModalProps) {
               </div>
 
               <div>
-                <Label className="text-xs text-muted-foreground">Successor (starts after predecessor)</Label>
+                <Label className="text-xs text-muted-foreground">{dependencyUxLabels.followingTask}</Label>
                 <div className="relative mt-1">
                   <Search className="h-3.5 w-3.5 absolute left-2 top-2.5 text-muted-foreground" />
                   <input
+                    ref={successorQueryRef}
                     className="w-full border rounded-md pl-7 pr-2 py-1.5 text-xs bg-card outline-none focus:ring-1 focus:ring-primary"
                     placeholder="Search tasks"
                     value={successorQuery}
@@ -343,7 +376,7 @@ export function LinkTasksModal({ open, onOpenChange }: LinkTasksModalProps) {
                   }}
                 >
                   <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Choose successor task" />
+                    <SelectValue placeholder="Choose following task" />
                   </SelectTrigger>
                   <SelectContent>
                     {successorOptions.length === 0 ? (
@@ -373,14 +406,14 @@ export function LinkTasksModal({ open, onOpenChange }: LinkTasksModalProps) {
                   disabled={!predecessorId || !successorId}
                 >
                   <ArrowRightLeft className="h-3.5 w-3.5 mr-1" />
-                  Swap
+                  Swap direction
                 </Button>
-                <span className="text-xs text-muted-foreground">Rule: Finish-to-Start</span>
+                <span className="text-xs text-muted-foreground">Rule: finish then start</span>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label className="text-xs text-muted-foreground">Lag Days</Label>
+                  <Label className="text-xs text-muted-foreground">{dependencyUxLabels.gapDays}</Label>
                   <input
                     type="number"
                     min={0}
@@ -395,7 +428,7 @@ export function LinkTasksModal({ open, onOpenChange }: LinkTasksModalProps) {
                 <div className="flex items-end pb-1">
                   <div className="flex items-center gap-2">
                     <Switch checked={autoShift} onCheckedChange={setAutoShift} />
-                    <Label className="text-xs">Auto-Shift successor</Label>
+                    <Label className="text-xs">Auto-move following task</Label>
                   </div>
                 </div>
               </div>
@@ -413,26 +446,24 @@ export function LinkTasksModal({ open, onOpenChange }: LinkTasksModalProps) {
               <div className="rounded-md border bg-card px-2.5 py-2 text-xs space-y-1">
                 <div>
                   <span className="text-muted-foreground">Preview:</span>{' '}
-                  <span className="font-medium">{predecessorTask?.name ?? 'Select predecessor'}</span>
+                  <span className="font-medium">{predecessorTask?.name ?? 'Select first task'}</span>
                   {' -> '}
-                  <span className="font-medium">{successorTask?.name ?? 'Select successor'}</span>
+                  <span className="font-medium">{successorTask?.name ?? 'Select following task'}</span>
                   {lagDays > 0 ? ` (+${lagDays}d)` : ''}
                 </div>
                 <div className="text-muted-foreground">
-                  {autoShift
-                    ? 'Auto-shift ON: successor will move later if needed.'
-                    : 'Auto-shift OFF: conflicts are allowed but flagged.'}
+                  {formatAutoMoveSummary(autoShift)}
                 </div>
                 {earliestAllowedStart ? (
                   <div className="text-muted-foreground">
-                    Earliest allowed start for successor: <span className="font-medium text-foreground">{earliestAllowedStart}</span>
+                    Earliest allowed start for following task: <span className="font-medium text-foreground">{earliestAllowedStart}</span>
                   </div>
                 ) : null}
                 {successorStartsTooEarly ? (
                   <div className="text-[11px] text-amber-700 flex items-center gap-1">
                     <TriangleAlert className="h-3.5 w-3.5" />
                     {autoShift
-                      ? 'Saving will shift the successor to meet this rule.'
+                      ? 'Saving will move the following task to meet this rule.'
                       : 'This creates a schedule conflict warning.'}
                   </div>
                 ) : null}
@@ -517,10 +548,10 @@ export function LinkTasksModal({ open, onOpenChange }: LinkTasksModalProps) {
                               </span>
                             ) : null}
                             <span className="text-[10px] rounded bg-primary/10 px-1.5 py-0.5 text-primary">
-                              +{dep.lagDays}d lag
+                              {formatDependencyRule(dep.lagDays)}
                             </span>
                             <span className="text-[10px] rounded bg-muted px-1.5 py-0.5 text-muted-foreground">
-                              {dep.autoShift ? 'Auto-shift' : 'Manual'}
+                              {formatAutoMoveTag(dep.autoShift)}
                             </span>
                           </div>
                           {dep.notes ? (
@@ -564,3 +595,4 @@ export function LinkTasksModal({ open, onOpenChange }: LinkTasksModalProps) {
     </Dialog>
   );
 }
+

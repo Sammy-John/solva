@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TaskStatus, TaskType } from "@/types/scheduling";
 import { useScheduleStore } from "@/store/scheduleStore";
 import {
@@ -18,10 +18,12 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Trash2, ArrowDown, Pencil, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { formatAutoMoveTag, formatDependencyRule } from "@/lib/dependencyUx";
 
 interface TaskDetailPanelProps {
   taskId: string | null;
   onClose: () => void;
+  onQuickAddDependency?: (taskId: string, role: "predecessor" | "successor") => void;
 }
 
 const statusClass = (s: TaskStatus) => {
@@ -45,15 +47,45 @@ const typeClass = (t: TaskType) => {
   return map[t];
 };
 
-export function TaskDetailPanel({ taskId, onClose }: TaskDetailPanelProps) {
-  const { tasks, people, dependencies, sections, updateTask, deleteTask } =
-    useScheduleStore();
+const parseGapDays = (value: string): number => {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return 0;
+  return Math.max(0, Math.floor(parsed));
+};
+
+export function TaskDetailPanel({ taskId, onClose, onQuickAddDependency }: TaskDetailPanelProps) {
+  const {
+    tasks,
+    people,
+    dependencies,
+    sections,
+    updateTask,
+    deleteTask,
+    addDependency,
+    updateDependency,
+    removeDependency,
+  } = useScheduleStore();
   const [newComment, setNewComment] = useState("");
   const [editingCommentIdx, setEditingCommentIdx] = useState<number | null>(
     null,
   );
   const [editingCommentText, setEditingCommentText] = useState("");
+
+  const [dependsOnTaskId, setDependsOnTaskId] = useState<string>("__none__");
+  const [gapDaysInput, setGapDaysInput] = useState<string>("0");
+  const [autoMoveCurrentTask, setAutoMoveCurrentTask] = useState<boolean>(true);
+  const [editingDependencyId, setEditingDependencyId] = useState<string | null>(null);
+  const [dependencyFormError, setDependencyFormError] = useState<string>("");
+
   const task = tasks.find((t) => t.id === taskId);
+
+  useEffect(() => {
+    setDependsOnTaskId("__none__");
+    setGapDaysInput("0");
+    setAutoMoveCurrentTask(true);
+    setEditingDependencyId(null);
+    setDependencyFormError("");
+  }, [taskId]);
 
   if (!task) return null;
 
@@ -62,16 +94,20 @@ export function TaskDetailPanel({ taskId, onClose }: TaskDetailPanelProps) {
     (p) => !task.assignedTo.includes(p.id),
   );
 
-  const predecessors = dependencies
+  const predecessorLinks = dependencies
     .filter((d) => d.successorId === task.id)
     .map((d) => ({
       dep: d,
       task: tasks.find((t) => t.id === d.predecessorId),
     }));
 
-  const successors = dependencies
+  const successorLinks = dependencies
     .filter((d) => d.predecessorId === task.id)
     .map((d) => ({ dep: d, task: tasks.find((t) => t.id === d.successorId) }));
+
+  const dependencyTaskOptions = tasks
+    .filter((t) => t.id !== task.id)
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   const addComment = () => {
     if (!newComment.trim()) return;
@@ -91,6 +127,70 @@ export function TaskDetailPanel({ taskId, onClose }: TaskDetailPanelProps) {
   const deleteComment = (idx: number) => {
     const updated = task.comments.filter((_, i) => i !== idx);
     updateTask(task.id, { comments: updated });
+  };
+
+  const resetDependencyForm = () => {
+    setDependsOnTaskId("__none__");
+    setGapDaysInput("0");
+    setAutoMoveCurrentTask(true);
+    setEditingDependencyId(null);
+    setDependencyFormError("");
+  };
+
+  const handleSaveDependency = () => {
+    setDependencyFormError("");
+
+    if (dependsOnTaskId === "__none__") {
+      setDependencyFormError("Choose a task this one depends on.");
+      return;
+    }
+
+    const lagDays = parseGapDays(gapDaysInput);
+
+    if (editingDependencyId) {
+      const result = updateDependency(editingDependencyId, {
+        predecessorId: dependsOnTaskId,
+        successorId: task.id,
+        lagDays,
+        autoShift: autoMoveCurrentTask,
+        notes: "",
+      });
+
+      if (!result.ok) {
+        setDependencyFormError(result.error ?? "Could not save dependency.");
+        return;
+      }
+
+      resetDependencyForm();
+      return;
+    }
+
+    const result = addDependency({
+      id: `d${Date.now()}`,
+      predecessorId: dependsOnTaskId,
+      successorId: task.id,
+      lagDays,
+      autoShift: autoMoveCurrentTask,
+      notes: "",
+    });
+
+    if (!result.ok) {
+      setDependencyFormError(result.error ?? "Could not add dependency.");
+      return;
+    }
+
+    resetDependencyForm();
+  };
+
+  const loadDependencyIntoForm = (dependencyId: string) => {
+    const dependency = predecessorLinks.find((item) => item.dep.id === dependencyId)?.dep;
+    if (!dependency) return;
+
+    setEditingDependencyId(dependency.id);
+    setDependsOnTaskId(dependency.predecessorId);
+    setGapDaysInput(String(dependency.lagDays));
+    setAutoMoveCurrentTask(dependency.autoShift);
+    setDependencyFormError("");
   };
 
   return (
@@ -336,56 +436,162 @@ export function TaskDetailPanel({ taskId, onClose }: TaskDetailPanelProps) {
 
           <Separator />
 
-          {predecessors.length > 0 || successors.length > 0 ? (
-            <div>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
               <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Dependency Chain
+                Dependencies
               </span>
-              <div className="mt-2 space-y-1">
-                {predecessors.map(({ dep, task: predTask }) => (
-                  <div
-                    key={dep.id}
-                    className="flex items-center gap-2 text-xs text-muted-foreground"
-                  >
-                    <span className="text-foreground font-medium">
-                      {predTask?.name || "Unknown"}
-                    </span>
-                    {dep.lagDays > 0 ? (
-                      <span className="text-[10px]">(+{dep.lagDays}d)</span>
-                    ) : null}
-                  </div>
-                ))}
-                {predecessors.length > 0 ? (
-                  <div className="flex justify-center py-0.5">
-                    <ArrowDown className="h-3 w-3 text-muted-foreground" />
-                  </div>
-                ) : null}
-                <div className="flex items-center gap-2 text-xs">
-                  <span className="font-semibold text-primary">
-                    {task.name}
-                  </span>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="h-7 text-xs"
+                onClick={() => onQuickAddDependency?.(task.id, "successor")}
+              >
+                Advanced
+              </Button>
+            </div>
+
+            <div className="rounded-md border bg-muted/20 p-3 space-y-2">
+              <div>
+                <LabelText text="Depends on (must finish first)" />
+                <Select
+                  value={dependsOnTaskId}
+                  onValueChange={(value) => {
+                    setDependsOnTaskId(value);
+                    setDependencyFormError("");
+                  }}
+                >
+                  <SelectTrigger className="mt-1 h-8 text-xs">
+                    <SelectValue placeholder="Choose task" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {dependencyTaskOptions.length === 0 ? (
+                      <div className="px-2 py-1.5 text-xs text-muted-foreground">
+                        No other tasks available
+                      </div>
+                    ) : (
+                      dependencyTaskOptions.map((optionTask) => (
+                        <SelectItem key={optionTask.id} value={optionTask.id}>
+                          {optionTask.name}
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <LabelText text="Gap days" />
+                  <input
+                    type="number"
+                    min={0}
+                    className="mt-1 w-full border rounded px-2 py-1.5 text-xs outline-none focus:ring-1 focus:ring-primary bg-card h-8"
+                    value={gapDaysInput}
+                    onChange={(e) => {
+                      setGapDaysInput(e.target.value);
+                      setDependencyFormError("");
+                    }}
+                  />
                 </div>
-                {successors.length > 0 ? (
-                  <div className="flex justify-center py-0.5">
-                    <ArrowDown className="h-3 w-3 text-muted-foreground" />
-                  </div>
+                <div>
+                  <LabelText text="Move this task if needed" />
+                  <Select
+                    value={autoMoveCurrentTask ? "yes" : "no"}
+                    onValueChange={(value) => setAutoMoveCurrentTask(value === "yes")}
+                  >
+                    <SelectTrigger className="mt-1 h-8 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="yes">Yes</SelectItem>
+                      <SelectItem value="no">No</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {dependencyFormError ? (
+                <p className="text-xs text-destructive">{dependencyFormError}</p>
+              ) : null}
+
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  className="h-7 text-xs"
+                  onClick={handleSaveDependency}
+                >
+                  {editingDependencyId ? "Save" : "Add Dependency"}
+                </Button>
+                {editingDependencyId ? (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-7 text-xs"
+                    onClick={resetDependencyForm}
+                  >
+                    Cancel Edit
+                  </Button>
                 ) : null}
-                {successors.map(({ dep, task: succTask }) => (
+              </div>
+            </div>
+
+            {predecessorLinks.length > 0 ? (
+              <div className="space-y-1">
+                <LabelText text="This task depends on" />
+                {predecessorLinks.map(({ dep, task: predTask }) => (
                   <div
                     key={dep.id}
-                    className="flex items-center gap-2 text-xs text-muted-foreground"
+                    className="rounded border bg-card px-2.5 py-2 text-xs flex items-start justify-between gap-2"
                   >
-                    <span className="text-foreground font-medium">
-                      {succTask?.name || "Unknown"}
-                    </span>
-                    {dep.lagDays > 0 ? (
-                      <span className="text-[10px]">(+{dep.lagDays}d)</span>
-                    ) : null}
+                    <div>
+                      <p className="text-foreground">
+                        {task.name} starts after <span className="font-medium">{predTask?.name ?? "Unknown task"}</span>
+                      </p>
+                      <p className="text-muted-foreground mt-0.5">
+                        {formatDependencyRule(dep.lagDays)} {formatAutoMoveTag(dep.autoShift)}.
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <button
+                        className="text-muted-foreground hover:text-primary p-0.5"
+                        onClick={() => loadDependencyIntoForm(dep.id)}
+                        title="Edit"
+                      >
+                        <Pencil className="h-3 w-3" />
+                      </button>
+                      <button
+                        className="text-muted-foreground hover:text-destructive p-0.5"
+                        onClick={() => removeDependency(dep.id)}
+                        title="Remove"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
-            </div>
-          ) : null}
+            ) : (
+              <p className="text-xs text-muted-foreground">No dependencies yet for this task.</p>
+            )}
+
+            {successorLinks.length > 0 ? (
+              <div className="space-y-1">
+                <LabelText text="Tasks waiting on this task" />
+                {successorLinks.map(({ dep, task: succTask }) => (
+                  <div key={dep.id} className="rounded border bg-card px-2.5 py-2 text-xs">
+                    <p className="text-foreground">
+                      <span className="font-medium">{succTask?.name ?? "Unknown task"}</span> starts after {task.name}
+                    </p>
+                    <p className="text-muted-foreground mt-0.5">
+                      {formatDependencyRule(dep.lagDays)} {formatAutoMoveTag(dep.autoShift)}.
+                    </p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </div>
 
           <Separator />
 
@@ -489,4 +695,8 @@ export function TaskDetailPanel({ taskId, onClose }: TaskDetailPanelProps) {
       </SheetContent>
     </Sheet>
   );
+}
+
+function LabelText({ text }: { text: string }) {
+  return <span className="text-[10px] text-muted-foreground">{text}</span>;
 }

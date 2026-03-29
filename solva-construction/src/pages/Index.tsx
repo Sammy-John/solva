@@ -68,6 +68,10 @@ const formatSnapshotTimestamp = (value: string): string => {
 
 const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }: IndexProps) => {
   const [linkModalOpen, setLinkModalOpen] = useState(false);
+  const [linkModalContext, setLinkModalContext] = useState<{ taskId: string | null; role: 'predecessor' | 'successor' }>({
+    taskId: null,
+    role: 'predecessor',
+  });
   const [peopleModalOpen, setPeopleModalOpen] = useState(false);
   const [filterType, setFilterType] = useState<TaskType | 'All'>('All');
   const [filterGroup, setFilterGroup] = useState<UserGroup | 'All'>('All');
@@ -393,7 +397,10 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
   return (
     <div className="flex flex-col h-screen bg-background">
       <ScheduleHeader
-        onLinkTasks={() => setLinkModalOpen(true)}
+        onLinkTasks={() => {
+          setLinkModalContext({ taskId: null, role: 'predecessor' });
+          setLinkModalOpen(true);
+        }}
         onOpenPeople={() => setPeopleModalOpen(true)}
         onExportCsv={handleExportCsv}
         onSaveSnapshot={handleSaveSnapshot}
@@ -454,10 +461,23 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
           onOpenDependencyChain={setDepChainTaskId}
         />
       </div>
-      <LinkTasksModal open={linkModalOpen} onOpenChange={setLinkModalOpen} />
+      <LinkTasksModal
+        open={linkModalOpen}
+        onOpenChange={setLinkModalOpen}
+        initialTaskId={linkModalContext.taskId}
+        initialRole={linkModalContext.role}
+      />
       <PeopleModal open={peopleModalOpen} onOpenChange={setPeopleModalOpen} />
       <CascadeNotification />
-      <TaskDetailPanel taskId={selectedTaskId} onClose={() => setSelectedTaskId(null)} />
+      <TaskDetailPanel
+        taskId={selectedTaskId}
+        onClose={() => setSelectedTaskId(null)}
+        onQuickAddDependency={(taskId, role) => {
+          // Block2 manual check: open task detail, click Add Dependency, verify modal opens prefilled for this task.
+          setLinkModalContext({ taskId, role });
+          setLinkModalOpen(true);
+        }}
+      />
       <DependencyChainModal
         taskId={depChainTaskId}
         open={!!depChainTaskId}
@@ -540,3 +560,4 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
 };
 
 export default Index;
+
