@@ -1,0 +1,12 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Default desktop capability for local app windows.",
+  "windows": [
+    "*"
+  ],
+  "permissions": [
+    "core:default",
+    "updater:default"
+  ]
+}

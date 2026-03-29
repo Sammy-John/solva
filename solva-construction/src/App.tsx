@@ -233,7 +233,22 @@ function App() {
         )
       }
 
-      const result = await downloadAndInstallUpdate(updateCheck.update)
+      const freshCheck = await checkForAppUpdate()
+      setUpdateCheck(freshCheck)
+
+      if (freshCheck.status !== 'update-available') {
+        setUpdateInstall({
+          status: 'error',
+          code: 'unknown',
+          message:
+            freshCheck.status === 'up-to-date'
+              ? 'No update is currently available. Please click Check for Updates again.'
+              : freshCheck.message,
+        })
+        return
+      }
+
+      const result = await downloadAndInstallUpdate(freshCheck.update)
       setUpdateInstall(result)
     } finally {
       setIsInstallingUpdate(false)
@@ -856,6 +871,9 @@ function App() {
 }
 
 export default App
+
+
+
 
 
 

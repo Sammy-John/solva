@@ -41,14 +41,19 @@ const ensureNonEmpty = (value, message) => {
   return String(value).trim()
 }
 
-const findNsisArtifacts = async (version) => {
+const findNsisArtifacts = async (version, installerPattern) => {
   const entries = await readdir(nsisDir)
-  const installerName = entries.find(
-    (name) => name.endsWith('-setup.exe') && name.includes(`_${version}_`),
-  )
+  const installerName = entries.find((name) => {
+    const versionMatch = name.endsWith('-setup.exe') && name.includes(`_${version}_`)
+    if (!versionMatch) return false
+    if (!installerPattern) return true
+    return name.includes(installerPattern)
+  })
 
   if (!installerName) {
-    throw new Error(`Could not find NSIS installer for version ${version} in ${nsisDir}`)
+    throw new Error(
+      `Could not find NSIS installer for version ${version}${installerPattern ? ` and pattern "${installerPattern}"` : ''} in ${nsisDir}`,
+    )
   }
 
   const signatureName = `${installerName}.sig`
@@ -71,8 +76,14 @@ const main = async () => {
 
   const notes = args.notes ?? `Alpha build ${version}`
   const pubDate = args['pub-date'] ?? new Date().toISOString()
+  const installerPattern = (args['installer-pattern'] ?? '').trim() || null
+  const omitVersionDir = String(args['omit-version-dir'] ?? 'false').toLowerCase() === 'true'
+  const urlFilenameMode = String(args['url-filename-mode'] ?? 'raw').toLowerCase()
 
-  const { installerName, signatureName } = await findNsisArtifacts(version)
+  const artifactsRoot = path.join(rootDir, args['artifacts-root'] ?? 'artifacts')
+  const latestManifestPath = path.join(rootDir, args['latest-manifest'] ?? 'artifacts/latest.json')
+
+  const { installerName, signatureName } = await findNsisArtifacts(version, installerPattern)
   const signaturePath = path.join(nsisDir, signatureName)
   const signature = ensureNonEmpty(
     (await readFile(signaturePath, 'utf8')).trim(),
@@ -80,7 +91,10 @@ const main = async () => {
   )
 
   const platformKey = 'windows-x86_64'
-  const installerUrl = `${baseUrl}/${version}/${encodeURIComponent(installerName)}`
+  const urlInstallerName = urlFilenameMode === 'github-dot' ? installerName.replace(/ /g, '.') : installerName
+  const installerUrl = omitVersionDir
+    ? `${baseUrl}/${encodeURIComponent(urlInstallerName)}`
+    : `${baseUrl}/${version}/${encodeURIComponent(urlInstallerName)}`
 
   const manifest = {
     version,
@@ -94,11 +108,10 @@ const main = async () => {
     },
   }
 
-  const versionArtifactDir = path.join(rootDir, 'artifacts', version)
+  const versionArtifactDir = path.join(artifactsRoot, version)
   await mkdir(versionArtifactDir, { recursive: true })
 
   const versionManifestPath = path.join(versionArtifactDir, 'latest.json')
-  const latestManifestPath = path.join(rootDir, 'artifacts', 'latest.json')
 
   await writeFile(versionManifestPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8')
   await writeFile(latestManifestPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8')
@@ -112,3 +125,4 @@ main().catch((error) => {
   console.error(error instanceof Error ? error.message : String(error))
   process.exit(1)
 })
+

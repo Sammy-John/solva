@@ -90,6 +90,14 @@ const mapUpdaterError = (error: unknown): { code: UpdaterErrorCode; message: str
     }
   }
 
+  const staleUpdateHints = ['resource id', 'invalid resource']
+  if (staleUpdateHints.some((hint) => normalized.includes(hint))) {
+    return {
+      code: 'unknown',
+      message: 'Update session expired. Please click Check for Updates again, then install.',
+    }
+  }
+
   return {
     code: 'unknown',
     message: raw,
@@ -171,3 +179,4 @@ export const downloadAndInstallUpdate = async (update: Update): Promise<UpdateIn
     }
   }
 }
+

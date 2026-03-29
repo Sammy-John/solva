@@ -178,3 +178,46 @@ Copy this block for each completed release/task:
 ### Pending
 - Full installed-app in-place updater validation (`vN -> vN+1`) against hosted endpoint.
 - Final manual data-preservation drill on installed app machine.
+
+## 2026-03-29 - Isolated Test Channel Setup
+
+### Completed
+- Added isolated Tauri config: `src-tauri/tauri.test.conf.json`
+  - identifier: `com.teknabu.constructionplannerdesktop.test`
+  - productName/title: `Construction Planner Desktop Test`
+  - updater endpoint: `https://updates.solva.app/test/latest.json`
+- Extended version sync to include both prod and test configs.
+- Added test release scripts:
+  - `release:alpha:test`
+  - `release:manifest:test`
+- Added test runbook: `docs/releases/test-channel.md`.
+
+### Verification Notes
+- `npm run release:version:sync` updated both configs to `1.0.2`.
+- `npm run release:alpha:test` passed and produced signed test installer artifacts.
+- `npm run release:manifest:test -- --base-url https://updates.solva.app/test --notes "Test channel acceptance 1.0.2"` passed.
+
+## 2026-03-29 - Updater Key Recovery + Hardening (Test v1.0.3)
+
+### Completed
+- Generated new permanent updater signing key pair on maintainer machine:
+  - private key: `C:\Users\Sammy John\.solva-keys\solva-updater-private.key`
+  - public key: `C:\Users\Sammy John\.solva-keys\solva-updater-private.key.pub`
+- Updated updater `pubkey` in both configs:
+  - `src-tauri/tauri.conf.json`
+  - `src-tauri/tauri.test.conf.json`
+- Hardened release scripts so `TAURI_SIGNING_PRIVATE_KEY_PATH` mode auto-loads key content for Tauri signing:
+  - `scripts/release/build-alpha.ps1`
+  - `scripts/release/build-alpha-test.ps1`
+- Built signed test-channel installer for `1.0.3` and generated GitHub test manifest.
+
+### Verification Notes
+- `npm run release:alpha:test` passed and produced:
+  - `artifacts/test/1.0.3/Construction Planner Desktop Test_1.0.3_x64-setup.exe`
+  - `artifacts/test/1.0.3/Construction Planner Desktop Test_1.0.3_x64-setup.exe.sig`
+- `npm run release:manifest:test:github -- --notes "Test update 1.0.3 (new permanent updater key)"` passed.
+
+### Important Migration Note
+- Because the original signing private key was unavailable, updater key identity changed.
+- Existing `1.0.2` installs will need a one-time manual installer move to `1.0.3`.
+- After that one-time move, future updates can use the new key normally.
