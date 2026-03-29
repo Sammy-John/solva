@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFile, writeFile, access } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
@@ -9,12 +9,24 @@ const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, '..', '..');
 
 const packageJsonPath = path.join(rootDir, 'package.json');
-const tauriConfigPath = path.join(rootDir, 'src-tauri', 'tauri.conf.json');
+const tauriConfigPaths = [
+  path.join(rootDir, 'src-tauri', 'tauri.conf.json'),
+  path.join(rootDir, 'src-tauri', 'tauri.test.conf.json'),
+];
 
 const readJson = async (filePath) => JSON.parse(await readFile(filePath, 'utf8'));
 
 const writeJson = async (filePath, value) => {
   await writeFile(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
+};
+
+const fileExists = async (filePath) => {
+  try {
+    await access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
 };
 
 const printUsage = () => {
@@ -35,26 +47,44 @@ const main = async () => {
   }
 
   const packageJson = await readJson(packageJsonPath);
-  const tauriConfig = await readJson(tauriConfigPath);
-
   const packageVersion = packageJson.version;
-  const tauriVersion = tauriConfig.version;
 
   if (typeof packageVersion !== 'string' || !packageVersion.trim()) {
     console.error('package.json version is missing or invalid.');
     process.exit(1);
   }
 
-  if (typeof tauriVersion !== 'string' || !tauriVersion.trim()) {
-    console.error('src-tauri/tauri.conf.json version is missing or invalid.');
+  const existingConfigPaths = [];
+  for (const cfgPath of tauriConfigPaths) {
+    if (await fileExists(cfgPath)) {
+      existingConfigPaths.push(cfgPath);
+    }
+  }
+
+  if (existingConfigPaths.length === 0) {
+    console.error('No Tauri config files found.');
     process.exit(1);
   }
 
+  const configs = await Promise.all(existingConfigPaths.map(async (cfgPath) => ({
+    cfgPath,
+    cfg: await readJson(cfgPath),
+  })));
+
+  for (const { cfgPath, cfg } of configs) {
+    if (typeof cfg.version !== 'string' || !cfg.version.trim()) {
+      console.error(`${path.relative(rootDir, cfgPath)} version is missing or invalid.`);
+      process.exit(1);
+    }
+  }
+
   if (mode === '--check') {
-    if (packageVersion !== tauriVersion) {
-      console.error(
-        `Version mismatch: package.json=${packageVersion} src-tauri/tauri.conf.json=${tauriVersion}`,
-      );
+    const mismatches = configs
+      .filter(({ cfg }) => cfg.version !== packageVersion)
+      .map(({ cfgPath, cfg }) => `${path.relative(rootDir, cfgPath)}=${cfg.version}`);
+
+    if (mismatches.length > 0) {
+      console.error(`Version mismatch: package.json=${packageVersion} ${mismatches.join(' ')}`);
       process.exit(1);
     }
 
@@ -62,9 +92,11 @@ const main = async () => {
     process.exit(0);
   }
 
-  tauriConfig.version = packageVersion;
-  await writeJson(tauriConfigPath, tauriConfig);
-  console.log(`Updated src-tauri/tauri.conf.json version -> ${packageVersion}`);
+  for (const { cfgPath, cfg } of configs) {
+    cfg.version = packageVersion;
+    await writeJson(cfgPath, cfg);
+    console.log(`Updated ${path.relative(rootDir, cfgPath)} version -> ${packageVersion}`);
+  }
 };
 
 main().catch((error) => {
