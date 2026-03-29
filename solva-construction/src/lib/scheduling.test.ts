@@ -129,6 +129,178 @@ describe('cascadeDependencies', () => {
       lagDays: 2,
     });
   });
+
+  it('returns deterministic affected order regardless of dependency input order', () => {
+    const tasks: Task[] = [
+      baseTask({
+        id: 'pred',
+        name: 'Pred',
+        startDate: '2026-03-01',
+        endDate: '2026-03-05',
+        duration: 5,
+      }),
+      baseTask({
+        id: 'succ-b',
+        name: 'Successor B',
+        startDate: '2026-03-01',
+        endDate: '2026-03-02',
+        duration: 2,
+      }),
+      baseTask({
+        id: 'succ-a',
+        name: 'Successor A',
+        startDate: '2026-03-01',
+        endDate: '2026-03-02',
+        duration: 2,
+      }),
+    ];
+
+    const deps: Dependency[] = [
+      {
+        id: 'd-b',
+        predecessorId: 'pred',
+        successorId: 'succ-b',
+        lagDays: 0,
+        autoShift: true,
+        notes: '',
+      },
+      {
+        id: 'd-a',
+        predecessorId: 'pred',
+        successorId: 'succ-a',
+        lagDays: 0,
+        autoShift: true,
+        notes: '',
+      },
+    ];
+
+    const result = cascadeDependencies(tasks, deps, 'pred');
+
+    expect(result.affectedIds).toEqual(['succ-a', 'succ-b']);
+    expect(result.movementSummaries.map((item) => item.taskId)).toEqual([
+      'succ-a',
+      'succ-b',
+    ]);
+  });
+
+  it('does not duplicate movement summaries when a task is revisited in cascade paths', () => {
+    const tasks: Task[] = [
+      baseTask({
+        id: 'a',
+        name: 'A',
+        startDate: '2026-04-01',
+        endDate: '2026-04-03',
+        duration: 3,
+      }),
+      baseTask({
+        id: 'b',
+        name: 'B',
+        startDate: '2026-04-01',
+        endDate: '2026-04-02',
+        duration: 2,
+      }),
+      baseTask({
+        id: 'c',
+        name: 'C',
+        startDate: '2026-04-01',
+        endDate: '2026-04-02',
+        duration: 2,
+      }),
+      baseTask({
+        id: 'd',
+        name: 'D',
+        startDate: '2026-04-01',
+        endDate: '2026-04-01',
+        duration: 1,
+      }),
+    ];
+
+    const deps: Dependency[] = [
+      {
+        id: 'd1',
+        predecessorId: 'a',
+        successorId: 'b',
+        lagDays: 0,
+        autoShift: true,
+        notes: '',
+      },
+      {
+        id: 'd2',
+        predecessorId: 'a',
+        successorId: 'c',
+        lagDays: 0,
+        autoShift: true,
+        notes: '',
+      },
+      {
+        id: 'd3',
+        predecessorId: 'b',
+        successorId: 'd',
+        lagDays: 0,
+        autoShift: true,
+        notes: '',
+      },
+      {
+        id: 'd4',
+        predecessorId: 'c',
+        successorId: 'd',
+        lagDays: 0,
+        autoShift: true,
+        notes: '',
+      },
+    ];
+
+    const result = cascadeDependencies(tasks, deps, 'a');
+    const summaryTaskIds = result.movementSummaries.map((item) => item.taskId);
+
+    expect(summaryTaskIds.filter((id) => id === 'd')).toHaveLength(1);
+    expect(new Set(summaryTaskIds).size).toBe(summaryTaskIds.length);
+  });
+
+  it('leaves unrelated tasks unchanged', () => {
+    const tasks: Task[] = [
+      baseTask({
+        id: 'pred',
+        name: 'Pred',
+        startDate: '2026-05-01',
+        endDate: '2026-05-04',
+        duration: 4,
+      }),
+      baseTask({
+        id: 'succ',
+        name: 'Succ',
+        startDate: '2026-05-01',
+        endDate: '2026-05-02',
+        duration: 2,
+      }),
+      baseTask({
+        id: 'untouched',
+        name: 'Untouched',
+        startDate: '2026-06-01',
+        endDate: '2026-06-02',
+        duration: 2,
+      }),
+    ];
+
+    const deps: Dependency[] = [
+      {
+        id: 'd1',
+        predecessorId: 'pred',
+        successorId: 'succ',
+        lagDays: 0,
+        autoShift: true,
+        notes: '',
+      },
+    ];
+
+    const result = cascadeDependencies(tasks, deps, 'pred');
+    const untouched = result.updatedTasks.find((task) => task.id === 'untouched');
+
+    expect(untouched?.startDate).toBe('2026-06-01');
+    expect(untouched?.endDate).toBe('2026-06-02');
+    expect(result.affectedIds).not.toContain('untouched');
+    expect(result.movementSummaries.map((item) => item.taskId)).not.toContain('untouched');
+  });
 });
 
 describe('createsDependencyCycle', () => {

@@ -251,14 +251,18 @@ export function cascadeDependencies(
     }
   }
 
-  const affectedIds = Array.from(affectedSet);
+  const affectedIds = Array.from(affectedSet).sort((a, b) => a.localeCompare(b));
+  const movementSummaries = Array.from(movementByTask.values()).sort((a, b) => {
+    if (a.taskName !== b.taskName) return a.taskName.localeCompare(b.taskName);
+    return a.taskId.localeCompare(b.taskId);
+  });
 
   return {
     updatedTasks: Array.from(taskMap.values()),
     movedCount: affectedIds.length,
     sourceTaskName: sourceTask?.name || "",
     affectedIds,
-    movementSummaries: Array.from(movementByTask.values()),
+    movementSummaries,
   };
 }
 
@@ -430,4 +434,5 @@ export function createsDependencyCycle(
 
   return false;
 }
+
 

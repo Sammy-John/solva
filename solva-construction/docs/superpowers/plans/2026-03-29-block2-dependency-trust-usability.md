@@ -141,7 +141,7 @@ Manual checks:
 - [x] **Step 5: Run build**
 Run: `npm run build`
 Expected: PASS
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ### Task 5: Consistency/Trust Guardrails For Date Movement
 
@@ -150,17 +150,17 @@ Expected: PASS
 - Modify: `src/lib/scheduling.ts`
 - Modify: `src/lib/scheduling.test.ts`
 
-- [ ] **Step 1: Add failing tests for stable cascade behavior**
+- [x] **Step 1: Add failing tests for stable cascade behavior**
 Cover:
 - multi-predecessor latest constraint wins
 - no duplicate re-shift loops
 - unchanged tasks remain unchanged
-- [ ] **Step 2: Run tests to confirm fail**
+- [x] **Step 2: Run tests to confirm fail**
 Run: `npm run test -- src/lib/scheduling.test.ts`
 Expected: FAIL for new trust assertions.
-- [ ] **Step 3: Implement minimal normalization safeguards**
+- [x] **Step 3: Implement minimal normalization safeguards**
 Keep existing logic, add only guardrails needed for deterministic movement summaries and consistent updates.
-- [ ] **Step 4: Re-run tests**
+- [x] **Step 4: Re-run tests**
 Run: `npm run test -- src/lib/scheduling.test.ts`
 Expected: PASS
 - [ ] **Step 5: Commit**
