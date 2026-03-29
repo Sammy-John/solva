@@ -288,6 +288,66 @@ export function getInvalidDependencies(
   return invalid;
 }
 
+export interface DependencyConflictDetail {
+  dependencyId: string;
+  predecessorId: string;
+  predecessorName: string;
+  successorId: string;
+  successorName: string;
+  lagDays: number;
+  earliestAllowedStart: string;
+  actualStart: string;
+  message: string;
+  suggestion: string;
+}
+
+export function getDependencyConflictDetails(
+  tasks: Task[],
+  dependencies: Dependency[],
+): DependencyConflictDetail[] {
+  const taskMap = new Map(tasks.map((t) => [t.id, t]));
+  const details: DependencyConflictDetail[] = [];
+
+  for (const dep of dependencies) {
+    if (dep.autoShift) continue;
+
+    const predecessor = taskMap.get(dep.predecessorId);
+    const successor = taskMap.get(dep.successorId);
+    if (!predecessor || !successor) continue;
+
+    const parsedPredEnd = parseISO(predecessor.endDate);
+    if (!isValid(parsedPredEnd)) continue;
+
+    const earliestAllowedStart = format(
+      addDays(parsedPredEnd, dep.lagDays),
+      "yyyy-MM-dd",
+    );
+
+    if (!successor.startDate || successor.startDate >= earliestAllowedStart) {
+      continue;
+    }
+
+    const lagPhrase =
+      dep.lagDays > 0
+        ? ` + ${dep.lagDays} day${dep.lagDays === 1 ? "" : "s"}`
+        : "";
+
+    details.push({
+      dependencyId: dep.id,
+      predecessorId: predecessor.id,
+      predecessorName: predecessor.name,
+      successorId: successor.id,
+      successorName: successor.name,
+      lagDays: dep.lagDays,
+      earliestAllowedStart,
+      actualStart: successor.startDate,
+      message: `${successor.name} starts ${successor.startDate} but must be ${earliestAllowedStart} or later because ${predecessor.name} finishes first${lagPhrase}.`,
+      suggestion: `Move ${successor.name} to ${earliestAllowedStart} or turn on auto-move.`,
+    });
+  }
+
+  return details;
+}
 export function getDependencyCount(
   taskId: string,
   dependencies: Dependency[],
@@ -370,3 +430,4 @@ export function createsDependencyCycle(
 
   return false;
 }
+

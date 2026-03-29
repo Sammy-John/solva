@@ -19,6 +19,7 @@ import { Separator } from "@/components/ui/separator";
 import { Trash2, ArrowDown, Pencil, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatAutoMoveTag, formatDependencyRule } from "@/lib/dependencyUx";
+import { getDependencyConflictDetails } from "@/lib/scheduling";
 
 interface TaskDetailPanelProps {
   taskId: string | null;
@@ -108,6 +109,13 @@ export function TaskDetailPanel({ taskId, onClose, onQuickAddDependency }: TaskD
   const dependencyTaskOptions = tasks
     .filter((t) => t.id !== task.id)
     .sort((a, b) => a.name.localeCompare(b.name));
+
+  const conflictByDependencyId = new Map(
+    getDependencyConflictDetails(tasks, dependencies).map((detail) => [
+      detail.dependencyId,
+      detail,
+    ]),
+  );
 
   const addComment = () => {
     if (!newComment.trim()) return;
@@ -537,40 +545,48 @@ export function TaskDetailPanel({ taskId, onClose, onQuickAddDependency }: TaskD
               </div>
             </div>
 
-            {predecessorLinks.length > 0 ? (
+                                    {predecessorLinks.length > 0 ? (
               <div className="space-y-1">
                 <LabelText text="This task depends on" />
-                {predecessorLinks.map(({ dep, task: predTask }) => (
-                  <div
-                    key={dep.id}
-                    className="rounded border bg-card px-2.5 py-2 text-xs flex items-start justify-between gap-2"
-                  >
-                    <div>
-                      <p className="text-foreground">
-                        {task.name} starts after <span className="font-medium">{predTask?.name ?? "Unknown task"}</span>
-                      </p>
-                      <p className="text-muted-foreground mt-0.5">
-                        {formatDependencyRule(dep.lagDays)} {formatAutoMoveTag(dep.autoShift)}.
-                      </p>
+                {predecessorLinks.map(({ dep, task: predTask }) => {
+                  const conflict = conflictByDependencyId.get(dep.id);
+                  return (
+                    <div
+                      key={dep.id}
+                      className="rounded border bg-card px-2.5 py-2 text-xs flex items-start justify-between gap-2"
+                    >
+                      <div>
+                        <p className="text-foreground">
+                          {task.name} starts after <span className="font-medium">{predTask?.name ?? "Unknown task"}</span>
+                        </p>
+                        <p className="text-muted-foreground mt-0.5">
+                          {formatDependencyRule(dep.lagDays)} {formatAutoMoveTag(dep.autoShift)}.
+                        </p>
+                        {conflict ? (
+                          <p className="text-[11px] text-amber-700 mt-1">
+                            {conflict.message} {conflict.suggestion}
+                          </p>
+                        ) : null}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <button
+                          className="text-muted-foreground hover:text-primary p-0.5"
+                          onClick={() => loadDependencyIntoForm(dep.id)}
+                          title="Edit"
+                        >
+                          <Pencil className="h-3 w-3" />
+                        </button>
+                        <button
+                          className="text-muted-foreground hover:text-destructive p-0.5"
+                          onClick={() => removeDependency(dep.id)}
+                          title="Remove"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <button
-                        className="text-muted-foreground hover:text-primary p-0.5"
-                        onClick={() => loadDependencyIntoForm(dep.id)}
-                        title="Edit"
-                      >
-                        <Pencil className="h-3 w-3" />
-                      </button>
-                      <button
-                        className="text-muted-foreground hover:text-destructive p-0.5"
-                        onClick={() => removeDependency(dep.id)}
-                        title="Remove"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <p className="text-xs text-muted-foreground">No dependencies yet for this task.</p>
@@ -700,3 +716,7 @@ export function TaskDetailPanel({ taskId, onClose, onQuickAddDependency }: TaskD
 function LabelText({ text }: { text: string }) {
   return <span className="text-[10px] text-muted-foreground">{text}</span>;
 }
+
+
+
+

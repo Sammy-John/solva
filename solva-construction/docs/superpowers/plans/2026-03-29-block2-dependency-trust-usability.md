@@ -119,7 +119,7 @@ Run:
 - `npm run test -- src/lib/scheduling.test.ts`
 - `npm run build`
 Expected: PASS
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ### Task 4: Strengthen Dependency Conflict Visibility In Table + Task Detail
 
@@ -128,17 +128,17 @@ Expected: PASS
 - Modify: `src/components/schedule/TaskDetailPanel.tsx`
 - Modify: `src/lib/scheduling.ts`
 
-- [ ] **Step 1: Define conflict explanation helper output**
+- [x] **Step 1: Define conflict explanation helper output**
 Add helper to produce specific reason text for invalid dependency (earliest allowed date vs actual).
-- [ ] **Step 2: Surface specific conflict text in tooltip/panel**
+- [x] **Step 2: Surface specific conflict text in tooltip/panel**
 Replace generic conflict copy with explicit explanation and suggested action.
-- [ ] **Step 3: Ensure no regression in warning logic**
+- [x] **Step 3: Ensure no regression in warning logic**
 Keep `getInvalidDependencies` as source-of-truth; only improve display detail.
-- [ ] **Step 4: Verify with manual scenario checks**
+- [x] **Step 4: Verify with manual scenario checks**
 Manual checks:
 - manual successor before allowed date with auto-shift OFF
 - warning appears with clear reason
-- [ ] **Step 5: Run build**
+- [x] **Step 5: Run build**
 Run: `npm run build`
 Expected: PASS
 - [ ] **Step 6: Commit**
