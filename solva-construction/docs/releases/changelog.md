@@ -221,3 +221,30 @@ Copy this block for each completed release/task:
 - Because the original signing private key was unavailable, updater key identity changed.
 - Existing `1.0.2` installs will need a one-time manual installer move to `1.0.3`.
 - After that one-time move, future updates can use the new key normally.
+
+## 2026-03-29 - Block2 Tasks 1-5 Complete
+
+**Version:** `1.0.5`
+**Plan Task:** `Block2 - Dependency Trust & Usability (Tasks 1-5)`
+
+### Completed
+- Implemented task-profile-first dependency workflow so users can add/edit/remove links directly in Task Profile.
+- Added builder-friendly dependency language helpers and replaced technical terms in core dependency views.
+- Added cascade movement summaries (`from -> to`) with explicit upstream reason metadata.
+- Upgraded cascade toast to show concise, task-level "what changed and why" details.
+- Added dependency conflict explanation helper with clear table tooltip and task-profile guidance text.
+- Added deterministic cascade guardrails:
+  - stable affected-task ordering
+  - stable movement summary ordering
+  - no duplicate movement summaries for revisited tasks
+- Expanded scheduling tests to cover cascade explainability and trust guardrails.
+
+### Verification Notes
+- `npm run test -- src/lib/dependencyUx.test.ts` PASS
+- `npm run test -- src/lib/scheduling.test.ts` PASS (6 tests)
+- `npm run test` PASS
+- `npm run build` PASS
+
+### Follow-ups
+- Run `docs/releases/block2-dependency-smoke-test.md` on installed app build with realistic project data.
+- Complete Block2 Task 6 final acceptance checklist and release handoff.

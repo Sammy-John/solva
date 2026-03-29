@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/dialog';
 import { ArrowRight, Workflow } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { formatAutoMoveTag, formatDependencyRule } from '@/lib/dependencyUx';
 
 interface DependencyChainModalProps {
   taskId: string | null;
@@ -108,7 +109,7 @@ export function DependencyChainModal({
         <DialogHeader>
           <DialogTitle className="text-sm font-semibold flex items-center gap-2">
             <Workflow className="h-4 w-4" />
-            Dependency Chain - {currentTask.name}
+            Dependency Links - {currentTask.name}
           </DialogTitle>
         </DialogHeader>
 
@@ -174,12 +175,12 @@ export function DependencyChainModal({
 
           <div className="space-y-2">
             <h4 className="text-xs font-semibold uppercase tracking-[0.08em] text-foreground/80">
-              Dependencies ({chainDependencies.length})
+              Links ({chainDependencies.length})
             </h4>
             <div className="rounded-md border max-h-[430px] overflow-y-auto">
               {chainDependencies.length === 0 ? (
                 <div className="px-3 py-3 text-xs text-muted-foreground">
-                  No dependencies in this chain.
+                  No links in this chain.
                 </div>
               ) : (
                 <div className="divide-y">
@@ -198,10 +199,10 @@ export function DependencyChainModal({
                         </div>
                         <div className="mt-1 flex flex-wrap gap-1.5 text-[11px] text-muted-foreground">
                           <span className="rounded bg-muted px-1.5 py-0.5">
-                            Rule: FS +{dep.lagDays}d
+                            Rule: {formatDependencyRule(dep.lagDays)}
                           </span>
                           <span className="rounded bg-muted px-1.5 py-0.5">
-                            {dep.autoShift ? 'Auto-shift' : 'Manual'}
+                            {formatAutoMoveTag(dep.autoShift)}
                           </span>
                           {isDirect ? (
                             <span className="rounded bg-primary/10 px-1.5 py-0.5 text-primary">
@@ -224,9 +225,10 @@ export function DependencyChainModal({
         </div>
 
         <p className="text-xs text-muted-foreground mt-1">
-          Tip: Open "Task Dependencies" to add, edit, or remove links.
+          Tip: Open Task Links to add, edit, or remove links.
         </p>
       </DialogContent>
     </Dialog>
   );
 }
+

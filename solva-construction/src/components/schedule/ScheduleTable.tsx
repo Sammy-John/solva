@@ -12,6 +12,7 @@ import {
   getUrgencyTooltip,
   getInvalidDependencies,
   getWorkflowChainCount,
+  getDependencyConflictDetails,
   hasMissingSupplyDates,
   isPastDue,
 } from "@/lib/scheduling";
@@ -127,6 +128,8 @@ export function ScheduleTable({
   const [draggingTaskId, setDraggingTaskId] = useState<string | null>(null);
   const [dragOverTaskId, setDragOverTaskId] = useState<string | null>(null);
   const invalidDeps = getInvalidDependencies(tasks, dependencies);
+  const conflictDetails = getDependencyConflictDetails(tasks, dependencies);
+  const conflictByDepId = new Map(conflictDetails.map((detail) => [detail.dependencyId, detail]));
   const filteredTasks = tasks.filter((t) => {
     if (filterType !== "All" && t.taskType !== filterType) return false;
     if (filterGroup !== "All" && t.userGroup !== filterGroup) return false;
@@ -253,6 +256,7 @@ export function ScheduleTable({
                 people={people}
                 dependencies={dependencies}
                 invalidDeps={invalidDeps}
+                conflictByDepId={conflictByDepId}
                 affectedIds={affectedIds}
                 editingCell={editingCell}
                 setEditingCell={setEditingCell}
@@ -305,6 +309,7 @@ interface SectionBlockProps {
   people: any[];
   dependencies: any[];
   invalidDeps: string[];
+  conflictByDepId: Map<string, { message: string; suggestion: string }>;
   affectedIds: string[];
   editingCell: { id: string; field: string } | null;
   setEditingCell: (v: { id: string; field: string } | null) => void;
@@ -334,6 +339,7 @@ function SectionBlock({
   people,
   dependencies,
   invalidDeps,
+  conflictByDepId,
   affectedIds,
   editingCell,
   setEditingCell,
@@ -430,6 +436,7 @@ function SectionBlock({
             people={people}
             dependencies={dependencies}
             invalidDeps={invalidDeps}
+                conflictByDepId={conflictByDepId}
             isAffected={affectedIds.includes(task.id)}
             editingCell={editingCell}
             setEditingCell={setEditingCell}
@@ -453,6 +460,7 @@ interface TaskRowProps {
   people: any[];
   dependencies: any[];
   invalidDeps: string[];
+  conflictByDepId: Map<string, { message: string; suggestion: string }>;
   isAffected: boolean;
   editingCell: { id: string; field: string } | null;
   setEditingCell: (v: { id: string; field: string } | null) => void;
@@ -476,6 +484,7 @@ function TaskRow({
   people,
   dependencies,
   invalidDeps,
+  conflictByDepId,
   isAffected,
   editingCell,
   setEditingCell,
@@ -501,9 +510,11 @@ function TaskRow({
     task.status,
     task.startDate,
   );
-  const hasWarning = dependencies.some(
-    (d: any) => d.successorId === task.id && invalidDeps.includes(d.id),
-  );
+  const conflictingDependencies = dependencies.filter((d: any) => d.successorId === task.id && invalidDeps.includes(d.id));
+  const hasWarning = conflictingDependencies.length > 0;
+  const conflictTooltipLines = conflictingDependencies
+    .map((dep: any) => conflictByDepId.get(dep.id))
+    .filter((detail): detail is { message: string; suggestion: string } => Boolean(detail));
   const chainCount = getWorkflowChainCount(task.id, dependencies);
   const isDragOver = dragOverTaskId === task.id && draggingTaskId !== task.id;
   const assignedPeople = people.filter((p: any) =>
@@ -569,7 +580,7 @@ function TaskRow({
                 <AlertTriangle className="h-3.5 w-3.5 text-[hsl(var(--urgency-orange))] shrink-0" />
               </TooltipTrigger>
               <TooltipContent>
-                Schedule conflict — dependency violated
+                {conflictTooltipLines.length > 0 ? conflictTooltipLines.map((line) => line.message).join(" ") : "Schedule conflict — dependency violated"}
               </TooltipContent>
             </Tooltip>
           ) : null}
@@ -856,6 +867,8 @@ function NewSectionRow({ onAdd }: { onAdd: (name: string) => Section | null }) {
     </tr>
   );
 }
+
+
 
 
 

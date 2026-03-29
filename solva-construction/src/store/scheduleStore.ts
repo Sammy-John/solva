@@ -13,6 +13,7 @@ import {
   recalcDuration,
   shouldAutoDelayTask,
   createsDependencyCycle,
+  CascadeMovementSummary,
 } from "@/lib/scheduling";
 
 interface DependencyMutationResult {
@@ -25,7 +26,7 @@ interface ScheduleState {
   people: Person[];
   dependencies: Dependency[];
   sections: Section[];
-  cascadeNotification: { message: string; affectedIds: string[] } | null;
+  cascadeNotification: { message: string; affectedIds: string[]; details: string[] } | null;
 
   setScheduleData: (
     tasks: Task[],
@@ -146,11 +147,18 @@ const validateDependency = (
 const dependencyShiftNotification = (
   sourceTaskName: string,
   affectedIds: string[],
-): { message: string; affectedIds: string[] } | null => {
+  movementSummaries: CascadeMovementSummary[],
+): { message: string; affectedIds: string[]; details: string[] } | null => {
   if (affectedIds.length === 0) return null;
+
+  const details = movementSummaries.slice(0, 3).map((summary) => {
+    return `${summary.taskName}: ${summary.fromStartDate || "(none)"} -> ${summary.toStartDate} (because ${summary.constrainedByTaskName} must finish first${summary.lagDays > 0 ? ` + ${summary.lagDays} day${summary.lagDays === 1 ? "" : "s"}` : ""}).`;
+  });
+
   return {
-    message: `Cascade: ${sourceTaskName} -> ${affectedIds.length} task${affectedIds.length > 1 ? "s" : ""} shifted.`,
+    message: `Cascade: ${sourceTaskName} moved ${affectedIds.length} task${affectedIds.length > 1 ? "s" : ""}.`,
     affectedIds,
+    details,
   };
 };
 
@@ -227,13 +235,11 @@ export const useScheduleStore = create<ScheduleState>((set, get) => ({
       cascadeDelayed(id, new Set([id]));
     }
 
-    const notification =
-      affectedIds.length > 0
-        ? {
-            message: `Cascade: ${result.sourceTaskName} -> ${affectedIds.length} task${affectedIds.length > 1 ? "s" : ""} affected.`,
-            affectedIds,
-          }
-        : null;
+    const notification = dependencyShiftNotification(
+      result.sourceTaskName,
+      affectedIds,
+      result.movementSummaries,
+    );
 
     set({ tasks: finalTasks, cascadeNotification: notification });
   },
@@ -349,6 +355,7 @@ export const useScheduleStore = create<ScheduleState>((set, get) => ({
       cascadeNotification: dependencyShiftNotification(
         result.sourceTaskName,
         result.affectedIds,
+        result.movementSummaries,
       ),
     });
 
@@ -395,6 +402,7 @@ export const useScheduleStore = create<ScheduleState>((set, get) => ({
       cascadeNotification: dependencyShiftNotification(
         result.sourceTaskName,
         result.affectedIds,
+        result.movementSummaries,
       ),
     });
 
@@ -408,3 +416,6 @@ export const useScheduleStore = create<ScheduleState>((set, get) => ({
 
   dismissCascadeNotification: () => set({ cascadeNotification: null }),
 }));
+
+
+
