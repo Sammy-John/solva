@@ -163,7 +163,7 @@ Keep existing logic, add only guardrails needed for deterministic movement summa
 - [x] **Step 4: Re-run tests**
 Run: `npm run test -- src/lib/scheduling.test.ts`
 Expected: PASS
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ### Task 6: Block2 Acceptance + Documentation Updates
 
@@ -172,17 +172,17 @@ Expected: PASS
 - Modify: `docs/superpowers/plans/2026-03-29-block2-dependency-trust-usability.md`
 - Create: `docs/releases/block2-dependency-smoke-test.md`
 
-- [ ] **Step 1: Add Block2 smoke checklist doc**
+- [x] **Step 1: Add Block2 smoke checklist doc**
 Include scenarios for setup reachability, dependency readability, and cascade explainability.
-- [ ] **Step 2: Record implementation outcomes in changelog**
+- [x] **Step 2: Record implementation outcomes in changelog**
 Capture versions, commands run, pass/fail notes.
-- [ ] **Step 3: Mark plan checklist items complete as executed**
-- [ ] **Step 4: Final verification run**
+- [x] **Step 3: Mark plan checklist items complete as executed**
+- [x] **Step 4: Final verification run**
 Run:
 - `npm run test`
 - `npm run build`
 Expected: PASS
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ## Scope Guardrails For Block2
 
