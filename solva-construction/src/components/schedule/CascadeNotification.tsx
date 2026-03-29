@@ -11,7 +11,7 @@ export function CascadeNotification() {
       const timer = setTimeout(() => {
         setVisible(false);
         dismissCascadeNotification();
-      }, 5000);
+      }, 7000);
       return () => clearTimeout(timer);
     }
   }, [cascadeNotification, dismissCascadeNotification]);
@@ -19,10 +19,19 @@ export function CascadeNotification() {
   if (!visible || !cascadeNotification) return null;
 
   return (
-    <div className="fixed bottom-4 left-4 z-50 bg-card border rounded-lg shadow-lg px-4 py-3 max-w-sm">
-      <p className="font-mono text-xs font-medium text-foreground">
+    <div className="fixed bottom-4 left-4 z-50 bg-card border rounded-lg shadow-lg px-4 py-3 max-w-md space-y-2">
+      <p className="text-xs font-semibold text-foreground">
         {cascadeNotification.message}
       </p>
+      {cascadeNotification.details.length > 0 ? (
+        <ul className="space-y-1">
+          {cascadeNotification.details.map((detail, idx) => (
+            <li key={`${idx}-${detail}`} className="text-[11px] text-muted-foreground">
+              {detail}
+            </li>
+          ))}
+        </ul>
+      ) : null}
     </div>
   );
 }

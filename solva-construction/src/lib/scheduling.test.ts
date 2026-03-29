@@ -56,6 +56,18 @@ describe('cascadeDependencies', () => {
     expect(successor?.startDate).toBe('2026-01-05');
     expect(successor?.endDate).toBe('2026-01-06');
     expect(result.affectedIds).toContain('succ');
+    expect(result.movementSummaries).toEqual([
+      {
+        taskId: 'succ',
+        taskName: 'Successor',
+        fromStartDate: '2026-01-02',
+        toStartDate: '2026-01-05',
+        constrainedByTaskId: 'pred',
+        constrainedByTaskName: 'Predecessor',
+        dependencyId: 'd1',
+        lagDays: 0,
+      },
+    ]);
   });
 
   it('uses the latest constrained start when a task has multiple auto-shift predecessors', () => {
@@ -107,6 +119,15 @@ describe('cascadeDependencies', () => {
 
     expect(successor?.startDate).toBe('2026-02-10');
     expect(successor?.endDate).toBe('2026-02-11');
+    expect(result.movementSummaries[0]).toMatchObject({
+      taskId: 'succ',
+      fromStartDate: '2026-02-04',
+      toStartDate: '2026-02-10',
+      constrainedByTaskId: 'pred-2',
+      constrainedByTaskName: 'Pred 2',
+      dependencyId: 'd2',
+      lagDays: 2,
+    });
   });
 });
 

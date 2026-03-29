@@ -72,7 +72,7 @@ Update `LinkTasksModal` and `DependencyChainModal` label copy to use helper outp
 - [x] **Step 5: Verify tests pass**
 Run: `npm run test -- src/lib/dependencyUx.test.ts`
 Expected: PASS
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ### Task 2: Make Dependency Setup Reachable From Task Profile
 
@@ -95,7 +95,7 @@ Allow incoming task context to preselect predecessor/successor candidate and foc
 - [x] **Step 5: Verify behavior manually and with build**
 Run: `npm run build`
 Expected: PASS and task-level dependency setup flow works.
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ### Task 3: Improve Cascade Explainability (“What changed and why”)
 
@@ -105,16 +105,16 @@ Expected: PASS and task-level dependency setup flow works.
 - Modify: `src/components/schedule/CascadeNotification.tsx`
 - Modify: `src/lib/scheduling.test.ts`
 
-- [ ] **Step 1: Add failing tests for cascade reason output**
+- [x] **Step 1: Add failing tests for cascade reason output**
 Add tests asserting cascade output includes per-task movement reasons (from date -> to date, constrained by which upstream task/dependency).
-- [ ] **Step 2: Run scheduling tests and confirm fail**
+- [x] **Step 2: Run scheduling tests and confirm fail**
 Run: `npm run test -- src/lib/scheduling.test.ts`
 Expected: FAIL for missing reason metadata.
-- [ ] **Step 3: Extend cascade result shape minimally**
+- [x] **Step 3: Extend cascade result shape minimally**
 In `cascadeDependencies`, add a bounded movement summary payload without changing dependency model.
-- [ ] **Step 4: Show friendly cascade summary in store + toast**
+- [x] **Step 4: Show friendly cascade summary in store + toast**
 Update store notification payload and `CascadeNotification` copy to include concise why/what changed details.
-- [ ] **Step 5: Re-run tests and build**
+- [x] **Step 5: Re-run tests and build**
 Run:
 - `npm run test -- src/lib/scheduling.test.ts`
 - `npm run build`
@@ -204,6 +204,8 @@ Expected: PASS
 - Dependency terminology is easier for non-technical builders.
 - Users can clearly see what moved, and why, after cascades.
 - Date movement behavior feels consistent and trustworthy without widening model scope.
+
+
 
 
 

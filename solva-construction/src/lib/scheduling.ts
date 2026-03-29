@@ -124,19 +124,39 @@ export function getUrgencyTooltip(
 }
 
 // --- Cascade ---
+export interface CascadeMovementSummary {
+  taskId: string;
+  taskName: string;
+  fromStartDate: string;
+  toStartDate: string;
+  constrainedByTaskId: string;
+  constrainedByTaskName: string;
+  dependencyId: string;
+  lagDays: number;
+}
+
 export interface CascadeResult {
   updatedTasks: Task[];
   movedCount: number;
   sourceTaskName: string;
   affectedIds: string[];
+  movementSummaries: CascadeMovementSummary[];
 }
 
-const computeEarliestAutoShiftStart = (
+interface AutoShiftConstraint {
+  earliestStart: string;
+  dependencyId: string;
+  predecessorId: string;
+  predecessorName: string;
+  lagDays: number;
+}
+
+const computeEarliestAutoShiftConstraint = (
   taskId: string,
   dependencies: Dependency[],
   taskMap: Map<string, Task>,
-): string | null => {
-  let earliestStart: string | null = null;
+): AutoShiftConstraint | null => {
+  let selected: AutoShiftConstraint | null = null;
 
   for (const dep of dependencies) {
     if (!dep.autoShift || dep.successorId !== taskId) continue;
@@ -152,12 +172,18 @@ const computeEarliestAutoShiftStart = (
       "yyyy-MM-dd",
     );
 
-    if (!earliestStart || constrainedStart > earliestStart) {
-      earliestStart = constrainedStart;
+    if (!selected || constrainedStart > selected.earliestStart) {
+      selected = {
+        earliestStart: constrainedStart,
+        dependencyId: dep.id,
+        predecessorId: dep.predecessorId,
+        predecessorName: predecessor.name,
+        lagDays: dep.lagDays,
+      };
     }
   }
 
-  return earliestStart;
+  return selected;
 };
 
 export function cascadeDependencies(
@@ -167,6 +193,7 @@ export function cascadeDependencies(
 ): CascadeResult {
   const taskMap = new Map(tasks.map((t) => [t.id, { ...t }]));
   const affectedSet = new Set<string>();
+  const movementByTask = new Map<string, CascadeMovementSummary>();
   const sourceTask = taskMap.get(changedTaskId);
 
   const queue = [changedTaskId];
@@ -186,17 +213,30 @@ export function cascadeDependencies(
     const current = taskMap.get(currentId);
     if (!current) continue;
 
-    const constrainedStart = computeEarliestAutoShiftStart(
+    const constraint = computeEarliestAutoShiftConstraint(
       currentId,
       dependencies,
       taskMap,
     );
 
-    if (constrainedStart && current.startDate < constrainedStart) {
-      current.startDate = constrainedStart;
-      current.endDate = recalcEndDate(constrainedStart, current.duration);
+    if (constraint && current.startDate < constraint.earliestStart) {
+      const originalStartDate = current.startDate;
+      current.startDate = constraint.earliestStart;
+      current.endDate = recalcEndDate(constraint.earliestStart, current.duration);
       taskMap.set(current.id, current);
       affectedSet.add(current.id);
+
+      const existingSummary = movementByTask.get(current.id);
+      movementByTask.set(current.id, {
+        taskId: current.id,
+        taskName: current.name,
+        fromStartDate: existingSummary?.fromStartDate ?? originalStartDate,
+        toStartDate: constraint.earliestStart,
+        constrainedByTaskId: constraint.predecessorId,
+        constrainedByTaskName: constraint.predecessorName,
+        dependencyId: constraint.dependencyId,
+        lagDays: constraint.lagDays,
+      });
     }
 
     const successors = dependencies.filter(
@@ -218,6 +258,7 @@ export function cascadeDependencies(
     movedCount: affectedIds.length,
     sourceTaskName: sourceTask?.name || "",
     affectedIds,
+    movementSummaries: Array.from(movementByTask.values()),
   };
 }
 
