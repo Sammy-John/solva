@@ -1,0 +1,418 @@
+.dashboard-shell,
+.workspace-shell {
+  min-height: 100vh;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px;
+  box-sizing: border-box;
+}
+
+.dashboard-header,
+.workspace-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.dashboard-header-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.dashboard-header h1,
+.workspace-header h1 {
+  margin: 0 0 10px;
+  font-size: 34px;
+  line-height: 1.1;
+  color: #111827;
+}
+
+.dashboard-header p,
+.workspace-description,
+.workspace-body p {
+  margin: 0;
+  color: #475569;
+  max-width: 760px;
+}
+
+.projects-panel,
+.workspace-body {
+  border: 1px solid #dbe2ea;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+}
+
+.templates-panel {
+  margin-top: 18px;
+}
+
+.projects-panel-header,
+.workspace-body {
+  padding: 22px;
+}
+
+.projects-panel-header {
+  border-bottom: 1px solid #edf2f7;
+}
+
+.templates-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.projects-panel-header h2,
+.workspace-body h2 {
+  margin: 0;
+  font-size: 20px;
+  color: #0f172a;
+}
+
+.empty-state {
+  padding: 28px 22px;
+  color: #64748b;
+}
+
+.empty-state p {
+  margin: 0;
+}
+
+.project-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.project-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding: 16px 22px;
+  border-top: 1px solid #edf2f7;
+}
+
+.project-row h3 {
+  margin: 0;
+  font-size: 17px;
+  color: #111827;
+}
+
+.project-row p {
+  margin: 5px 0 0;
+  color: #64748b;
+}
+
+.template-meta {
+  font-size: 12px;
+}
+
+.project-row-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.primary-button,
+.secondary-button {
+  border: none;
+  border-radius: 10px;
+  padding: 11px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primary-button {
+  background: #155eef;
+  color: #ffffff;
+}
+
+.primary-button:hover {
+  background: #0f4fd0;
+}
+
+.secondary-button {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.secondary-button:hover {
+  background: #e2e8f0;
+}
+
+.danger-button {
+  border: none;
+  border-radius: 10px;
+  padding: 11px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  background: #fef2f2;
+  color: #b42318;
+}
+
+.danger-button:hover {
+  background: #fee2e2;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 520px;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #dbe2ea;
+  box-shadow: 0 26px 48px rgba(2, 6, 23, 0.24);
+  padding: 22px;
+}
+
+.modal-card h2 {
+  margin: 0 0 16px;
+  color: #111827;
+}
+
+.modal-form {
+  display: grid;
+  gap: 14px;
+}
+
+.modal-form label {
+  display: grid;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.modal-form input,
+.modal-form textarea,
+.modal-form select {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 10px;
+  font: inherit;
+  color: #111827;
+  background: #ffffff;
+}
+
+.modal-form input:focus,
+.modal-form textarea:focus,
+.modal-form select:focus {
+  outline: 2px solid #a5b4fc;
+  border-color: #6366f1;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.field-error,
+.inline-error {
+  margin: -4px 0 0;
+  font-size: 13px;
+  color: #b42318;
+}
+
+.field-help {
+  margin: -6px 0 0;
+  font-size: 12px;
+  color: #475569;
+}
+
+.workspace-kicker {
+  margin: 0 0 8px;
+  color: #0369a1;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.status-alert {
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid #fecaca;
+  background: #fff7f7;
+}
+
+.status-alert strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #991b1b;
+}
+
+.status-alert p {
+  margin: 0;
+  color: #7f1d1d;
+}
+
+.status-alert-error {
+  border-color: #fecaca;
+  background: #fff7f7;
+}
+
+.storage-panel {
+  position: fixed;
+  left: 12px;
+  bottom: 12px;
+  z-index: 9999;
+  width: min(440px, calc(100vw - 24px));
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid #dbe2ea;
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.storage-panel-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.storage-mode,
+.storage-runtime {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.storage-mode-sqlite {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.storage-mode-browser-fallback-localstorage {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.storage-mode-sqlite-error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.storage-runtime {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.storage-panel-label {
+  margin: 0 0 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #475569;
+}
+
+.storage-panel-value,
+.storage-panel-hint {
+  margin: 0 0 10px;
+  font-size: 12px;
+  color: #0f172a;
+  word-break: break-all;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.storage-panel-hint {
+  color: #475569;
+}
+
+.storage-panel-button {
+  width: 100%;
+}
+
+.storage-panel-actions {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.storage-update-status {
+  margin: 0 0 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.storage-update-status-up-to-date,
+.storage-update-status-not-tauri {
+  background: #eff6ff;
+  color: #1e3a8a;
+}
+
+.storage-update-status-update-available {
+  background: #fff7ed;
+  color: #9a3412;
+}
+
+.storage-update-status-installed {
+  background: #ecfdf5;
+  color: #166534;
+}
+
+.storage-update-status-error {
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+@media (max-width: 900px) {
+  .dashboard-shell,
+  .workspace-shell {
+    padding: 24px;
+  }
+
+  .dashboard-header,
+  .workspace-header,
+  .project-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .dashboard-header-actions {
+    width: 100%;
+  }
+}
+
+
+.storage-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  font-size: 12px;
+  color: #334155;
+}
+
+.storage-checkbox-row input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+}
