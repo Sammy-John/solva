@@ -2,6 +2,10 @@ import { describe, expect, it } from 'vitest';
 import {
   cascadeDependencies,
   createsDependencyCycle,
+  getUrgency,
+  getUrgencyTooltip,
+  hasMissingSupplyDates,
+  isPastDue,
 } from '@/lib/scheduling';
 import { Dependency, Task } from '@/types/scheduling';
 
@@ -300,6 +304,23 @@ describe('cascadeDependencies', () => {
     expect(untouched?.endDate).toBe('2026-06-02');
     expect(result.affectedIds).not.toContain('untouched');
     expect(result.movementSummaries.map((item) => item.taskId)).not.toContain('untouched');
+  });
+});
+
+describe('date-critical urgency parity', () => {
+  it('treats inspection like other date-critical tasks for missing dates', () => {
+    expect(hasMissingSupplyDates('Inspection', '', '', 'Planned')).toBe(true);
+    expect(hasMissingSupplyDates('Inspection', '2026-04-10', '2026-04-11', 'Planned')).toBe(false);
+  });
+
+  it('flags overdue inspection tasks', () => {
+    expect(isPastDue('Inspection', '2020-01-01', 'Planned')).toBe(true);
+    expect(isPastDue('Inspection', '2099-01-01', 'Planned')).toBe(false);
+  });
+
+  it('returns urgency and tooltip copy for inspection', () => {
+    expect(getUrgency('Inspection', '2099-01-10', 'Planned', '2099-01-01')).toBe('green');
+    expect(getUrgencyTooltip('Inspection', '2099-01-10', 'Planned', '2099-01-01')).toContain('Inspection due in');
   });
 });
 
