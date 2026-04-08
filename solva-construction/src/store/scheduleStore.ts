@@ -22,6 +22,7 @@ interface DependencyMutationResult {
 }
 
 interface ScheduleState {
+  excludeWeekends: boolean;
   tasks: Task[];
   people: Person[];
   dependencies: Dependency[];
@@ -58,6 +59,7 @@ interface ScheduleState {
   ) => DependencyMutationResult;
   removeDependency: (id: string) => void;
 
+  setExcludeWeekends: (excludeWeekends: boolean) => void;
   dismissCascadeNotification: () => void;
 }
 
@@ -163,6 +165,7 @@ const dependencyShiftNotification = (
 };
 
 export const useScheduleStore = create<ScheduleState>((set, get) => ({
+  excludeWeekends: true,
   tasks: initialTasks,
   people: initialPeople,
   dependencies: initialDependencies,
@@ -183,9 +186,9 @@ export const useScheduleStore = create<ScheduleState>((set, get) => ({
 
   updateTask: (id, updates) => {
     const state = get();
-    const tasks = state.tasks.map((t) => {
-      if (t.id !== id) return t;
-      const updated = { ...t, ...updates };
+    const tasks = state.tasks.map((task) => {
+      if (task.id !== id) return task;
+      const updated = { ...task, ...updates };
 
       if ("taskType" in updates && updates.taskType) {
         updated.userGroup = userGroupFromTaskType(updated.taskType);
@@ -193,45 +196,57 @@ export const useScheduleStore = create<ScheduleState>((set, get) => ({
 
       const hasStartDate = Boolean(updated.startDate);
       const hasEndDate = Boolean(updated.endDate);
+
       if ("startDate" in updates && !("endDate" in updates)) {
         updated.endDate = hasStartDate
-          ? recalcEndDate(updated.startDate, updated.duration)
+          ? recalcEndDate(updated.startDate, updated.duration, state.excludeWeekends)
           : "";
       } else if ("endDate" in updates && !("startDate" in updates)) {
         updated.duration =
           hasStartDate && hasEndDate
-            ? recalcDuration(updated.startDate, updated.endDate)
+            ? recalcDuration(updated.startDate, updated.endDate, state.excludeWeekends)
             : 0;
       } else if ("duration" in updates && !("endDate" in updates)) {
         updated.endDate = hasStartDate
-          ? recalcEndDate(updated.startDate, updated.duration)
+          ? recalcEndDate(updated.startDate, updated.duration, state.excludeWeekends)
           : "";
       }
+
       return updated;
     });
 
-    const result = cascadeDependencies(tasks, state.dependencies, id);
+    const result = cascadeDependencies(
+      tasks,
+      state.dependencies,
+      id,
+      state.excludeWeekends,
+    );
+
     let finalTasks = result.updatedTasks.map(normalizeTask);
     const affectedIds = [...result.affectedIds];
 
     if ("status" in updates && updates.status === "Delayed") {
       const cascadeDelayed = (taskId: string, visited: Set<string>) => {
-        const succs = state.dependencies.filter(
-          (d) => d.predecessorId === taskId,
+        const successors = state.dependencies.filter(
+          (dep) => dep.predecessorId === taskId,
         );
-        for (const dep of succs) {
-          if (visited.has(dep.successorId)) continue;
-          visited.add(dep.successorId);
-          finalTasks = finalTasks.map((t) => {
-            if (t.id === dep.successorId && t.status !== "Completed") {
-              if (!affectedIds.includes(t.id)) affectedIds.push(t.id);
-              return { ...t, status: "Delayed" as TaskStatus };
+
+        for (const dependency of successors) {
+          if (visited.has(dependency.successorId)) continue;
+          visited.add(dependency.successorId);
+
+          finalTasks = finalTasks.map((task) => {
+            if (task.id === dependency.successorId && task.status !== "Completed") {
+              if (!affectedIds.includes(task.id)) affectedIds.push(task.id);
+              return { ...task, status: "Delayed" as TaskStatus };
             }
-            return t;
+            return task;
           });
-          cascadeDelayed(dep.successorId, visited);
+
+          cascadeDelayed(dependency.successorId, visited);
         }
       };
+
       cascadeDelayed(id, new Set([id]));
     }
 
@@ -246,9 +261,9 @@ export const useScheduleStore = create<ScheduleState>((set, get) => ({
 
   deleteTask: (id) =>
     set((state) => ({
-      tasks: state.tasks.filter((t) => t.id !== id),
+      tasks: state.tasks.filter((task) => task.id !== id),
       dependencies: state.dependencies.filter(
-        (d) => d.predecessorId !== id && d.successorId !== id,
+        (dep) => dep.predecessorId !== id && dep.successorId !== id,
       ),
     })),
 
@@ -320,16 +335,20 @@ export const useScheduleStore = create<ScheduleState>((set, get) => ({
 
   addPerson: (person) =>
     set((state) => ({ people: [...state.people, person] })),
+
   updatePerson: (id, updates) =>
     set((state) => ({
-      people: state.people.map((p) => (p.id === id ? { ...p, ...updates } : p)),
+      people: state.people.map((person) =>
+        person.id === id ? { ...person, ...updates } : person,
+      ),
     })),
+
   removePerson: (id) =>
     set((state) => ({
-      people: state.people.filter((p) => p.id !== id),
-      tasks: state.tasks.map((t) => ({
-        ...t,
-        assignedTo: t.assignedTo.filter((assignedId) => assignedId !== id),
+      people: state.people.filter((person) => person.id !== id),
+      tasks: state.tasks.map((task) => ({
+        ...task,
+        assignedTo: task.assignedTo.filter((assignedId) => assignedId !== id),
       })),
     })),
 
@@ -346,11 +365,16 @@ export const useScheduleStore = create<ScheduleState>((set, get) => ({
       notes: dep.notes?.trim() ?? "",
     };
 
-    const newDeps = [...state.dependencies, normalizedDep];
-    const result = cascadeDependencies(state.tasks, newDeps, normalizedDep.predecessorId);
+    const newDependencies = [...state.dependencies, normalizedDep];
+    const result = cascadeDependencies(
+      state.tasks,
+      newDependencies,
+      normalizedDep.predecessorId,
+      state.excludeWeekends,
+    );
 
     set({
-      dependencies: newDeps,
+      dependencies: newDependencies,
       tasks: result.updatedTasks.map(normalizeTask),
       cascadeNotification: dependencyShiftNotification(
         result.sourceTaskName,
@@ -394,6 +418,7 @@ export const useScheduleStore = create<ScheduleState>((set, get) => ({
       state.tasks,
       updatedDependencies,
       candidate.predecessorId,
+      state.excludeWeekends,
     );
 
     set({
@@ -411,11 +436,47 @@ export const useScheduleStore = create<ScheduleState>((set, get) => ({
 
   removeDependency: (id) =>
     set((state) => ({
-      dependencies: state.dependencies.filter((d) => d.id !== id),
+      dependencies: state.dependencies.filter((dep) => dep.id !== id),
     })),
+
+  setExcludeWeekends: (excludeWeekends) =>
+    set((state) => {
+      const recalculatedTasks = state.tasks.map((task) => {
+        if (!task.startDate) return task;
+        const normalizedDuration = Math.max(0, Math.floor(task.duration || 0));
+        if (normalizedDuration === 0) return task;
+
+        return {
+          ...task,
+          endDate: recalcEndDate(task.startDate, normalizedDuration, excludeWeekends),
+        };
+      });
+
+      let cascadedTasks = recalculatedTasks;
+      const autoShiftRoots = Array.from(
+        new Set(
+          state.dependencies
+            .filter((dep) => dep.autoShift)
+            .map((dep) => dep.predecessorId),
+        ),
+      );
+
+      for (const rootTaskId of autoShiftRoots) {
+        const cascade = cascadeDependencies(
+          cascadedTasks,
+          state.dependencies,
+          rootTaskId,
+          excludeWeekends,
+        );
+        cascadedTasks = cascade.updatedTasks;
+      }
+
+      return {
+        excludeWeekends,
+        tasks: cascadedTasks.map(normalizeTask),
+        cascadeNotification: null,
+      };
+    }),
 
   dismissCascadeNotification: () => set({ cascadeNotification: null }),
 }));
-
-
-

@@ -117,6 +117,7 @@ export function ScheduleTable({
     deleteSection,
     reorderTask,
     cascadeNotification,
+    excludeWeekends,
   } = useScheduleStore();
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(
     new Set(),
@@ -127,8 +128,8 @@ export function ScheduleTable({
   } | null>(null);
   const [draggingTaskId, setDraggingTaskId] = useState<string | null>(null);
   const [dragOverTaskId, setDragOverTaskId] = useState<string | null>(null);
-  const invalidDeps = getInvalidDependencies(tasks, dependencies);
-  const conflictDetails = getDependencyConflictDetails(tasks, dependencies);
+  const invalidDeps = getInvalidDependencies(tasks, dependencies, excludeWeekends);
+  const conflictDetails = getDependencyConflictDetails(tasks, dependencies, excludeWeekends);
   const conflictByDepId = new Map(conflictDetails.map((detail) => [detail.dependencyId, detail]));
   const filteredTasks = tasks.filter((t) => {
     if (filterType !== "All" && t.taskType !== filterType) return false;
@@ -164,13 +165,20 @@ export function ScheduleTable({
     updateTask(taskId, updates);
     setEditingCell(null);
   };
-  const handleDropOnTask = (targetTaskId: string, targetSectionId: string) => {
-    if (!draggingTaskId || draggingTaskId === targetTaskId) return;
-    reorderTask(draggingTaskId, targetTaskId, targetSectionId);
+  const handleDropOnTask = (
+    sourceTaskId: string | null,
+    targetTaskId: string,
+    targetSectionId: string,
+  ) => {
+    if (!sourceTaskId || sourceTaskId === targetTaskId) return;
+    reorderTask(sourceTaskId, targetTaskId, targetSectionId);
   };
-  const handleDropOnSection = (targetSectionId: string) => {
-    if (!draggingTaskId) return;
-    reorderTask(draggingTaskId, null, targetSectionId);
+  const handleDropOnSection = (
+    sourceTaskId: string | null,
+    targetSectionId: string,
+  ) => {
+    if (!sourceTaskId) return;
+    reorderTask(sourceTaskId, null, targetSectionId);
   };
   const sortedSections = [...sections].sort((a, b) => a.order - b.order);
   const sectionGroups = sortedSections.map((section) => {
@@ -252,11 +260,11 @@ export function ScheduleTable({
                 criticalCount={criticalCount}
                 onToggle={() => toggleSection(section.id)}
                 onDelete={() => deleteSection(section.id)}
-                onDropOnSection={() => handleDropOnSection(section.id)}
+                onDropOnSection={(sourceTaskId) => handleDropOnSection(sourceTaskId, section.id)}
                 people={people}
                 dependencies={dependencies}
                 invalidDeps={invalidDeps}
-                conflictByDepId={conflictByDepId}
+            conflictByDepId={conflictByDepId}
                 affectedIds={affectedIds}
                 editingCell={editingCell}
                 setEditingCell={setEditingCell}
@@ -305,7 +313,7 @@ interface SectionBlockProps {
   criticalCount: number;
   onToggle: () => void;
   onDelete: () => void;
-  onDropOnSection: () => void;
+  onDropOnSection: (sourceTaskId: string | null) => void;
   people: any[];
   dependencies: any[];
   invalidDeps: string[];
@@ -325,7 +333,11 @@ interface SectionBlockProps {
   dragOverTaskId: string | null;
   setDraggingTaskId: (id: string | null) => void;
   setDragOverTaskId: (id: string | null) => void;
-  onDropOnTask: (targetTaskId: string, targetSectionId: string) => void;
+  onDropOnTask: (
+    sourceTaskId: string | null,
+    targetTaskId: string,
+    targetSectionId: string,
+  ) => void;
 }
 function SectionBlock({
   section,
@@ -359,12 +371,16 @@ function SectionBlock({
         className="bg-muted/70 border-b border-border/60 cursor-pointer hover:bg-muted transition-colors"
         onClick={onToggle}
         onDragOver={(e) => {
-          if (!draggingTaskId) return;
+          const draggedId =
+            draggingTaskId || e.dataTransfer.getData("text/task-id");
+          if (!draggedId) return;
           e.preventDefault();
         }}
         onDrop={(e) => {
           e.preventDefault();
-          onDropOnSection();
+          const draggedId =
+            draggingTaskId || e.dataTransfer.getData("text/task-id");
+          onDropOnSection(draggedId || null);
           setDragOverTaskId(null);
           setDraggingTaskId(null);
         }}
@@ -436,7 +452,7 @@ function SectionBlock({
             people={people}
             dependencies={dependencies}
             invalidDeps={invalidDeps}
-                conflictByDepId={conflictByDepId}
+            conflictByDepId={conflictByDepId}
             isAffected={affectedIds.includes(task.id)}
             editingCell={editingCell}
             setEditingCell={setEditingCell}
@@ -476,7 +492,11 @@ interface TaskRowProps {
   dragOverTaskId: string | null;
   setDraggingTaskId: (id: string | null) => void;
   setDragOverTaskId: (id: string | null) => void;
-  onDropOnTask: (targetTaskId: string, targetSectionId: string) => void;
+  onDropOnTask: (
+    sourceTaskId: string | null,
+    targetTaskId: string,
+    targetSectionId: string,
+  ) => void;
 }
 function TaskRow({
   task,
@@ -522,7 +542,8 @@ function TaskRow({
   );
   const assignablePeople = people.filter(
     (p: any) => !task.assignedTo.includes(p.id),
-  );  return (
+  );
+  return (
     <tr
       className={cn(
         "border-b border-border/60 cursor-pointer transition-colors group text-foreground text-[10px] leading-4",
@@ -533,7 +554,10 @@ function TaskRow({
       )}
       onClick={() => onSelectTask(task.id)}
       onDragOver={(e) => {
-        const draggedTask = allTasks.find((t) => t.id === draggingTaskId);
+        const draggedId =
+          draggingTaskId || e.dataTransfer.getData("text/task-id");
+        if (!draggedId) return;
+        const draggedTask = allTasks.find((t) => t.id === draggedId);
         if (!draggedTask || draggedTask.id === task.id) return;
         e.preventDefault();
         setDragOverTaskId(task.id);
@@ -545,7 +569,9 @@ function TaskRow({
       }}
       onDrop={(e) => {
         e.preventDefault();
-        onDropOnTask(task.id, task.sectionId);
+        const draggedId =
+          draggingTaskId || e.dataTransfer.getData("text/task-id");
+        onDropOnTask(draggedId || null, task.id, task.sectionId);
         setDragOverTaskId(null);
         setDraggingTaskId(null);
       }}
@@ -563,6 +589,7 @@ function TaskRow({
           onDragStart={(e) => {
             setDraggingTaskId(task.id);
             e.dataTransfer.effectAllowed = "move";
+            e.dataTransfer.setData("text/task-id", task.id);
           }}
           onDragEnd={() => {
             setDraggingTaskId(null);
@@ -867,6 +894,8 @@ function NewSectionRow({ onAdd }: { onAdd: (name: string) => Section | null }) {
     </tr>
   );
 }
+
+
 
 
 

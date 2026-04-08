@@ -13,19 +13,118 @@ import {
   isValid,
 } from "date-fns";
 
-// --- Date helpers ---
-export function recalcEndDate(startDate: string, duration: number): string {
-  const parsedStart = parseISO(startDate);
-  if (!isValid(parsedStart)) return "";
-  const safeDuration = Math.max(0, Math.floor(duration));
-  const inclusiveOffset = safeDuration > 0 ? safeDuration - 1 : 0;
-  return format(addDays(parsedStart, inclusiveOffset), "yyyy-MM-dd");
+const DATE_FMT = "yyyy-MM-dd";
+
+const isWeekendDate = (date: Date): boolean => {
+  const day = date.getDay();
+  return day === 0 || day === 6;
+};
+
+const formatDate = (date: Date): string => format(date, DATE_FMT);
+
+const addScheduleDays = (
+  startDate: string,
+  days: number,
+  excludeWeekends = false,
+): string | null => {
+  const parsed = parseISO(startDate);
+  if (!isValid(parsed)) return null;
+
+  const safeDays = Math.max(0, Math.floor(days));
+  if (!excludeWeekends) {
+    return formatDate(addDays(parsed, safeDays));
+  }
+
+  if (safeDays === 0) return formatDate(parsed);
+
+  let cursor = parsed;
+  let added = 0;
+  while (added < safeDays) {
+    cursor = addDays(cursor, 1);
+    if (!isWeekendDate(cursor)) {
+      added += 1;
+    }
+  }
+
+  return formatDate(cursor);
+};
+
+export function addLagDays(
+  startDate: string,
+  lagDays: number,
+  excludeWeekends = false,
+): string | null {
+  return addScheduleDays(startDate, lagDays, excludeWeekends);
 }
 
-export function recalcDuration(startDate: string, endDate: string): number {
+const countWorkingDaysInclusive = (startDate: Date, endDate: Date): number => {
+  let cursor = startDate;
+  let total = 0;
+
+  while (cursor <= endDate) {
+    if (!isWeekendDate(cursor)) {
+      total += 1;
+    }
+    cursor = addDays(cursor, 1);
+  }
+
+  return total;
+};
+
+// --- Date helpers ---
+export function recalcEndDate(
+  startDate: string,
+  duration: number,
+  excludeWeekends = false,
+): string {
+  const parsedStart = parseISO(startDate);
+  if (!isValid(parsedStart)) return "";
+
+  const safeDuration = Math.max(0, Math.floor(duration));
+  const inclusiveOffset = safeDuration > 0 ? safeDuration - 1 : 0;
+
+  if (!excludeWeekends) {
+    return formatDate(addDays(parsedStart, inclusiveOffset));
+  }
+
+  if (inclusiveOffset === 0) {
+    if (!isWeekendDate(parsedStart)) {
+      return formatDate(parsedStart);
+    }
+
+    let nextWorking = parsedStart;
+    while (isWeekendDate(nextWorking)) {
+      nextWorking = addDays(nextWorking, 1);
+    }
+    return formatDate(nextWorking);
+  }
+
+  let cursor = parsedStart;
+  let counted = 0;
+  while (counted < inclusiveOffset) {
+    cursor = addDays(cursor, 1);
+    if (!isWeekendDate(cursor)) {
+      counted += 1;
+    }
+  }
+
+  return formatDate(cursor);
+}
+
+export function recalcDuration(
+  startDate: string,
+  endDate: string,
+  excludeWeekends = false,
+): number {
   const parsedStart = parseISO(startDate);
   const parsedEnd = parseISO(endDate);
   if (!isValid(parsedStart) || !isValid(parsedEnd)) return 0;
+
+  if (excludeWeekends) {
+    if (parsedEnd < parsedStart) return 0;
+    return countWorkingDaysInclusive(parsedStart, parsedEnd);
+  }
+
   return Math.max(0, differenceInCalendarDays(parsedEnd, parsedStart) + 1);
 }
 
@@ -165,6 +264,7 @@ const computeEarliestAutoShiftConstraint = (
   taskId: string,
   dependencies: Dependency[],
   taskMap: Map<string, Task>,
+  excludeWeekends: boolean,
 ): AutoShiftConstraint | null => {
   let selected: AutoShiftConstraint | null = null;
 
@@ -174,13 +274,12 @@ const computeEarliestAutoShiftConstraint = (
     const predecessor = taskMap.get(dep.predecessorId);
     if (!predecessor) continue;
 
-    const parsedPredEnd = parseISO(predecessor.endDate);
-    if (!isValid(parsedPredEnd)) continue;
-
-    const constrainedStart = format(
-      addDays(parsedPredEnd, dep.lagDays),
-      "yyyy-MM-dd",
+    const constrainedStart = addScheduleDays(
+      predecessor.endDate,
+      dep.lagDays,
+      excludeWeekends,
     );
+    if (!constrainedStart) continue;
 
     if (!selected || constrainedStart > selected.earliestStart) {
       selected = {
@@ -200,6 +299,7 @@ export function cascadeDependencies(
   tasks: Task[],
   dependencies: Dependency[],
   changedTaskId: string,
+  excludeWeekends = false,
 ): CascadeResult {
   const taskMap = new Map(tasks.map((t) => [t.id, { ...t }]));
   const affectedSet = new Set<string>();
@@ -227,12 +327,17 @@ export function cascadeDependencies(
       currentId,
       dependencies,
       taskMap,
+      excludeWeekends,
     );
 
     if (constraint && current.startDate < constraint.earliestStart) {
       const originalStartDate = current.startDate;
       current.startDate = constraint.earliestStart;
-      current.endDate = recalcEndDate(constraint.earliestStart, current.duration);
+      current.endDate = recalcEndDate(
+        constraint.earliestStart,
+        current.duration,
+        excludeWeekends,
+      );
       taskMap.set(current.id, current);
       affectedSet.add(current.id);
 
@@ -280,6 +385,7 @@ export function cascadeDependencies(
 export function getInvalidDependencies(
   tasks: Task[],
   dependencies: Dependency[],
+  excludeWeekends = false,
 ): string[] {
   const taskMap = new Map(tasks.map((t) => [t.id, t]));
   const invalid: string[] = [];
@@ -289,12 +395,9 @@ export function getInvalidDependencies(
     const succ = taskMap.get(dep.successorId);
     if (!pred || !succ) continue;
 
-    const parsedPredEnd = parseISO(pred.endDate);
-    if (!isValid(parsedPredEnd)) continue;
-    const earliestStart = format(
-      addDays(parsedPredEnd, dep.lagDays),
-      "yyyy-MM-dd",
-    );
+    const earliestStart = addScheduleDays(pred.endDate, dep.lagDays, excludeWeekends);
+    if (!earliestStart) continue;
+
     if (succ.startDate < earliestStart && !dep.autoShift) {
       invalid.push(dep.id);
     }
@@ -318,6 +421,7 @@ export interface DependencyConflictDetail {
 export function getDependencyConflictDetails(
   tasks: Task[],
   dependencies: Dependency[],
+  excludeWeekends = false,
 ): DependencyConflictDetail[] {
   const taskMap = new Map(tasks.map((t) => [t.id, t]));
   const details: DependencyConflictDetail[] = [];
@@ -329,13 +433,12 @@ export function getDependencyConflictDetails(
     const successor = taskMap.get(dep.successorId);
     if (!predecessor || !successor) continue;
 
-    const parsedPredEnd = parseISO(predecessor.endDate);
-    if (!isValid(parsedPredEnd)) continue;
-
-    const earliestAllowedStart = format(
-      addDays(parsedPredEnd, dep.lagDays),
-      "yyyy-MM-dd",
+    const earliestAllowedStart = addScheduleDays(
+      predecessor.endDate,
+      dep.lagDays,
+      excludeWeekends,
     );
+    if (!earliestAllowedStart) continue;
 
     if (!successor.startDate || successor.startDate >= earliestAllowedStart) {
       continue;
@@ -362,6 +465,7 @@ export function getDependencyConflictDetails(
 
   return details;
 }
+
 export function getDependencyCount(
   taskId: string,
   dependencies: Dependency[],
@@ -444,7 +548,3 @@ export function createsDependencyCycle(
 
   return false;
 }
-
-
-
-
