@@ -202,7 +202,7 @@ export function ScheduleTable({
   const affectedIds = cascadeNotification?.affectedIds || [];
   return (
     <div className="overflow-x-auto">
-      <table className="w-full border-collapse font-sans text-[10px] leading-4">
+      <table className="w-full border-collapse font-sans text-[10px] leading-4" onPointerUpCapture={() => { if (!draggingTaskId) return; setDraggingTaskId(null); setDragOverTaskId(null); }}>
         <thead>
           <tr className="border-b bg-muted/60">
             <th className="px-2 py-2.5 text-center text-[11px] font-semibold text-foreground/80 uppercase tracking-[0.08em] w-[50px]">
@@ -368,19 +368,15 @@ function SectionBlock({
   return (
     <>
       <tr
-        className="bg-muted/70 border-b border-border/60 cursor-pointer hover:bg-muted transition-colors"
+        className={cn("bg-muted/70 border-b border-border/60 cursor-pointer hover:bg-muted transition-colors", draggingTaskId && dragOverTaskId === section.id && "ring-2 ring-primary/40")}
         onClick={onToggle}
-        onDragOver={(e) => {
-          const draggedId =
-            draggingTaskId || e.dataTransfer.getData("text/task-id");
-          if (!draggedId) return;
-          e.preventDefault();
+        onPointerEnter={() => {
+          if (!draggingTaskId) return;
+          setDragOverTaskId(section.id);
         }}
-        onDrop={(e) => {
-          e.preventDefault();
-          const draggedId =
-            draggingTaskId || e.dataTransfer.getData("text/task-id");
-          onDropOnSection(draggedId || null);
+        onPointerUp={() => {
+          if (!draggingTaskId) return;
+          onDropOnSection(draggingTaskId);
           setDragOverTaskId(null);
           setDraggingTaskId(null);
         }}
@@ -553,25 +549,16 @@ function TaskRow({
         isDragOver && "ring-2 ring-primary/40",
       )}
       onClick={() => onSelectTask(task.id)}
-      onDragOver={(e) => {
-        const draggedId =
-          draggingTaskId || e.dataTransfer.getData("text/task-id");
-        if (!draggedId) return;
-        const draggedTask = allTasks.find((t) => t.id === draggedId);
-        if (!draggedTask || draggedTask.id === task.id) return;
-        e.preventDefault();
+      onPointerEnter={() => {
+        if (!draggingTaskId || draggingTaskId === task.id) return;
         setDragOverTaskId(task.id);
       }}
-      onDragLeave={() => {
-        if (dragOverTaskId === task.id) {
-          setDragOverTaskId(null);
-        }
+      onPointerLeave={() => {
+        if (dragOverTaskId === task.id) setDragOverTaskId(null);
       }}
-      onDrop={(e) => {
-        e.preventDefault();
-        const draggedId =
-          draggingTaskId || e.dataTransfer.getData("text/task-id");
-        onDropOnTask(draggedId || null, task.id, task.sectionId);
+      onPointerUp={() => {
+        if (!draggingTaskId || draggingTaskId === task.id) return;
+        onDropOnTask(draggingTaskId, task.id, task.sectionId);
         setDragOverTaskId(null);
         setDraggingTaskId(null);
       }}
@@ -582,18 +569,13 @@ function TaskRow({
       >
         <button
           type="button"
-          draggable
-          className="inline-flex h-6 w-6 items-center justify-center rounded border border-border text-muted-foreground hover:bg-accent"
+
+          className="inline-flex h-6 w-6 cursor-grab active:cursor-grabbing items-center justify-center rounded border border-border text-muted-foreground hover:bg-accent"
           aria-label="Drag task"
           title="Drag to reorder or move to another section"
-          onDragStart={(e) => {
+          onPointerDown={(e) => {
+            e.stopPropagation();
             setDraggingTaskId(task.id);
-            e.dataTransfer.effectAllowed = "move";
-            e.dataTransfer.setData("text/task-id", task.id);
-          }}
-          onDragEnd={() => {
-            setDraggingTaskId(null);
-            setDragOverTaskId(null);
           }}
         >
           <GripVertical className="h-3.5 w-3.5" />
@@ -894,6 +876,13 @@ function NewSectionRow({ onAdd }: { onAdd: (name: string) => Section | null }) {
     </tr>
   );
 }
+
+
+
+
+
+
+
 
 
 

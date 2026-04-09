@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import WorkspacePage from '@/pages/Index'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { ProjectToolsPanel } from '@/components/ProjectToolsPanel'
 import {
   createProject,
   deleteProject,
@@ -413,82 +414,25 @@ function App() {
   const activeProject = projects.find((project) => project.id === activeProjectId) ?? null
   const canOpenDataFolder = storageStatus.runtime === 'tauri'
   const canInstallUpdate = updateCheck?.status === 'update-available' && !isInstallingUpdate
-
   const storagePanel = (
-    <aside className="storage-panel" aria-label="Storage diagnostics">
-      <div className="storage-panel-row">
-        <span className={`storage-mode storage-mode-${storageStatus.storageMode}`}>
-          {storageStatus.storageMode}
-        </span>
-        <span className="storage-runtime">
-          {storageStatus.runtime} {storageStatus.isPackaged ? 'installed' : 'dev'}
-        </span>
-      </div>
-      <p className="storage-panel-label">Current App Version</p>
-      <p className="storage-panel-value" title={appVersion}>{appVersion}</p>
-      <p className="storage-panel-label">Current Database Path</p>
-      <p className="storage-panel-value" title={storageStatus.dbPath || 'Not available'}>
-        {storageStatus.dbPath || 'Not available'}
-      </p>
-      <p className="storage-panel-label">Data Folder</p>
-      <p className="storage-panel-value" title={storageStatus.dataDir || 'Not available'}>
-        {storageStatus.dataDir || 'Not available'}
-      </p>
-      <p className="storage-panel-hint">{storageStatus.message}</p>
-
-      {updateCheck ? (
-        <p className={`storage-update-status storage-update-status-${updateCheck.status}`}>
-          {updateCheck.message}
-          {updateCheck.status === 'update-available' ? ` (${updateCheck.currentVersion} -> ${updateCheck.latestVersion})` : ''}
-        </p>
-      ) : null}
-
-      {updateInstall ? (
-        <p className={`storage-update-status storage-update-status-${updateInstall.status}`}>
-          {updateInstall.message}
-        </p>
-      ) : null}
-
-      <div className="storage-panel-actions">
-        <label className="storage-checkbox-row">
-          <input
-            type="checkbox"
-            checked={backupBeforeInstall}
-            onChange={(event) => setBackupBeforeInstall(event.target.checked)}
-            disabled={isInstallingUpdate}
-          />
-          <span>Create DB backup before installing update</span>
-        </label>
-
-        <button
-          type="button"
-          className="secondary-button storage-panel-button"
-          onClick={handleCheckForUpdates}
-          disabled={isCheckingUpdates || isInstallingUpdate}
-        >
-          {isCheckingUpdates ? 'Checking...' : 'Check for Updates'}
-        </button>
-
-        {canInstallUpdate ? (
-          <button
-            type="button"
-            className="secondary-button storage-panel-button"
-            onClick={handleInstallUpdate}
-            disabled={!canInstallUpdate}
-          >
-            {isInstallingUpdate ? 'Installing...' : 'Install Update'}
-          </button>
-        ) : null}
-      </div>
-
-      {canOpenDataFolder ? (
-        <button type="button" className="secondary-button storage-panel-button" onClick={handleOpenDataFolder}>
-          Open Data Folder
-        </button>
-      ) : null}
-      {openFolderError ? <p className="inline-error">{openFolderError}</p> : null}
-    </aside>
+    <ProjectToolsPanel
+      storageStatus={storageStatus}
+      appVersion={appVersion}
+      updateCheck={updateCheck}
+      updateInstall={updateInstall}
+      isCheckingUpdates={isCheckingUpdates}
+      isInstallingUpdate={isInstallingUpdate}
+      backupBeforeInstall={backupBeforeInstall}
+      setBackupBeforeInstall={setBackupBeforeInstall}
+      onCheckForUpdates={handleCheckForUpdates}
+      canInstallUpdate={Boolean(canInstallUpdate)}
+      onInstallUpdate={handleInstallUpdate}
+      canOpenDataFolder={canOpenDataFolder}
+      onOpenDataFolder={handleOpenDataFolder}
+      openFolderError={openFolderError}
+    />
   )
+
   if (activeProjectId) {
     return (
       <TooltipProvider>
