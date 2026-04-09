@@ -248,3 +248,25 @@ Copy this block for each completed release/task:
 ### Follow-ups
 - Run `docs/releases/block2-dependency-smoke-test.md` on installed app build with realistic project data.
 - Complete Block2 Task 6 final acceptance checklist and release handoff.
+
+## 2026-04-09 - Block3+4 Combined: Date-Critical Parity (Inspection + Ordering/Delivery)
+
+**Version:** `1.0.5`
+**Plan Task:** `Block3+4 Combined - Date-Critical Task Consistency`
+
+### Completed
+- Combined Block3 and Block4 implementation direction into one date-critical task stream.
+- Updated scheduling classification so `Inspection` is treated as date-critical alongside `Ordering` and `Delivery`.
+- Preserved existing urgency model with Ordering-specific thresholds and shared Delivery/Inspection thresholds.
+- Updated urgency tooltip labeling to correctly use `Inspection` wording.
+- Added focused scheduling tests for Inspection parity:
+  - missing-date detection
+  - overdue detection
+  - urgency + tooltip messaging
+
+### Verification Notes
+- `npm run test -- src/lib/scheduling.test.ts` PASS (`9 passed`)
+
+### Follow-ups
+- Run full verification (`npm run test`, `npm run build`) before release prep.
+- Continue combined Block3+4 work for any additional UX refinements requested by client.

@@ -36,7 +36,11 @@ const getDaysToEndDate = (endDate: string): number | null => {
 };
 
 export function isSupplyTaskType(taskType: TaskType): boolean {
-  return taskType === "Ordering" || taskType === "Delivery";
+  return (
+    taskType === "Ordering" ||
+    taskType === "Delivery" ||
+    taskType === "Inspection"
+  );
 }
 
 export function hasMissingSupplyDates(
@@ -99,7 +103,13 @@ export function getUrgencyTooltip(
   status?: TaskStatus,
   startDate = "",
 ): string | null {
-  const label = taskType === "Ordering" ? "Order" : "Delivery";
+  const labelByTaskType: Record<TaskType, string> = {
+    Internal: "Task",
+    Ordering: "Order",
+    Delivery: "Delivery",
+    Inspection: "Inspection",
+  };
+  const label = labelByTaskType[taskType];
 
   if (hasMissingSupplyDates(taskType, startDate, endDate, status)) {
     return `${label} dates are missing - critical risk. Set start and end dates and check dependency chain.`;
@@ -434,5 +444,7 @@ export function createsDependencyCycle(
 
   return false;
 }
+
+
 
 
