@@ -15,7 +15,12 @@ Scope: `solva-construction` desktop app release/update flow
 
 ## 2) Signing Key Rules (Critical)
 
+Quick setup guide: `docs/releases/signing-env-setup.md`
+
+## 2.1) Local Signing Env Rule
+
 - Use one long-lived updater signing key.
+- Keep signing env in `.env.release.local` (gitignored) so new terminals still work.
 - Never commit private keys to git.
 - Keep private key in secure local path + secure backup.
 - Keep public key in:
@@ -91,3 +96,5 @@ A release is considered done only when all are true:
 - release assets uploaded
 - installed-app update validated (`vN -> vN+1`)
 - changelog + plan checklist updated
+
+

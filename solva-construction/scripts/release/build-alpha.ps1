@@ -6,17 +6,7 @@ Set-Location $root
 
 Write-Host '[release:alpha] Starting alpha release build...'
 
-if (-not $env:TAURI_SIGNING_PRIVATE_KEY -and -not $env:TAURI_SIGNING_PRIVATE_KEY_PATH) {
-  throw 'Missing signer env vars. Set TAURI_SIGNING_PRIVATE_KEY (or TAURI_SIGNING_PRIVATE_KEY_PATH) before running release:alpha.'
-}
-
-if (-not $env:TAURI_SIGNING_PRIVATE_KEY -and $env:TAURI_SIGNING_PRIVATE_KEY_PATH) {
-  if (-not (Test-Path -LiteralPath $env:TAURI_SIGNING_PRIVATE_KEY_PATH)) {
-    throw "Signing key path not found: $($env:TAURI_SIGNING_PRIVATE_KEY_PATH)"
-  }
-  # Tauri expects key content in TAURI_SIGNING_PRIVATE_KEY for updater signatures.
-  $env:TAURI_SIGNING_PRIVATE_KEY = Get-Content -LiteralPath $env:TAURI_SIGNING_PRIVATE_KEY_PATH -Raw
-}
+& (Join-Path $PSScriptRoot 'load-signing-env.ps1')
 
 npm run release:version:check
 npm run test
@@ -43,7 +33,7 @@ if ($matches.Count -eq 0) {
 # Updater requires a signature file alongside the installer.
 $sigMatches = $matches | Where-Object { $_.Name -like '*.exe.sig' }
 if ($sigMatches.Count -eq 0) {
-  throw "Updater signature (.sig) was not generated for $version. Ensure TAURI_SIGNING_PRIVATE_KEY(_PATH) is correct and TAURI_SIGNING_PRIVATE_KEY_PASSWORD is set to the correct password for the key."
+  throw "Updater signature (.sig) was not generated for $version. Ensure signing key path/password are correct."
 }
 
 foreach ($file in $matches) {

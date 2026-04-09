@@ -1,13 +1,12 @@
-# Block5 Scheduling Consistency + Weekend Logic + Drag/Drop Reliability
+# Block5 Scheduling Consistency + Weekend Logic
 
-**Goal:** Make schedule editing feel consistent and non-technical by tightening inline date behavior, adding workday counting mode, and hardening task drag/drop movement.
+**Goal:** Make schedule editing feel consistent and non-technical by tightening inline date behavior and adding workday counting mode.
 
 ## Scope
 
 - Keep inline date fields editable (`start`, `end`, `days`) and ensure recalculation behavior is consistent.
 - Add an explicit `Workdays only` mode that excludes weekends from duration and lag counting.
 - Keep weekends available in date picker (user can still choose weekend dates).
-- Ensure drag/drop reordering and cross-section moves are reliable.
 - Keep dependency conflict previews consistent with selected weekend mode.
 
 ## Files
@@ -28,11 +27,11 @@
 - [x] Add global schedule mode state for weekend counting and wire it through updates/cascade.
 - [x] Add header toggle (`Workdays only`) and connect it to store state.
 - [x] Ensure dependency preview uses the same weekend-aware lag logic.
-- [x] Harden drag/drop flow to use explicit drag payload fallback when local drag state is missing.
+- [ ] Schedule task reordering UX moved to a separate follow-up block.
 - [x] Fix malformed schedule table/index code and restore build-safe typing/handlers.
 - [x] Run focused scheduling tests.
 - [x] Run full verification (`npm run test`, `npm run build`).
-- [ ] Manual UX pass on installed app for inline dates + cross-section drag/drop.
+- [ ] Manual UX pass on installed app for inline dates + weekend/workday mode behavior.
 
 ## Verification Commands
 
@@ -44,4 +43,6 @@
 
 - Users can toggle between calendar-day and workday counting without changing how they pick dates.
 - Dependency lag and cascade behavior follow the same counting mode.
-- Task drag/drop movement is more resilient, including cross-section drops.
+- Task reordering UX improvements moved to a dedicated follow-up block.
+
+
