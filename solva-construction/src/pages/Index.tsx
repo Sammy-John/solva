@@ -95,6 +95,8 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
   const people = useScheduleStore((state) => state.people);
   const setScheduleData = useScheduleStore((state) => state.setScheduleData);
   const updateTask = useScheduleStore((state) => state.updateTask);
+  const excludeWeekends = useScheduleStore((state) => state.excludeWeekends);
+  const setExcludeWeekends = useScheduleStore((state) => state.setExcludeWeekends);
 
   useEffect(() => {
     let isCancelled = false;
@@ -417,6 +419,8 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
         setFilterStatus={setFilterStatus}
         filterUrgent={filterUrgent}
         setFilterUrgent={setFilterUrgent}
+        excludeWeekends={excludeWeekends}
+        setExcludeWeekends={setExcludeWeekends}
       />
       <ScheduleHealthSummary />
       {scheduleLoadError ? (
@@ -560,4 +564,5 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
 };
 
 export default Index;
+
 

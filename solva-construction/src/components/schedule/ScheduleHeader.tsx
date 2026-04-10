@@ -29,6 +29,8 @@ interface ScheduleHeaderProps {
   setFilterStatus: (v: TaskStatus | 'All') => void;
   filterUrgent: boolean;
   setFilterUrgent: (v: boolean) => void;
+  excludeWeekends: boolean;
+  setExcludeWeekends: (v: boolean) => void;
 }
 
 export function ScheduleHeader({
@@ -49,6 +51,8 @@ export function ScheduleHeader({
   setFilterStatus,
   filterUrgent,
   setFilterUrgent,
+  excludeWeekends,
+  setExcludeWeekends,
 }: ScheduleHeaderProps) {
   return (
     <header className="shrink-0 flex items-center justify-between px-6 md:px-8 py-3.5 border-b bg-card shadow-sm">
@@ -112,6 +116,18 @@ export function ScheduleHeader({
           />
           <Label htmlFor="urgent-filter" className="text-xs text-muted-foreground cursor-pointer whitespace-nowrap">
             Urgent
+          </Label>
+        </div>
+
+        <div className="flex items-center gap-1.5">
+          <Switch
+            id="weekend-mode"
+            checked={excludeWeekends}
+            onCheckedChange={setExcludeWeekends}
+            className="scale-75"
+          />
+          <Label htmlFor="weekend-mode" className="text-xs text-muted-foreground cursor-pointer whitespace-nowrap">
+            Workdays only
           </Label>
         </div>
 

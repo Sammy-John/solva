@@ -16,7 +16,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { addDays, format, isValid, parseISO } from 'date-fns';
+import { addLagDays, createsDependencyCycle } from '@/lib/scheduling';
 import {
   ArrowRightLeft,
   Link2,
@@ -25,7 +25,7 @@ import {
   TriangleAlert,
   X,
 } from 'lucide-react';
-import { createsDependencyCycle } from '@/lib/scheduling';
+
 import {
   dependencyUxLabels,
   formatAutoMoveSummary,
@@ -49,11 +49,8 @@ const parseLagDays = (value: string): number => {
 const computeEarliestStartFromPredecessor = (
   predecessorEndDate: string,
   lagDays: number,
-): string | null => {
-  const parsed = parseISO(predecessorEndDate);
-  if (!isValid(parsed)) return null;
-  return format(addDays(parsed, lagDays), 'yyyy-MM-dd');
-};
+  excludeWeekends: boolean,
+): string | null => addLagDays(predecessorEndDate, lagDays, excludeWeekends);
 
 export function LinkTasksModal({
   open,
@@ -68,6 +65,7 @@ export function LinkTasksModal({
     addDependency,
     updateDependency,
     removeDependency,
+    excludeWeekends,
   } = useScheduleStore();
 
   const [predecessorId, setPredecessorId] = useState('');
@@ -167,7 +165,7 @@ export function LinkTasksModal({
   });
 
   const earliestAllowedStart = predecessorTask
-    ? computeEarliestStartFromPredecessor(predecessorTask.endDate, lagDays)
+    ? computeEarliestStartFromPredecessor(predecessorTask.endDate, lagDays, excludeWeekends)
     : null;
   const successorStartsTooEarly =
     !!successorTask?.startDate &&

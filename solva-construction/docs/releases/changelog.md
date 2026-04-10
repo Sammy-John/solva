@@ -270,3 +270,25 @@ Copy this block for each completed release/task:
 ### Follow-ups
 - Run full verification (`npm run test`, `npm run build`) before release prep.
 - Continue combined Block3+4 work for any additional UX refinements requested by client.
+
+## 2026-04-09 - Block5 Scheduling Consistency + Workdays
+
+**Version:** `1.0.5`
+**Plan Task:** `Block5 - Inline Date Consistency + Weekend Counting Option`
+
+### Completed
+- Added weekend-aware lag helper and threaded weekend mode through cascade/dependency validation logic.
+- Added store-level `excludeWeekends` mode and wired recalculation for inline date edits (`start`, `end`, `duration`) plus cascade updates.
+- Added `Workdays only` toggle in schedule header and connected it through Index/store.
+- Updated dependency modal preview to use the same weekend-aware lag calculation as schedule logic.
+- Repaired malformed ScheduleTable/Index edits so schedule UI compiles cleanly.
+
+### Verification Notes
+- `npm run test -- src/lib/scheduling.test.ts` PASS (`9 passed`)
+- `npm run test` PASS (`16 passed`)
+- `npm run build` PASS
+
+### Follow-ups
+- Manual installed-app UX pass for inline date edit behavior and weekend mode interactions on real project data.
+
+

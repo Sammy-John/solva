@@ -1,23 +1,24 @@
-import { useMemo, useState } from 'react';
-import type { StorageStatus } from '@/lib/storageRuntime';
-import type { AppUpdateCheckResult, UpdateInstallResult } from '@/lib/updater';
-import { getLatestChanges } from '@/lib/releaseNotes';
+import { useMemo, useState } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
+import type { StorageStatus } from '@/lib/storageRuntime'
+import type { AppUpdateCheckResult, UpdateInstallResult } from '@/lib/updater'
+import { getLatestChanges } from '@/lib/releaseNotes'
 
 export interface ProjectToolsPanelProps {
-  storageStatus: StorageStatus;
-  appVersion: string;
-  updateCheck: AppUpdateCheckResult | null;
-  updateInstall: UpdateInstallResult | null;
-  isCheckingUpdates: boolean;
-  isInstallingUpdate: boolean;
-  backupBeforeInstall: boolean;
-  setBackupBeforeInstall: (value: boolean) => void;
-  onCheckForUpdates: () => void;
-  canInstallUpdate: boolean;
-  onInstallUpdate: () => void;
-  canOpenDataFolder: boolean;
-  onOpenDataFolder: () => void;
-  openFolderError: string | null;
+  storageStatus: StorageStatus
+  appVersion: string
+  updateCheck: AppUpdateCheckResult | null
+  updateInstall: UpdateInstallResult | null
+  isCheckingUpdates: boolean
+  isInstallingUpdate: boolean
+  backupBeforeInstall: boolean
+  setBackupBeforeInstall: Dispatch<SetStateAction<boolean>>
+  onCheckForUpdates: () => Promise<void> | void
+  canInstallUpdate: boolean
+  onInstallUpdate: () => Promise<void> | void
+  canOpenDataFolder: boolean
+  onOpenDataFolder: () => Promise<void> | void
+  openFolderError: string | null
 }
 
 function PanelSection({
@@ -27,11 +28,11 @@ function PanelSection({
   onToggle,
   children,
 }: {
-  title: string;
-  toggleLabel: string;
-  isOpen: boolean;
-  onToggle: () => void;
-  children: React.ReactNode;
+  title: string
+  toggleLabel: string
+  isOpen: boolean
+  onToggle: () => void
+  children: ReactNode
 }) {
   return (
     <section className="storage-panel-section">
@@ -48,7 +49,15 @@ function PanelSection({
       </div>
       {isOpen ? <div className="storage-panel-section-body">{children}</div> : null}
     </section>
-  );
+  )
+}
+
+const renderUpdateStatus = (updateCheck: AppUpdateCheckResult | null): string => {
+  if (!updateCheck) return 'Click "Check for Updates" to check availability.'
+  if (updateCheck.status === 'update-available') {
+    return `Update available: ${updateCheck.currentVersion} -> ${updateCheck.latestVersion}`
+  }
+  return updateCheck.message
 }
 
 export function ProjectToolsPanel({
@@ -67,10 +76,10 @@ export function ProjectToolsPanel({
   onOpenDataFolder,
   openFolderError,
 }: ProjectToolsPanelProps) {
-  const [showUpdates, setShowUpdates] = useState(true);
-  const [showData, setShowData] = useState(true);
+  const [showUpdates, setShowUpdates] = useState(true)
+  const [showData, setShowData] = useState(true)
 
-  const latestChanges = useMemo(() => getLatestChanges(appVersion), [appVersion]);
+  const latestChanges = useMemo(() => getLatestChanges(appVersion), [appVersion])
 
   return (
     <aside className="storage-panel" aria-label="Project tools">
@@ -90,8 +99,8 @@ export function ProjectToolsPanel({
         onToggle={() => setShowUpdates((current) => !current)}
       >
         <p className="storage-panel-label">Current App Version</p>
-        <p className="storage-panel-value" title={appVersion}>
-          {appVersion}
+        <p className="storage-panel-value" title={appVersion || 'unknown'}>
+          {appVersion || 'unknown'}
         </p>
 
         <p className="storage-panel-label">Latest Changes</p>
@@ -107,12 +116,11 @@ export function ProjectToolsPanel({
 
         {updateCheck ? (
           <p className={`storage-update-status storage-update-status-${updateCheck.status}`}>
-            {updateCheck.message}
-            {updateCheck.status === 'update-available'
-              ? ` (${updateCheck.currentVersion} -> ${updateCheck.latestVersion})`
-              : ''}
+            {renderUpdateStatus(updateCheck)}
           </p>
-        ) : null}
+        ) : (
+          <p className="storage-panel-hint">{renderUpdateStatus(null)}</p>
+        )}
 
         {updateInstall ? (
           <p className={`storage-update-status storage-update-status-${updateInstall.status}`}>
@@ -134,7 +142,9 @@ export function ProjectToolsPanel({
           <button
             type="button"
             className="secondary-button storage-panel-button"
-            onClick={onCheckForUpdates}
+            onClick={() => {
+              void onCheckForUpdates()
+            }}
             disabled={isCheckingUpdates || isInstallingUpdate}
           >
             {isCheckingUpdates ? 'Checking...' : 'Check for Updates'}
@@ -144,8 +154,10 @@ export function ProjectToolsPanel({
             <button
               type="button"
               className="secondary-button storage-panel-button"
-              onClick={onInstallUpdate}
-              disabled={!canInstallUpdate}
+              onClick={() => {
+                void onInstallUpdate()
+              }}
+              disabled={isInstallingUpdate}
             >
               {isInstallingUpdate ? 'Installing...' : 'Install Update'}
             </button>
@@ -175,7 +187,9 @@ export function ProjectToolsPanel({
           <button
             type="button"
             className="secondary-button storage-panel-button"
-            onClick={onOpenDataFolder}
+            onClick={() => {
+              void onOpenDataFolder()
+            }}
           >
             Open Data Folder
           </button>
@@ -184,5 +198,5 @@ export function ProjectToolsPanel({
         {openFolderError ? <p className="inline-error">{openFolderError}</p> : null}
       </PanelSection>
     </aside>
-  );
+  )
 }

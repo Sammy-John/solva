@@ -117,6 +117,7 @@ export function ScheduleTable({
     deleteSection,
     reorderTask,
     cascadeNotification,
+    excludeWeekends,
   } = useScheduleStore();
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(
     new Set(),
@@ -127,8 +128,8 @@ export function ScheduleTable({
   } | null>(null);
   const [draggingTaskId, setDraggingTaskId] = useState<string | null>(null);
   const [dragOverTaskId, setDragOverTaskId] = useState<string | null>(null);
-  const invalidDeps = getInvalidDependencies(tasks, dependencies);
-  const conflictDetails = getDependencyConflictDetails(tasks, dependencies);
+  const invalidDeps = getInvalidDependencies(tasks, dependencies, excludeWeekends);
+  const conflictDetails = getDependencyConflictDetails(tasks, dependencies, excludeWeekends);
   const conflictByDepId = new Map(conflictDetails.map((detail) => [detail.dependencyId, detail]));
   const filteredTasks = tasks.filter((t) => {
     if (filterType !== "All" && t.taskType !== filterType) return false;
@@ -164,13 +165,20 @@ export function ScheduleTable({
     updateTask(taskId, updates);
     setEditingCell(null);
   };
-  const handleDropOnTask = (targetTaskId: string, targetSectionId: string) => {
-    if (!draggingTaskId || draggingTaskId === targetTaskId) return;
-    reorderTask(draggingTaskId, targetTaskId, targetSectionId);
+  const handleDropOnTask = (
+    sourceTaskId: string | null,
+    targetTaskId: string,
+    targetSectionId: string,
+  ) => {
+    if (!sourceTaskId || sourceTaskId === targetTaskId) return;
+    reorderTask(sourceTaskId, targetTaskId, targetSectionId);
   };
-  const handleDropOnSection = (targetSectionId: string) => {
-    if (!draggingTaskId) return;
-    reorderTask(draggingTaskId, null, targetSectionId);
+  const handleDropOnSection = (
+    sourceTaskId: string | null,
+    targetSectionId: string,
+  ) => {
+    if (!sourceTaskId) return;
+    reorderTask(sourceTaskId, null, targetSectionId);
   };
   const sortedSections = [...sections].sort((a, b) => a.order - b.order);
   const sectionGroups = sortedSections.map((section) => {
@@ -194,7 +202,7 @@ export function ScheduleTable({
   const affectedIds = cascadeNotification?.affectedIds || [];
   return (
     <div className="overflow-x-auto">
-      <table className="w-full border-collapse font-sans text-[10px] leading-4">
+      <table className="w-full border-collapse font-sans text-[10px] leading-4" onPointerUpCapture={() => { if (!draggingTaskId) return; setDraggingTaskId(null); setDragOverTaskId(null); }}>
         <thead>
           <tr className="border-b bg-muted/60">
             <th className="px-2 py-2.5 text-center text-[11px] font-semibold text-foreground/80 uppercase tracking-[0.08em] w-[50px]">
@@ -252,11 +260,11 @@ export function ScheduleTable({
                 criticalCount={criticalCount}
                 onToggle={() => toggleSection(section.id)}
                 onDelete={() => deleteSection(section.id)}
-                onDropOnSection={() => handleDropOnSection(section.id)}
+                onDropOnSection={(sourceTaskId) => handleDropOnSection(sourceTaskId, section.id)}
                 people={people}
                 dependencies={dependencies}
                 invalidDeps={invalidDeps}
-                conflictByDepId={conflictByDepId}
+            conflictByDepId={conflictByDepId}
                 affectedIds={affectedIds}
                 editingCell={editingCell}
                 setEditingCell={setEditingCell}
@@ -305,7 +313,7 @@ interface SectionBlockProps {
   criticalCount: number;
   onToggle: () => void;
   onDelete: () => void;
-  onDropOnSection: () => void;
+  onDropOnSection: (sourceTaskId: string | null) => void;
   people: any[];
   dependencies: any[];
   invalidDeps: string[];
@@ -325,7 +333,11 @@ interface SectionBlockProps {
   dragOverTaskId: string | null;
   setDraggingTaskId: (id: string | null) => void;
   setDragOverTaskId: (id: string | null) => void;
-  onDropOnTask: (targetTaskId: string, targetSectionId: string) => void;
+  onDropOnTask: (
+    sourceTaskId: string | null,
+    targetTaskId: string,
+    targetSectionId: string,
+  ) => void;
 }
 function SectionBlock({
   section,
@@ -356,15 +368,15 @@ function SectionBlock({
   return (
     <>
       <tr
-        className="bg-muted/70 border-b border-border/60 cursor-pointer hover:bg-muted transition-colors"
+        className={cn("bg-muted/70 border-b border-border/60 cursor-pointer hover:bg-muted transition-colors", draggingTaskId && dragOverTaskId === section.id && "ring-2 ring-primary/40")}
         onClick={onToggle}
-        onDragOver={(e) => {
+        onPointerEnter={() => {
           if (!draggingTaskId) return;
-          e.preventDefault();
+          setDragOverTaskId(section.id);
         }}
-        onDrop={(e) => {
-          e.preventDefault();
-          onDropOnSection();
+        onPointerUp={() => {
+          if (!draggingTaskId) return;
+          onDropOnSection(draggingTaskId);
           setDragOverTaskId(null);
           setDraggingTaskId(null);
         }}
@@ -436,7 +448,7 @@ function SectionBlock({
             people={people}
             dependencies={dependencies}
             invalidDeps={invalidDeps}
-                conflictByDepId={conflictByDepId}
+            conflictByDepId={conflictByDepId}
             isAffected={affectedIds.includes(task.id)}
             editingCell={editingCell}
             setEditingCell={setEditingCell}
@@ -476,7 +488,11 @@ interface TaskRowProps {
   dragOverTaskId: string | null;
   setDraggingTaskId: (id: string | null) => void;
   setDragOverTaskId: (id: string | null) => void;
-  onDropOnTask: (targetTaskId: string, targetSectionId: string) => void;
+  onDropOnTask: (
+    sourceTaskId: string | null,
+    targetTaskId: string,
+    targetSectionId: string,
+  ) => void;
 }
 function TaskRow({
   task,
@@ -522,7 +538,8 @@ function TaskRow({
   );
   const assignablePeople = people.filter(
     (p: any) => !task.assignedTo.includes(p.id),
-  );  return (
+  );
+  return (
     <tr
       className={cn(
         "border-b border-border/60 cursor-pointer transition-colors group text-foreground text-[10px] leading-4",
@@ -532,20 +549,16 @@ function TaskRow({
         isDragOver && "ring-2 ring-primary/40",
       )}
       onClick={() => onSelectTask(task.id)}
-      onDragOver={(e) => {
-        const draggedTask = allTasks.find((t) => t.id === draggingTaskId);
-        if (!draggedTask || draggedTask.id === task.id) return;
-        e.preventDefault();
+      onPointerEnter={() => {
+        if (!draggingTaskId || draggingTaskId === task.id) return;
         setDragOverTaskId(task.id);
       }}
-      onDragLeave={() => {
-        if (dragOverTaskId === task.id) {
-          setDragOverTaskId(null);
-        }
+      onPointerLeave={() => {
+        if (dragOverTaskId === task.id) setDragOverTaskId(null);
       }}
-      onDrop={(e) => {
-        e.preventDefault();
-        onDropOnTask(task.id, task.sectionId);
+      onPointerUp={() => {
+        if (!draggingTaskId || draggingTaskId === task.id) return;
+        onDropOnTask(draggingTaskId, task.id, task.sectionId);
         setDragOverTaskId(null);
         setDraggingTaskId(null);
       }}
@@ -556,17 +569,13 @@ function TaskRow({
       >
         <button
           type="button"
-          draggable
-          className="inline-flex h-6 w-6 items-center justify-center rounded border border-border text-muted-foreground hover:bg-accent"
+
+          className="inline-flex h-6 w-6 cursor-grab active:cursor-grabbing items-center justify-center rounded border border-border text-muted-foreground hover:bg-accent"
           aria-label="Drag task"
           title="Drag to reorder or move to another section"
-          onDragStart={(e) => {
+          onPointerDown={(e) => {
+            e.stopPropagation();
             setDraggingTaskId(task.id);
-            e.dataTransfer.effectAllowed = "move";
-          }}
-          onDragEnd={() => {
-            setDraggingTaskId(null);
-            setDragOverTaskId(null);
           }}
         >
           <GripVertical className="h-3.5 w-3.5" />
@@ -867,6 +876,15 @@ function NewSectionRow({ onAdd }: { onAdd: (name: string) => Section | null }) {
     </tr>
   );
 }
+
+
+
+
+
+
+
+
+
 
 
 
