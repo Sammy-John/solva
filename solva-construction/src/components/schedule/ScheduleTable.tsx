@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useScheduleStore } from "@/store/scheduleStore";
 import {
   Task,
@@ -126,8 +126,8 @@ export function ScheduleTable({
     id: string;
     field: string;
   } | null>(null);
-  const [draggingTaskId, setDraggingTaskId] = useState<string | null>(null);
-  const [dragOverTaskId, setDragOverTaskId] = useState<string | null>(null);
+  const [moveSourceTaskId, setMoveSourceTaskId] = useState<string | null>(null);
+  const [moveOverId, setMoveOverId] = useState<string | null>(null);
   const invalidDeps = getInvalidDependencies(tasks, dependencies, excludeWeekends);
   const conflictDetails = getDependencyConflictDetails(tasks, dependencies, excludeWeekends);
   const conflictByDepId = new Map(conflictDetails.map((detail) => [detail.dependencyId, detail]));
@@ -200,12 +200,48 @@ export function ScheduleTable({
     };
   });
   const affectedIds = cascadeNotification?.affectedIds || [];
+  const moveSourceTask = moveSourceTaskId
+    ? tasks.find((t) => t.id === moveSourceTaskId) || null
+    : null;
+
+  useEffect(() => {
+    if (!moveSourceTaskId) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      setMoveSourceTaskId(null);
+      setMoveOverId(null);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [moveSourceTaskId]);
   return (
     <div className="overflow-x-auto">
-      <table className="w-full border-collapse font-sans text-[10px] leading-4" onPointerUpCapture={() => { if (!draggingTaskId) return; setDraggingTaskId(null); setDragOverTaskId(null); }}>
+      {moveSourceTask ? (
+        <div className="mb-2 rounded-md border border-border bg-muted/40 px-3 py-2">
+          <div className="flex items-center justify-between gap-3">
+            <div className="text-[11px] text-foreground/80">
+              <span className="font-semibold text-foreground">Move mode:</span>{" "}
+              {moveSourceTask.name} — click a task to place before it, or a
+              section header to move to the end.
+              <span className="ml-2 text-muted-foreground">(Esc to cancel)</span>
+            </div>
+            <button
+              type="button"
+              className="inline-flex h-7 items-center rounded-md border border-border bg-background px-2 text-[11px] text-foreground/80 hover:bg-accent"
+              onClick={() => {
+                setMoveSourceTaskId(null);
+                setMoveOverId(null);
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      ) : null}
+      <table className="w-full border-collapse font-sans text-[10px] leading-4">
         <thead>
           <tr className="border-b bg-muted/60">
-            <th className="px-2 py-2.5 text-center text-[11px] font-semibold text-foreground/80 uppercase tracking-[0.08em] w-[50px]">
+            <th className="sticky left-0 z-20 bg-muted/60 px-2 py-2.5 text-center text-[11px] font-semibold text-foreground/80 uppercase tracking-[0.08em] w-[50px]">
               Move
             </th>
             <th className="px-3 py-2.5 text-left text-[11px] font-semibold text-foreground/80 uppercase tracking-[0.08em] w-auto">
@@ -272,10 +308,10 @@ export function ScheduleTable({
                 onSelectTask={onSelectTask}
                 onOpenDependencyChain={onOpenDependencyChain}
                 allTasks={tasks}
-                draggingTaskId={draggingTaskId}
-                dragOverTaskId={dragOverTaskId}
-                setDraggingTaskId={setDraggingTaskId}
-                setDragOverTaskId={setDragOverTaskId}
+                moveSourceTaskId={moveSourceTaskId}
+                moveOverId={moveOverId}
+                setMoveSourceTaskId={setMoveSourceTaskId}
+                setMoveOverId={setMoveOverId}
                 onDropOnTask={handleDropOnTask}
               />
             );
@@ -329,10 +365,10 @@ interface SectionBlockProps {
   onSelectTask: (id: string) => void;
   onOpenDependencyChain: (id: string) => void;
   allTasks: Task[];
-  draggingTaskId: string | null;
-  dragOverTaskId: string | null;
-  setDraggingTaskId: (id: string | null) => void;
-  setDragOverTaskId: (id: string | null) => void;
+  moveSourceTaskId: string | null;
+  moveOverId: string | null;
+  setMoveSourceTaskId: (id: string | null) => void;
+  setMoveOverId: (id: string | null) => void;
   onDropOnTask: (
     sourceTaskId: string | null,
     targetTaskId: string,
@@ -359,26 +395,36 @@ function SectionBlock({
   onSelectTask,
   onOpenDependencyChain,
   allTasks,
-  draggingTaskId,
-  dragOverTaskId,
-  setDraggingTaskId,
-  setDragOverTaskId,
+  moveSourceTaskId,
+  moveOverId,
+  setMoveSourceTaskId,
+  setMoveOverId,
   onDropOnTask,
 }: SectionBlockProps) {
   return (
     <>
       <tr
-        className={cn("bg-muted/70 border-b border-border/60 cursor-pointer hover:bg-muted transition-colors", draggingTaskId && dragOverTaskId === section.id && "ring-2 ring-primary/40")}
-        onClick={onToggle}
-        onPointerEnter={() => {
-          if (!draggingTaskId) return;
-          setDragOverTaskId(section.id);
+        className={cn(
+          "bg-muted/70 border-b border-border/60 cursor-pointer hover:bg-muted transition-colors",
+          moveSourceTaskId && moveOverId === section.id && "ring-2 ring-primary/40",
+        )}
+        onClick={moveSourceTaskId ? undefined : onToggle}
+        onClickCapture={(e) => {
+          if (!moveSourceTaskId) return;
+          const target = e.target as HTMLElement | null;
+          if (target?.closest('button, input, textarea, select, a, [role="button"]')) return;
+          e.preventDefault();
+          e.stopPropagation();
+          onDropOnSection(moveSourceTaskId);
+          setMoveOverId(null);
+          setMoveSourceTaskId(null);
         }}
-        onPointerUp={() => {
-          if (!draggingTaskId) return;
-          onDropOnSection(draggingTaskId);
-          setDragOverTaskId(null);
-          setDraggingTaskId(null);
+        onPointerEnter={() => {
+          if (!moveSourceTaskId) return;
+          setMoveOverId(section.id);
+        }}
+        onPointerLeave={() => {
+          if (moveOverId === section.id) setMoveOverId(null);
         }}
       >
         <td colSpan={9} className="px-3 py-2">
@@ -456,10 +502,10 @@ function SectionBlock({
             onSelectTask={onSelectTask}
             onOpenDependencyChain={onOpenDependencyChain}
             allTasks={allTasks}
-            draggingTaskId={draggingTaskId}
-            dragOverTaskId={dragOverTaskId}
-            setDraggingTaskId={setDraggingTaskId}
-            setDragOverTaskId={setDragOverTaskId}
+            moveSourceTaskId={moveSourceTaskId}
+            moveOverId={moveOverId}
+            setMoveSourceTaskId={setMoveSourceTaskId}
+            setMoveOverId={setMoveOverId}
             onDropOnTask={onDropOnTask}
           />
         ))}
@@ -484,10 +530,10 @@ interface TaskRowProps {
   onSelectTask: (id: string) => void;
   onOpenDependencyChain: (id: string) => void;
   allTasks: Task[];
-  draggingTaskId: string | null;
-  dragOverTaskId: string | null;
-  setDraggingTaskId: (id: string | null) => void;
-  setDragOverTaskId: (id: string | null) => void;
+  moveSourceTaskId: string | null;
+  moveOverId: string | null;
+  setMoveSourceTaskId: (id: string | null) => void;
+  setMoveOverId: (id: string | null) => void;
   onDropOnTask: (
     sourceTaskId: string | null,
     targetTaskId: string,
@@ -508,10 +554,10 @@ function TaskRow({
   onSelectTask,
   onOpenDependencyChain,
   allTasks,
-  draggingTaskId,
-  dragOverTaskId,
-  setDraggingTaskId,
-  setDragOverTaskId,
+  moveSourceTaskId,
+  moveOverId,
+  setMoveSourceTaskId,
+  setMoveOverId,
   onDropOnTask,
 }: TaskRowProps) {
   const urgency = getUrgency(
@@ -532,7 +578,8 @@ function TaskRow({
     .map((dep: any) => conflictByDepId.get(dep.id))
     .filter((detail): detail is { message: string; suggestion: string } => Boolean(detail));
   const chainCount = getWorkflowChainCount(task.id, dependencies);
-  const isDragOver = dragOverTaskId === task.id && draggingTaskId !== task.id;
+  const isMoveOver =
+    moveOverId === task.id && moveSourceTaskId !== null && moveSourceTaskId !== task.id;
   const assignedPeople = people.filter((p: any) =>
     task.assignedTo.includes(p.id),
   );
@@ -546,21 +593,28 @@ function TaskRow({
         taskRowClass(task.taskType),
         "hover:brightness-[0.98]",
         isAffected && "cascade-highlight",
-        isDragOver && "ring-2 ring-primary/40",
+        isMoveOver && "ring-2 ring-primary/40",
       )}
-      onClick={() => onSelectTask(task.id)}
+      onClick={moveSourceTaskId ? undefined : () => onSelectTask(task.id)}
+      onClickCapture={(e) => {
+        if (!moveSourceTaskId) return;
+        const target = e.target as HTMLElement | null;
+        if (target?.closest('[data-move-grip="true"]')) return;
+        if (target?.closest('[data-move-handle-cell="true"]')) return;
+        if (target?.closest('button, input, textarea, select, a, [role="button"]')) return;
+        e.preventDefault();
+        e.stopPropagation();
+        if (moveSourceTaskId === task.id) return;
+        onDropOnTask(moveSourceTaskId, task.id, task.sectionId);
+        setMoveOverId(null);
+        setMoveSourceTaskId(null);
+      }}
       onPointerEnter={() => {
-        if (!draggingTaskId || draggingTaskId === task.id) return;
-        setDragOverTaskId(task.id);
+        if (!moveSourceTaskId || moveSourceTaskId === task.id) return;
+        setMoveOverId(task.id);
       }}
       onPointerLeave={() => {
-        if (dragOverTaskId === task.id) setDragOverTaskId(null);
-      }}
-      onPointerUp={() => {
-        if (!draggingTaskId || draggingTaskId === task.id) return;
-        onDropOnTask(draggingTaskId, task.id, task.sectionId);
-        setDragOverTaskId(null);
-        setDraggingTaskId(null);
+        if (moveOverId === task.id) setMoveOverId(null);
       }}
     >
       <td
@@ -569,13 +623,27 @@ function TaskRow({
       >
         <button
           type="button"
-
-          className="inline-flex h-6 w-6 cursor-grab active:cursor-grabbing items-center justify-center rounded border border-border text-muted-foreground hover:bg-accent"
-          aria-label="Drag task"
-          title="Drag to reorder or move to another section"
-          onPointerDown={(e) => {
+          data-move-grip="true"
+          className={cn(
+            "inline-flex h-6 w-6 items-center justify-center rounded border border-border text-muted-foreground hover:bg-accent",
+            moveSourceTaskId === task.id && "bg-accent text-foreground",
+          )}
+          aria-label="Move task"
+          title={
+            moveSourceTaskId === task.id
+              ? "Cancel move"
+              : "Move this task (then click destination)"
+          }
+          onClick={(e) => {
+            e.preventDefault();
             e.stopPropagation();
-            setDraggingTaskId(task.id);
+            if (moveSourceTaskId === task.id) {
+              setMoveSourceTaskId(null);
+              setMoveOverId(null);
+              return;
+            }
+            setMoveSourceTaskId(task.id);
+            setMoveOverId(null);
           }}
         >
           <GripVertical className="h-3.5 w-3.5" />
@@ -614,6 +682,7 @@ function TaskRow({
                 taskTypeNameClass(task.taskType),
               )}
               onDoubleClick={(e) => {
+                if (moveSourceTaskId) return;
                 e.stopPropagation();
                 setEditingCell({ id: task.id, field: "name" });
               }}
