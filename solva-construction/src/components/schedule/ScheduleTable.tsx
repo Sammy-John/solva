@@ -67,30 +67,30 @@ const urgencyClass = (level: string) => {
   if (level === "green") return "urgency-green";
   return "";
 };
-const taskRowClass = (taskType: TaskType) => {
+const taskCellClass = (taskType: TaskType) => {
   const map: Record<TaskType, string> = {
-    Internal: "task-row-internal",
-    Delivery: "task-row-delivery",
-    Ordering: "task-row-ordering",
-    Inspection: "task-row-inspection",
+    Internal: "bg-background border-l-4 border-transparent",
+    Delivery: "bg-solva-smart/10 border-l-4 border-solva-smart",
+    Ordering: "bg-solva-wine/10 border-l-4 border-solva-wine",
+    Inspection: "bg-solva-pine/15 border-l-4 border-solva-pine",
   };
   return map[taskType];
 };
 const taskTypeNameClass = (taskType: TaskType) => {
   const map: Record<TaskType, string> = {
     Internal: "text-foreground font-semibold",
-    Delivery: "text-[hsl(var(--task-delivery))] font-bold",
-    Ordering: "text-[hsl(var(--task-ordering))] font-bold",
-    Inspection: "text-[hsl(var(--task-inspection))] font-bold",
+    Delivery: "text-solva-smart font-semibold",
+    Ordering: "text-solva-wine font-semibold",
+    Inspection: "text-solva-pine font-bold",
   };
   return map[taskType];
 };
 const taskTypeIcon = (taskType: TaskType) => {
   const iconMap: Record<TaskType, string> = {
     Internal: "text-foreground/90",
-    Delivery: "text-[hsl(var(--task-delivery))]",
-    Ordering: "text-[hsl(var(--task-ordering))]",
-    Inspection: "text-[hsl(var(--task-inspection))]",
+    Delivery: "text-solva-smart",
+    Ordering: "text-solva-wine",
+    Inspection: "text-solva-pine",
   };
   const iconClass = cn("h-4 w-4 shrink-0", iconMap[taskType]);
   if (taskType === "Internal") return <Hammer className={iconClass} />;
@@ -215,7 +215,7 @@ export function ScheduleTable({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [moveSourceTaskId]);
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto rounded-lg border border-border bg-background shadow-sm">
       {moveSourceTask ? (
         <div className="mb-2 rounded-md border border-border bg-muted/40 px-3 py-2">
           <div className="flex items-center justify-between gap-3">
@@ -238,34 +238,35 @@ export function ScheduleTable({
           </div>
         </div>
       ) : null}
-      <table className="w-full border-collapse font-sans text-[10px] leading-4">
+      <table className="w-full border-collapse font-sans text-[11px] leading-5">
         <thead>
-          <tr className="border-b bg-muted/60">
-            <th className="sticky left-0 z-20 bg-muted/60 px-2 py-2.5 text-center text-[11px] font-semibold text-foreground/80 uppercase tracking-[0.08em] w-[50px]">
+          <tr className="border-b bg-solva-smart">
+            <th className="sticky left-0 z-20 bg-solva-smart px-2 py-2.5 text-center text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[50px]">
               Move
             </th>
-            <th className="px-3 py-2.5 text-left text-[11px] font-semibold text-foreground/80 uppercase tracking-[0.08em] w-auto">
+            <th className="px-3 py-2.5 text-left text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-auto">
               Task
             </th>
-            <th className="px-[0.4rem] py-2.5 text-left text-[11px] font-semibold text-foreground/80 uppercase tracking-[0.08em] w-[100px]">
+            <th className="px-[0.4rem] py-2.5 text-left text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[100px]">
               Start
             </th>
-            <th className="px-2 py-2.5 text-center text-[11px] font-semibold text-foreground/80 uppercase tracking-[0.08em] w-[48px]">
+            <th className="px-2 py-2.5 text-center text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[48px]">
               Days
             </th>
-            <th className="px-[0.4rem] py-2.5 text-left text-[11px] font-semibold text-foreground/80 uppercase tracking-[0.08em] w-[100px]">
+            <th className="px-[0.4rem] py-2.5 text-left text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[100px]">
               End
             </th>
-            <th className="px-[0.4rem] py-2.5 text-left text-[11px] font-semibold text-foreground/80 uppercase tracking-[0.08em] w-auto">
+            <th className="px-3 py-2.5 text-left text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[180px] min-w-[180px]">Waiting On</th>
+            <th className="px-[0.4rem] py-2.5 text-left text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-auto">
               Assigned
             </th>
-            <th className="px-[0.4rem] py-2.5 text-left text-[11px] font-semibold text-foreground/80 uppercase tracking-[0.08em] w-[132px] min-w-[132px]">
+            <th className="px-[0.4rem] py-2.5 text-left text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[132px] min-w-[132px]">
               Status
             </th>
-            <th className="px-3 py-2.5 text-left text-[11px] font-semibold text-foreground/80 uppercase tracking-[0.08em] w-[200px]">
+            <th className="px-3 py-2.5 text-left text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[200px]">
               Comment
             </th>
-            <th className="px-3 py-2.5 text-center text-[11px] font-semibold text-foreground/80 uppercase tracking-[0.08em] w-[60px]">
+            <th className="px-3 py-2.5 text-center text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[60px]">
               Chain
             </th>
           </tr>
@@ -274,7 +275,7 @@ export function ScheduleTable({
           {tasks.length === 0 ? (
             <tr className="border-b">
               <td
-                colSpan={9}
+                colSpan={10}
                 className="px-3 py-6 text-sm text-muted-foreground"
               >
                 No tasks yet. Create your first task to begin.
@@ -405,7 +406,7 @@ function SectionBlock({
     <>
       <tr
         className={cn(
-          "bg-muted/70 border-b border-border/60 cursor-pointer hover:bg-muted transition-colors",
+          "bg-solva-smart/10 border-b border-solva-smart/20 cursor-pointer hover:bg-solva-smart/15 transition-colors",
           moveSourceTaskId && moveOverId === section.id && "ring-2 ring-primary/40",
         )}
         onClick={moveSourceTaskId ? undefined : onToggle}
@@ -427,15 +428,15 @@ function SectionBlock({
           if (moveOverId === section.id) setMoveOverId(null);
         }}
       >
-        <td colSpan={9} className="px-3 py-2">
+        <td colSpan={10} className="px-3 py-2">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               {isCollapsed ? (
-                <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
+                <ChevronRight className="h-3.5 w-3.5 text-solva-smart/70" />
               ) : (
-                <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                <ChevronDown className="h-3.5 w-3.5 text-solva-smart/70" />
               )}
-              <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-foreground/85">
+              <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-solva-smart">
                 {section.name}
               </span>
               {criticalCount > 0 ? (
@@ -578,6 +579,11 @@ function TaskRow({
     .map((dep: any) => conflictByDepId.get(dep.id))
     .filter((detail): detail is { message: string; suggestion: string } => Boolean(detail));
   const chainCount = getWorkflowChainCount(task.id, dependencies);
+  const waitingOnNames = dependencies
+    .filter((d: any) => d.successorId === task.id)
+    .map((d: any) => allTasks.find((t) => t.id === d.predecessorId)?.name ?? "")
+    .filter((name: string) => Boolean(name));
+  const waitingOnText = waitingOnNames.join(", ");
   const isMoveOver =
     moveOverId === task.id && moveSourceTaskId !== null && moveSourceTaskId !== task.id;
   const assignedPeople = people.filter((p: any) =>
@@ -590,8 +596,7 @@ function TaskRow({
     <tr
       className={cn(
         "border-b border-border/60 cursor-pointer transition-colors group text-foreground text-[10px] leading-4",
-        taskRowClass(task.taskType),
-        "hover:brightness-[0.98]",
+        "hover:bg-muted/20",
         isAffected && "cascade-highlight",
         isMoveOver && "ring-2 ring-primary/40",
       )}
@@ -649,7 +654,7 @@ function TaskRow({
           <GripVertical className="h-3.5 w-3.5" />
         </button>
       </td>
-      <td className="px-[0.4rem] py-[0.2rem] w-auto max-w-none">
+      <td className={cn("px-3 py-2 w-auto max-w-none", taskCellClass(task.taskType))}>
         <div className="flex items-center gap-2">
           {hasWarning ? (
             <Tooltip>
@@ -772,6 +777,12 @@ function TaskRow({
           {tooltip ? <TooltipContent>{tooltip}</TooltipContent> : null}
         </Tooltip>
       </td>
+      <td className="px-3 py-1.5 w-[180px] min-w-[180px] max-w-[220px] select-none">
+        <span className="block truncate text-[10px] text-muted-foreground">
+          {waitingOnText}
+        </span>
+      </td>
+      
       <td className="px-[0.4rem] py-1.5 w-auto" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center gap-1 whitespace-nowrap">
           {assignedPeople.length > 0 ? (
@@ -894,7 +905,7 @@ function NewTaskRow({
   const [value, setValue] = useState("");
   return (
     <tr className="border-b opacity-40 hover:opacity-70 transition-opacity">
-      <td className="px-3 py-2" colSpan={9}>
+      <td className="px-3 py-2" colSpan={10}>
         <input
           className="bg-transparent outline-none text-[12px] text-muted-foreground w-full placeholder:text-muted-foreground/60"
           placeholder={disabled ? "Create a section first..." : "+ New Task..."}
@@ -916,7 +927,7 @@ function NewSectionRow({ onAdd }: { onAdd: (name: string) => Section | null }) {
   const [value, setValue] = useState("");
   return (
     <tr className="border-b">
-      <td colSpan={9} className="px-3 py-2">
+      <td colSpan={10} className="px-3 py-2">
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -945,6 +956,21 @@ function NewSectionRow({ onAdd }: { onAdd: (name: string) => Section | null }) {
     </tr>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -1,5 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
-import { ScheduleHeader } from '@/components/schedule/ScheduleHeader';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ScheduleTable } from '@/components/schedule/ScheduleTable';
 import { ScheduleHealthSummary } from '@/components/schedule/ScheduleHealthSummary';
 import { LinkTasksModal } from '@/components/schedule/LinkTasksModal';
@@ -27,7 +26,10 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { SolvaBrandHero } from '@/components/branding/SolvaBrandHero';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import brownTownDefault from '@/assets/brown-town.jpg';
+import { Download, FileSpreadsheet, Image as ImageIcon, LayoutGrid, Link2, RotateCcw, Save, Settings as SettingsIcon, Users } from 'lucide-react';
 
 interface IndexProps {
   onBackToDashboard: () => void;
@@ -391,84 +393,283 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
     document.body.removeChild(anchor);
     URL.revokeObjectURL(url);
   };
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [sidebarImageUrl, setSidebarImageUrl] = useState<string>(brownTownDefault);
+  const [sidebarObjectUrl, setSidebarObjectUrl] = useState<string | null>(null);
+  const sidebarFileInputRef = useRef<HTMLInputElement | null>(null);
 
+  useEffect(() => {
+    return () => {
+      if (sidebarObjectUrl) URL.revokeObjectURL(sidebarObjectUrl);
+    };
+  }, [sidebarObjectUrl]);
+
+  const handleSidebarImageUpload = (file: File | null) => {
+    if (!file) return;
+    if (sidebarObjectUrl) URL.revokeObjectURL(sidebarObjectUrl);
+    const nextUrl = URL.createObjectURL(file);
+    setSidebarObjectUrl(nextUrl);
+    setSidebarImageUrl(nextUrl);
+  };
+
+  const handleToggleWorkdaysOnly = (nextValue: boolean) => {
+    const message = nextValue
+      ? "Enable Workdays only? This will exclude weekends from scheduling calculations and may shift task dates."
+      : "Disable Workdays only? This may change task dates.";
+
+    if (!window.confirm(message)) return;
+    setExcludeWeekends(nextValue);
+  };
   const selectedSnapshot = useMemo(
     () => snapshots.find((snapshot) => snapshot.id === selectedSnapshotId) ?? null,
     [snapshots, selectedSnapshotId],
   );
 
   return (
-    <div className="flex flex-col h-screen bg-background">
-      <ScheduleHeader
-        onLinkTasks={() => {
+    <div className="flex h-screen w-screen overflow-hidden bg-background">
+      <aside className="w-[280px] shrink-0 bg-solva-wine text-solva-porcelain flex flex-col">
+        <div className="p-4 border-b border-solva-porcelain/10">
+          <button
+            type="button"
+            className="group relative w-full overflow-hidden rounded-xl border border-solva-porcelain/15 bg-black/10"
+            onClick={() => sidebarFileInputRef.current?.click()}
+          >
+            <img
+              src={sidebarImageUrl}
+              alt="Workspace"
+              className="h-[160px] w-full object-cover opacity-90 transition-opacity group-hover:opacity-100"
+              draggable={false}
+            />
+            <div className="absolute inset-0 flex items-end justify-end p-2">
+              <span className="inline-flex items-center gap-1.5 rounded-md border border-white/15 bg-black/35 px-2 py-1 text-[11px] font-semibold">
+                <ImageIcon className="h-3.5 w-3.5" />
+                Change
+              </span>
+            </div>
+          </button>
+          <input
+            ref={sidebarFileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(event) => handleSidebarImageUpload(event.target.files?.[0] ?? null)}
+          />
+        </div>
+
+        <nav className="flex-1 p-3 space-y-1">
+          <button
+            type="button"
+            className="w-full flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold hover:bg-white/10"
+            onClick={onBackToDashboard}
+          >
+            <LayoutGrid className="h-4 w-4" />
+            Projects
+          </button>
+
+          <div className="mt-3 pt-3 border-t border-solva-porcelain/10 space-y-1">
+            <button
+              type="button"
+              className="w-full flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold hover:bg-white/10"
+              onClick={handleSaveSnapshot}
+            >
+              <Save className="h-4 w-4" />
+              Save Snapshot
+            </button>
+            <button
+              type="button"
+              className="w-full flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold hover:bg-white/10"
+              onClick={handleOpenLoadSnapshot}
+            >
+              <Download className="h-4 w-4" />
+              Load Snapshot
+            </button>
+            <button
+              type="button"
+              className="w-full flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold hover:bg-white/10"
+              onClick={handleQuickRestoreSnapshot}
+            >
+              <RotateCcw className="h-4 w-4" />
+              Restore Last
+            </button>
+            <button
+              type="button"
+              className="w-full flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold hover:bg-white/10"
+              onClick={handleExportCsv}
+            >
+              <FileSpreadsheet className="h-4 w-4" />
+              Export CSV
+            </button>
+          </div>
+        </nav>
+
+        <div className="p-3 border-t border-solva-porcelain/10">
+          <button
+            type="button"
+            className="w-full flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold hover:bg-white/10"
+            onClick={() => setSettingsOpen(true)}
+          >
+            <SettingsIcon className="h-4 w-4" />
+            Settings
+          </button>
+        </div>
+      </aside>
+
+      <div className="flex-1 min-w-0 flex flex-col">
+        <header className="px-6 py-4 border-b border-border bg-solva-porcelain">
+  <div className="flex flex-wrap items-center justify-between gap-4">
+    <div className="min-w-0 flex items-baseline gap-3">
+      <h1 className="font-heading text-3xl text-solva-smart truncate">{projectName}</h1>
+      {projectDescription ? (
+        <p className="text-sm text-solva-smart/70 truncate">{projectDescription}</p>
+      ) : null}
+    </div>
+
+    <div className="flex flex-wrap items-center gap-3">
+      <Button
+        variant="outline"
+        className="h-9 border-solva-smart/25 text-solva-smart hover:bg-solva-smart/5"
+        onClick={() => {
           setLinkModalContext({ taskId: null, role: 'predecessor' });
           setLinkModalOpen(true);
         }}
-        onOpenPeople={() => setPeopleModalOpen(true)}
-        onExportCsv={handleExportCsv}
-        onSaveSnapshot={handleSaveSnapshot}
-        onLoadSnapshot={handleOpenLoadSnapshot}
-        onQuickRestoreSnapshot={handleQuickRestoreSnapshot}
-        onBackToDashboard={onBackToDashboard}
-        projectName={projectName}
-        projectDescription={projectDescription}
-        filterType={filterType}
-        setFilterType={setFilterType}
-        filterGroup={filterGroup}
-        setFilterGroup={setFilterGroup}
-        filterStatus={filterStatus}
-        setFilterStatus={setFilterStatus}
-        filterUrgent={filterUrgent}
-        setFilterUrgent={setFilterUrgent}
-        excludeWeekends={excludeWeekends}
-        setExcludeWeekends={setExcludeWeekends}
-      />
-      <div className="px-4 md:px-6 lg:px-8 pt-4">
-        <SolvaBrandHero />
+      >
+        <Link2 className="h-4 w-4 mr-2" />
+        Links
+      </Button>
+
+      <Button
+        variant="outline"
+        className="h-9 border-solva-smart/25 text-solva-smart hover:bg-solva-smart/5"
+        onClick={() => setPeopleModalOpen(true)}
+      >
+        <Users className="h-4 w-4 mr-2" />
+        People
+      </Button>
+
+      <div className="flex items-center gap-2">
+        <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-solva-smart/70">Type</span>
+        <select
+          className="h-9 rounded-md border border-solva-smart/20 bg-white px-3 text-sm text-solva-smart"
+          value={filterType}
+          onChange={(event) => setFilterType(event.target.value as TaskType | 'All')}
+        >
+          <option value="All">All</option>
+          <option value="Internal">Internal</option>
+          <option value="Inspection">Inspection</option>
+          <option value="Ordering">Ordering</option>
+          <option value="Delivery">Delivery</option>
+        </select>
       </div>
-      <ScheduleHealthSummary />
-      {scheduleLoadError ? (
-        <section className="px-4 md:px-6 lg:px-8 pt-4">
-          <div className="status-alert status-alert-error">
-            <strong>Schedule Load Failed</strong>
-            <p>{scheduleLoadError}</p>
-          </div>
-        </section>
-      ) : null}
-      {scheduleSaveError ? (
-        <section className="px-4 md:px-6 lg:px-8 pt-4">
-          <div className="status-alert status-alert-error">
-            <strong>Schedule Save Failed</strong>
-            <p>{scheduleSaveError}</p>
-          </div>
-        </section>
-      ) : null}
-      {snapshotError ? (
-        <section className="px-4 md:px-6 lg:px-8 pt-4">
-          <div className="status-alert status-alert-error">
-            <strong>Snapshot Error</strong>
-            <p>{snapshotError}</p>
-          </div>
-        </section>
-      ) : null}
-      {snapshotInfo ? (
-        <section className="px-4 md:px-6 lg:px-8 pt-4">
-          <div className="status-alert border-emerald-200 bg-emerald-50">
-            <strong className="text-emerald-800">Snapshot</strong>
-            <p className="text-emerald-800">{snapshotInfo}</p>
-          </div>
-        </section>
-      ) : null}
-      <div className="flex-1 overflow-auto px-4 md:px-6 lg:px-8 pb-4">
-        <ScheduleTable
-          filterType={filterType}
-          filterGroup={filterGroup}
-          filterStatus={filterStatus}
-          filterUrgent={filterUrgent}
-          onSelectTask={setSelectedTaskId}
-          onOpenDependencyChain={setDepChainTaskId}
+
+      <div className="flex items-center gap-2">
+        <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-solva-smart/70">Group</span>
+        <select
+          className="h-9 rounded-md border border-solva-smart/20 bg-white px-3 text-sm text-solva-smart"
+          value={filterGroup}
+          onChange={(event) => setFilterGroup(event.target.value as UserGroup | 'All')}
+        >
+          <option value="All">All</option>
+          <option value="Internal">Internal</option>
+          <option value="Suppliers">Suppliers</option>
+        </select>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-solva-smart/70">Status</span>
+        <select
+          className="h-9 rounded-md border border-solva-smart/20 bg-white px-3 text-sm text-solva-smart"
+          value={filterStatus}
+          onChange={(event) => setFilterStatus(event.target.value as TaskStatus | 'All')}
+        >
+          <option value="All">All</option>
+          <option value="Planned">Planned</option>
+          <option value="Booked">Booked</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Completed">Completed</option>
+          <option value="Delayed">Delayed</option>
+        </select>
+      </div>
+
+      <div className="flex items-center gap-2 rounded-md border border-solva-smart/15 bg-white px-3 py-2">
+        <Switch id="filter-urgent" checked={filterUrgent} onCheckedChange={setFilterUrgent} />
+        <Label htmlFor="filter-urgent" className="text-sm text-solva-smart">Urgent</Label>
+      </div>
+
+      <div className="flex items-center gap-2 rounded-md border border-solva-smart/15 bg-white px-3 py-2">
+        <Switch
+          id="filter-workdays"
+          checked={excludeWeekends}
+          onCheckedChange={handleToggleWorkdaysOnly}
         />
+        <Label htmlFor="filter-workdays" className="text-sm text-solva-smart">Workdays only</Label>
       </div>
+    </div>
+  </div>
+</header>
+
+        <div className="px-6 pt-4">
+          <ScheduleHealthSummary />
+        </div>
+
+        {scheduleLoadError ? (
+          <section className="px-6 pt-4">
+            <div className="status-alert status-alert-error">
+              <strong>Schedule Load Failed</strong>
+              <p>{scheduleLoadError}</p>
+            </div>
+          </section>
+        ) : null}
+        {scheduleSaveError ? (
+          <section className="px-6 pt-4">
+            <div className="status-alert status-alert-error">
+              <strong>Schedule Save Failed</strong>
+              <p>{scheduleSaveError}</p>
+            </div>
+          </section>
+        ) : null}
+        {snapshotError ? (
+          <section className="px-6 pt-4">
+            <div className="status-alert status-alert-error">
+              <strong>Snapshot Error</strong>
+              <p>{snapshotError}</p>
+            </div>
+          </section>
+        ) : null}
+        {snapshotInfo ? (
+          <section className="px-6 pt-4">
+            <div className="status-alert border-emerald-200 bg-emerald-50">
+              <strong className="text-emerald-800">Snapshot</strong>
+              <p className="text-emerald-800">{snapshotInfo}</p>
+            </div>
+          </section>
+        ) : null}
+
+        <div className="flex-1 overflow-auto px-6 pb-6 pt-4">
+          <ScheduleTable
+            filterType={filterType}
+            filterGroup={filterGroup}
+            filterStatus={filterStatus}
+            filterUrgent={filterUrgent}
+            onSelectTask={setSelectedTaskId}
+            onOpenDependencyChain={setDepChainTaskId}
+          />
+        </div>
+      </div>
+
+      <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
+        <DialogContent className="sm:max-w-[520px]">
+          <DialogHeader>
+            <DialogTitle>Settings</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">Settings isn't active yet in this version.</p>
+          <div className="flex justify-end pt-2">
+            <Button variant="outline" onClick={() => setSettingsOpen(false)}>
+              Close
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <LinkTasksModal
         open={linkModalOpen}
         onOpenChange={setLinkModalOpen}
@@ -568,5 +769,9 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
 };
 
 export default Index;
+
+
+
+
 
 
