@@ -29,6 +29,7 @@ import {
   Truck,
   ShoppingCart,
   ClipboardCheck,
+  HelpCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -242,32 +243,32 @@ export function ScheduleTable({
         <thead>
           <tr className="border-b bg-solva-smart">
             <th className="sticky left-0 z-20 bg-solva-smart px-2 py-2.5 text-center text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[50px]">
-              Move
+              <div className="inline-flex items-center gap-1"><span>Move</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: Move" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">Click the grip to enter Move mode, then click a destination task (places before) or a section header (moves to end).</TooltipContent></Tooltip></div>
             </th>
             <th className="px-3 py-2.5 text-left text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-auto">
-              Task
+              <div className="inline-flex items-center gap-1"><span>Task</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: Task" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">Task name and type. Double-click the name to edit (disabled while moving).</TooltipContent></Tooltip></div>
             </th>
             <th className="px-[0.4rem] py-2.5 text-left text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[100px]">
-              Start
+              <div className="inline-flex items-center gap-1"><span>Start</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: Start" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">Start date for the task.</TooltipContent></Tooltip></div>
             </th>
             <th className="px-2 py-2.5 text-center text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[48px]">
-              Days
+              <div className="inline-flex items-center gap-1"><span>Days</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: Days" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">Duration in workdays.</TooltipContent></Tooltip></div>
             </th>
             <th className="px-[0.4rem] py-2.5 text-left text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[100px]">
-              End
+              <div className="inline-flex items-center gap-1"><span>End</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: End" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">End date for the task.</TooltipContent></Tooltip></div>
             </th>
-            <th className="px-3 py-2.5 text-left text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[180px] min-w-[180px]">Waiting On</th>
+            <th className="px-3 py-2.5 text-left text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[180px] min-w-[180px]"><div className="inline-flex items-center gap-1"><span>Waiting On</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: Waiting On" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">Shows predecessor tasks this task depends on (read-only).</TooltipContent></Tooltip></div></th>
             <th className="px-[0.4rem] py-2.5 text-left text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-auto">
-              Assigned
+              <div className="inline-flex items-center gap-1"><span>Assigned</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: Assigned" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">People assigned to the task.</TooltipContent></Tooltip></div>
             </th>
             <th className="px-[0.4rem] py-2.5 text-left text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[132px] min-w-[132px]">
-              Status
+              <div className="inline-flex items-center gap-1"><span>Status</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: Status" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">Current progress status.</TooltipContent></Tooltip></div>
             </th>
             <th className="px-3 py-2.5 text-left text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[200px]">
-              Comment
+              <div className="inline-flex items-center gap-1"><span>Comment</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: Comment" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">First comment/notes preview.</TooltipContent></Tooltip></div>
             </th>
             <th className="px-3 py-2.5 text-center text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[60px]">
-              Chain
+              <div className="inline-flex items-center gap-1"><span>Chain</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: Chain" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">Opens dependency chain view for this task.</TooltipContent></Tooltip></div>
             </th>
           </tr>
         </thead>
@@ -956,6 +957,7 @@ function NewSectionRow({ onAdd }: { onAdd: (name: string) => Section | null }) {
     </tr>
   );
 }
+
 
 
 

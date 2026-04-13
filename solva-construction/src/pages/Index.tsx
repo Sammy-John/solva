@@ -28,8 +28,9 @@ import {
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import brownTownDefault from '@/assets/brown-town.jpg';
-import { Download, FileSpreadsheet, Image as ImageIcon, LayoutGrid, Link2, RotateCcw, Save, Settings as SettingsIcon, Users } from 'lucide-react';
+import { BookOpen, Download, FileSpreadsheet, Image as ImageIcon, LayoutGrid, Link2, RotateCcw, Save, Settings as SettingsIcon, Users } from 'lucide-react';
 
 interface IndexProps {
   onBackToDashboard: () => void;
@@ -394,6 +395,7 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
     URL.revokeObjectURL(url);
   };
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(false);
   const [sidebarImageUrl, setSidebarImageUrl] = useState<string>(brownTownDefault);
   const [sidebarObjectUrl, setSidebarObjectUrl] = useState<string | null>(null);
   const sidebarFileInputRef = useRef<HTMLInputElement | null>(null);
@@ -502,16 +504,24 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
           </div>
         </nav>
 
-        <div className="p-3 border-t border-solva-porcelain/10">
-          <button
-            type="button"
-            className="w-full flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold hover:bg-white/10"
-            onClick={() => setSettingsOpen(true)}
-          >
-            <SettingsIcon className="h-4 w-4" />
-            Settings
-          </button>
-        </div>
+        <div className="p-3 border-t border-solva-porcelain/10 space-y-1">
+  <button
+    type="button"
+    className="w-full flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold hover:bg-white/10"
+    onClick={() => setGuideOpen(true)}
+  >
+    <BookOpen className="h-4 w-4" />
+    Guide
+  </button>
+  <button
+    type="button"
+    className="w-full flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold hover:bg-white/10"
+    onClick={() => setSettingsOpen(true)}
+  >
+    <SettingsIcon className="h-4 w-4" />
+    Settings
+  </button>
+</div>
       </aside>
 
       <div className="flex-1 min-w-0 flex flex-col">
@@ -655,7 +665,59 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
           />
         </div>
       </div>
+      <Sheet open={guideOpen} onOpenChange={setGuideOpen}>
+        <SheetContent side="left" className="w-[280px] sm:max-w-none p-0 bg-solva-porcelain text-solva-smart">
+          <div className="h-full flex flex-col">
+            <div className="px-4 py-4 border-b border-solva-smart/10">
+              <SheetHeader className="space-y-0 text-left">
+                <SheetTitle className="font-label uppercase tracking-[0.14em] text-solva-smart">Guide</SheetTitle>
+              </SheetHeader>
+              <p className="mt-2 text-sm text-solva-smart/75">
+                Quick tips for using the scheduler.
+              </p>
+            </div>
 
+            <div className="flex-1 overflow-auto px-4 py-4 space-y-3">
+              <details className="rounded-lg border border-solva-smart/15 bg-white p-3">
+                <summary className="cursor-pointer font-semibold">Moving tasks</summary>
+                <p className="mt-2 text-sm text-solva-smart/80">
+                  Click the grip in the Move column to enter Move mode, then click another task to place it before that row.
+                  Click a section header to move the task to the end of that section. Press Esc to cancel.
+                </p>
+              </details>
+
+              <details className="rounded-lg border border-solva-smart/15 bg-white p-3">
+                <summary className="cursor-pointer font-semibold">Dependencies &amp; Waiting On</summary>
+                <p className="mt-2 text-sm text-solva-smart/80">
+                  Use Links to add predecessor/successor relationships. The Waiting On column shows the predecessor task names for each task (read-only).
+                </p>
+              </details>
+
+              <details className="rounded-lg border border-solva-smart/15 bg-white p-3">
+                <summary className="cursor-pointer font-semibold">Snapshots</summary>
+                <p className="mt-2 text-sm text-solva-smart/80">
+                  Save Snapshot captures the current schedule. Load Snapshot lets you pick a snapshot to load. Restore Last quickly restores the most recent snapshot.
+                </p>
+              </details>
+
+              <details className="rounded-lg border border-solva-smart/15 bg-white p-3">
+                <summary className="cursor-pointer font-semibold">Filters</summary>
+                <p className="mt-2 text-sm text-solva-smart/80">
+                  Use Type/Group/Status to narrow the table. Urgent highlights tasks needing attention.
+                  Workdays only changes scheduling calculations and asks for confirmation.
+                </p>
+              </details>
+
+              <details className="rounded-lg border border-solva-smart/15 bg-white p-3">
+                <summary className="cursor-pointer font-semibold">Export CSV</summary>
+                <p className="mt-2 text-sm text-solva-smart/80">
+                  Export CSV downloads your schedule as a spreadsheet-friendly file.
+                </p>
+              </details>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
       <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
         <DialogContent className="sm:max-w-[520px]">
           <DialogHeader>
@@ -769,6 +831,9 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
 };
 
 export default Index;
+
+
+
 
 
 
