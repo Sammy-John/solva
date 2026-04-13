@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useScheduleStore } from "@/store/scheduleStore";
 import {
   Task,
@@ -29,6 +29,7 @@ import {
   Truck,
   ShoppingCart,
   ClipboardCheck,
+  HelpCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -67,30 +68,30 @@ const urgencyClass = (level: string) => {
   if (level === "green") return "urgency-green";
   return "";
 };
-const taskRowClass = (taskType: TaskType) => {
+const taskCellClass = (taskType: TaskType) => {
   const map: Record<TaskType, string> = {
-    Internal: "task-row-internal",
-    Delivery: "task-row-delivery",
-    Ordering: "task-row-ordering",
-    Inspection: "task-row-inspection",
+    Internal: "bg-background border-l-4 border-transparent",
+    Delivery: "bg-solva-smart/10 border-l-4 border-solva-smart",
+    Ordering: "bg-solva-wine/10 border-l-4 border-solva-wine",
+    Inspection: "bg-solva-pine/15 border-l-4 border-solva-pine",
   };
   return map[taskType];
 };
 const taskTypeNameClass = (taskType: TaskType) => {
   const map: Record<TaskType, string> = {
     Internal: "text-foreground font-semibold",
-    Delivery: "text-[hsl(var(--task-delivery))] font-bold",
-    Ordering: "text-[hsl(var(--task-ordering))] font-bold",
-    Inspection: "text-[hsl(var(--task-inspection))] font-bold",
+    Delivery: "text-solva-smart font-semibold",
+    Ordering: "text-solva-wine font-semibold",
+    Inspection: "text-solva-pine font-bold",
   };
   return map[taskType];
 };
 const taskTypeIcon = (taskType: TaskType) => {
   const iconMap: Record<TaskType, string> = {
     Internal: "text-foreground/90",
-    Delivery: "text-[hsl(var(--task-delivery))]",
-    Ordering: "text-[hsl(var(--task-ordering))]",
-    Inspection: "text-[hsl(var(--task-inspection))]",
+    Delivery: "text-solva-smart",
+    Ordering: "text-solva-wine",
+    Inspection: "text-solva-pine",
   };
   const iconClass = cn("h-4 w-4 shrink-0", iconMap[taskType]);
   if (taskType === "Internal") return <Hammer className={iconClass} />;
@@ -126,8 +127,8 @@ export function ScheduleTable({
     id: string;
     field: string;
   } | null>(null);
-  const [draggingTaskId, setDraggingTaskId] = useState<string | null>(null);
-  const [dragOverTaskId, setDragOverTaskId] = useState<string | null>(null);
+  const [moveSourceTaskId, setMoveSourceTaskId] = useState<string | null>(null);
+  const [moveOverId, setMoveOverId] = useState<string | null>(null);
   const invalidDeps = getInvalidDependencies(tasks, dependencies, excludeWeekends);
   const conflictDetails = getDependencyConflictDetails(tasks, dependencies, excludeWeekends);
   const conflictByDepId = new Map(conflictDetails.map((detail) => [detail.dependencyId, detail]));
@@ -200,37 +201,74 @@ export function ScheduleTable({
     };
   });
   const affectedIds = cascadeNotification?.affectedIds || [];
+  const moveSourceTask = moveSourceTaskId
+    ? tasks.find((t) => t.id === moveSourceTaskId) || null
+    : null;
+
+  useEffect(() => {
+    if (!moveSourceTaskId) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      setMoveSourceTaskId(null);
+      setMoveOverId(null);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [moveSourceTaskId]);
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full border-collapse font-sans text-[10px] leading-4" onPointerUpCapture={() => { if (!draggingTaskId) return; setDraggingTaskId(null); setDragOverTaskId(null); }}>
+    <div className="overflow-x-auto rounded-lg border border-border bg-background shadow-sm">
+      {moveSourceTask ? (
+        <div className="mb-2 rounded-md border border-border bg-muted/40 px-3 py-2">
+          <div className="flex items-center justify-between gap-3">
+            <div className="text-[11px] text-foreground/80">
+              <span className="font-semibold text-foreground">Move mode:</span>{" "}
+              {moveSourceTask.name} — click a task to place before it, or a
+              section header to move to the end.
+              <span className="ml-2 text-muted-foreground">(Esc to cancel)</span>
+            </div>
+            <button
+              type="button"
+              className="inline-flex h-7 items-center rounded-md border border-border bg-background px-2 text-[11px] text-foreground/80 hover:bg-accent"
+              onClick={() => {
+                setMoveSourceTaskId(null);
+                setMoveOverId(null);
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      ) : null}
+      <table className="w-full border-collapse font-sans text-[11px] leading-5">
         <thead>
-          <tr className="border-b bg-muted/60">
-            <th className="px-2 py-2.5 text-center text-[11px] font-semibold text-foreground/80 uppercase tracking-[0.08em] w-[50px]">
-              Move
+          <tr className="border-b bg-solva-smart">
+            <th className="sticky left-0 z-20 bg-solva-smart px-2 py-2.5 text-center text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[50px]">
+              <div className="inline-flex items-center gap-1"><span>Move</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: Move" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">Click the grip to enter Move mode, then click a destination task (places before) or a section header (moves to end).</TooltipContent></Tooltip></div>
             </th>
-            <th className="px-3 py-2.5 text-left text-[11px] font-semibold text-foreground/80 uppercase tracking-[0.08em] w-auto">
-              Task
+            <th className="px-3 py-2.5 text-left text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-auto">
+              <div className="inline-flex items-center gap-1"><span>Task</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: Task" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">Task name and type. Double-click the name to edit (disabled while moving).</TooltipContent></Tooltip></div>
             </th>
-            <th className="px-[0.4rem] py-2.5 text-left text-[11px] font-semibold text-foreground/80 uppercase tracking-[0.08em] w-[100px]">
-              Start
+            <th className="px-[0.4rem] py-2.5 text-left text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[100px]">
+              <div className="inline-flex items-center gap-1"><span>Start</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: Start" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">Start date for the task.</TooltipContent></Tooltip></div>
             </th>
-            <th className="px-2 py-2.5 text-center text-[11px] font-semibold text-foreground/80 uppercase tracking-[0.08em] w-[48px]">
-              Days
+            <th className="px-2 py-2.5 text-center text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[48px]">
+              <div className="inline-flex items-center gap-1"><span>Days</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: Days" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">Duration in workdays.</TooltipContent></Tooltip></div>
             </th>
-            <th className="px-[0.4rem] py-2.5 text-left text-[11px] font-semibold text-foreground/80 uppercase tracking-[0.08em] w-[100px]">
-              End
+            <th className="px-[0.4rem] py-2.5 text-left text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[100px]">
+              <div className="inline-flex items-center gap-1"><span>End</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: End" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">End date for the task.</TooltipContent></Tooltip></div>
             </th>
-            <th className="px-[0.4rem] py-2.5 text-left text-[11px] font-semibold text-foreground/80 uppercase tracking-[0.08em] w-auto">
-              Assigned
+            <th className="px-3 py-2.5 text-left text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[180px] min-w-[180px]"><div className="inline-flex items-center gap-1"><span>Waiting On</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: Waiting On" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">Shows predecessor tasks this task depends on (read-only).</TooltipContent></Tooltip></div></th>
+            <th className="px-[0.4rem] py-2.5 text-left text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-auto">
+              <div className="inline-flex items-center gap-1"><span>Assigned</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: Assigned" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">People assigned to the task.</TooltipContent></Tooltip></div>
             </th>
-            <th className="px-[0.4rem] py-2.5 text-left text-[11px] font-semibold text-foreground/80 uppercase tracking-[0.08em] w-[132px] min-w-[132px]">
-              Status
+            <th className="px-[0.4rem] py-2.5 text-left text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[132px] min-w-[132px]">
+              <div className="inline-flex items-center gap-1"><span>Status</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: Status" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">Current progress status.</TooltipContent></Tooltip></div>
             </th>
-            <th className="px-3 py-2.5 text-left text-[11px] font-semibold text-foreground/80 uppercase tracking-[0.08em] w-[200px]">
-              Comment
+            <th className="px-3 py-2.5 text-left text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[200px]">
+              <div className="inline-flex items-center gap-1"><span>Comment</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: Comment" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">First comment/notes preview.</TooltipContent></Tooltip></div>
             </th>
-            <th className="px-3 py-2.5 text-center text-[11px] font-semibold text-foreground/80 uppercase tracking-[0.08em] w-[60px]">
-              Chain
+            <th className="px-3 py-2.5 text-center text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[60px]">
+              <div className="inline-flex items-center gap-1"><span>Chain</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: Chain" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">Opens dependency chain view for this task.</TooltipContent></Tooltip></div>
             </th>
           </tr>
         </thead>
@@ -238,7 +276,7 @@ export function ScheduleTable({
           {tasks.length === 0 ? (
             <tr className="border-b">
               <td
-                colSpan={9}
+                colSpan={10}
                 className="px-3 py-6 text-sm text-muted-foreground"
               >
                 No tasks yet. Create your first task to begin.
@@ -272,10 +310,10 @@ export function ScheduleTable({
                 onSelectTask={onSelectTask}
                 onOpenDependencyChain={onOpenDependencyChain}
                 allTasks={tasks}
-                draggingTaskId={draggingTaskId}
-                dragOverTaskId={dragOverTaskId}
-                setDraggingTaskId={setDraggingTaskId}
-                setDragOverTaskId={setDragOverTaskId}
+                moveSourceTaskId={moveSourceTaskId}
+                moveOverId={moveOverId}
+                setMoveSourceTaskId={setMoveSourceTaskId}
+                setMoveOverId={setMoveOverId}
                 onDropOnTask={handleDropOnTask}
               />
             );
@@ -329,10 +367,10 @@ interface SectionBlockProps {
   onSelectTask: (id: string) => void;
   onOpenDependencyChain: (id: string) => void;
   allTasks: Task[];
-  draggingTaskId: string | null;
-  dragOverTaskId: string | null;
-  setDraggingTaskId: (id: string | null) => void;
-  setDragOverTaskId: (id: string | null) => void;
+  moveSourceTaskId: string | null;
+  moveOverId: string | null;
+  setMoveSourceTaskId: (id: string | null) => void;
+  setMoveOverId: (id: string | null) => void;
   onDropOnTask: (
     sourceTaskId: string | null,
     targetTaskId: string,
@@ -359,37 +397,47 @@ function SectionBlock({
   onSelectTask,
   onOpenDependencyChain,
   allTasks,
-  draggingTaskId,
-  dragOverTaskId,
-  setDraggingTaskId,
-  setDragOverTaskId,
+  moveSourceTaskId,
+  moveOverId,
+  setMoveSourceTaskId,
+  setMoveOverId,
   onDropOnTask,
 }: SectionBlockProps) {
   return (
     <>
       <tr
-        className={cn("bg-muted/70 border-b border-border/60 cursor-pointer hover:bg-muted transition-colors", draggingTaskId && dragOverTaskId === section.id && "ring-2 ring-primary/40")}
-        onClick={onToggle}
-        onPointerEnter={() => {
-          if (!draggingTaskId) return;
-          setDragOverTaskId(section.id);
+        className={cn(
+          "bg-solva-smart/10 border-b border-solva-smart/20 cursor-pointer hover:bg-solva-smart/15 transition-colors",
+          moveSourceTaskId && moveOverId === section.id && "ring-2 ring-primary/40",
+        )}
+        onClick={moveSourceTaskId ? undefined : onToggle}
+        onClickCapture={(e) => {
+          if (!moveSourceTaskId) return;
+          const target = e.target as HTMLElement | null;
+          if (target?.closest('button, input, textarea, select, a, [role="button"]')) return;
+          e.preventDefault();
+          e.stopPropagation();
+          onDropOnSection(moveSourceTaskId);
+          setMoveOverId(null);
+          setMoveSourceTaskId(null);
         }}
-        onPointerUp={() => {
-          if (!draggingTaskId) return;
-          onDropOnSection(draggingTaskId);
-          setDragOverTaskId(null);
-          setDraggingTaskId(null);
+        onPointerEnter={() => {
+          if (!moveSourceTaskId) return;
+          setMoveOverId(section.id);
+        }}
+        onPointerLeave={() => {
+          if (moveOverId === section.id) setMoveOverId(null);
         }}
       >
-        <td colSpan={9} className="px-3 py-2">
+        <td colSpan={10} className="px-3 py-2">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               {isCollapsed ? (
-                <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
+                <ChevronRight className="h-3.5 w-3.5 text-solva-smart/70" />
               ) : (
-                <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                <ChevronDown className="h-3.5 w-3.5 text-solva-smart/70" />
               )}
-              <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-foreground/85">
+              <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-solva-smart">
                 {section.name}
               </span>
               {criticalCount > 0 ? (
@@ -456,10 +504,10 @@ function SectionBlock({
             onSelectTask={onSelectTask}
             onOpenDependencyChain={onOpenDependencyChain}
             allTasks={allTasks}
-            draggingTaskId={draggingTaskId}
-            dragOverTaskId={dragOverTaskId}
-            setDraggingTaskId={setDraggingTaskId}
-            setDragOverTaskId={setDragOverTaskId}
+            moveSourceTaskId={moveSourceTaskId}
+            moveOverId={moveOverId}
+            setMoveSourceTaskId={setMoveSourceTaskId}
+            setMoveOverId={setMoveOverId}
             onDropOnTask={onDropOnTask}
           />
         ))}
@@ -484,10 +532,10 @@ interface TaskRowProps {
   onSelectTask: (id: string) => void;
   onOpenDependencyChain: (id: string) => void;
   allTasks: Task[];
-  draggingTaskId: string | null;
-  dragOverTaskId: string | null;
-  setDraggingTaskId: (id: string | null) => void;
-  setDragOverTaskId: (id: string | null) => void;
+  moveSourceTaskId: string | null;
+  moveOverId: string | null;
+  setMoveSourceTaskId: (id: string | null) => void;
+  setMoveOverId: (id: string | null) => void;
   onDropOnTask: (
     sourceTaskId: string | null,
     targetTaskId: string,
@@ -508,10 +556,10 @@ function TaskRow({
   onSelectTask,
   onOpenDependencyChain,
   allTasks,
-  draggingTaskId,
-  dragOverTaskId,
-  setDraggingTaskId,
-  setDragOverTaskId,
+  moveSourceTaskId,
+  moveOverId,
+  setMoveSourceTaskId,
+  setMoveOverId,
   onDropOnTask,
 }: TaskRowProps) {
   const urgency = getUrgency(
@@ -532,7 +580,13 @@ function TaskRow({
     .map((dep: any) => conflictByDepId.get(dep.id))
     .filter((detail): detail is { message: string; suggestion: string } => Boolean(detail));
   const chainCount = getWorkflowChainCount(task.id, dependencies);
-  const isDragOver = dragOverTaskId === task.id && draggingTaskId !== task.id;
+  const waitingOnNames = dependencies
+    .filter((d: any) => d.successorId === task.id)
+    .map((d: any) => allTasks.find((t) => t.id === d.predecessorId)?.name ?? "")
+    .filter((name: string) => Boolean(name));
+  const waitingOnText = waitingOnNames.join(", ");
+  const isMoveOver =
+    moveOverId === task.id && moveSourceTaskId !== null && moveSourceTaskId !== task.id;
   const assignedPeople = people.filter((p: any) =>
     task.assignedTo.includes(p.id),
   );
@@ -543,24 +597,30 @@ function TaskRow({
     <tr
       className={cn(
         "border-b border-border/60 cursor-pointer transition-colors group text-foreground text-[10px] leading-4",
-        taskRowClass(task.taskType),
-        "hover:brightness-[0.98]",
+        "hover:bg-muted/20",
         isAffected && "cascade-highlight",
-        isDragOver && "ring-2 ring-primary/40",
+        isMoveOver && "ring-2 ring-primary/40",
       )}
-      onClick={() => onSelectTask(task.id)}
+      onClick={moveSourceTaskId ? undefined : () => onSelectTask(task.id)}
+      onClickCapture={(e) => {
+        if (!moveSourceTaskId) return;
+        const target = e.target as HTMLElement | null;
+        if (target?.closest('[data-move-grip="true"]')) return;
+        if (target?.closest('[data-move-handle-cell="true"]')) return;
+        if (target?.closest('button, input, textarea, select, a, [role="button"]')) return;
+        e.preventDefault();
+        e.stopPropagation();
+        if (moveSourceTaskId === task.id) return;
+        onDropOnTask(moveSourceTaskId, task.id, task.sectionId);
+        setMoveOverId(null);
+        setMoveSourceTaskId(null);
+      }}
       onPointerEnter={() => {
-        if (!draggingTaskId || draggingTaskId === task.id) return;
-        setDragOverTaskId(task.id);
+        if (!moveSourceTaskId || moveSourceTaskId === task.id) return;
+        setMoveOverId(task.id);
       }}
       onPointerLeave={() => {
-        if (dragOverTaskId === task.id) setDragOverTaskId(null);
-      }}
-      onPointerUp={() => {
-        if (!draggingTaskId || draggingTaskId === task.id) return;
-        onDropOnTask(draggingTaskId, task.id, task.sectionId);
-        setDragOverTaskId(null);
-        setDraggingTaskId(null);
+        if (moveOverId === task.id) setMoveOverId(null);
       }}
     >
       <td
@@ -569,19 +629,33 @@ function TaskRow({
       >
         <button
           type="button"
-
-          className="inline-flex h-6 w-6 cursor-grab active:cursor-grabbing items-center justify-center rounded border border-border text-muted-foreground hover:bg-accent"
-          aria-label="Drag task"
-          title="Drag to reorder or move to another section"
-          onPointerDown={(e) => {
+          data-move-grip="true"
+          className={cn(
+            "inline-flex h-6 w-6 items-center justify-center rounded border border-border text-muted-foreground hover:bg-accent",
+            moveSourceTaskId === task.id && "bg-accent text-foreground",
+          )}
+          aria-label="Move task"
+          title={
+            moveSourceTaskId === task.id
+              ? "Cancel move"
+              : "Move this task (then click destination)"
+          }
+          onClick={(e) => {
+            e.preventDefault();
             e.stopPropagation();
-            setDraggingTaskId(task.id);
+            if (moveSourceTaskId === task.id) {
+              setMoveSourceTaskId(null);
+              setMoveOverId(null);
+              return;
+            }
+            setMoveSourceTaskId(task.id);
+            setMoveOverId(null);
           }}
         >
           <GripVertical className="h-3.5 w-3.5" />
         </button>
       </td>
-      <td className="px-[0.4rem] py-[0.2rem] w-auto max-w-none">
+      <td className={cn("px-3 py-2 w-auto max-w-none", taskCellClass(task.taskType))}>
         <div className="flex items-center gap-2">
           {hasWarning ? (
             <Tooltip>
@@ -614,6 +688,7 @@ function TaskRow({
                 taskTypeNameClass(task.taskType),
               )}
               onDoubleClick={(e) => {
+                if (moveSourceTaskId) return;
                 e.stopPropagation();
                 setEditingCell({ id: task.id, field: "name" });
               }}
@@ -703,6 +778,12 @@ function TaskRow({
           {tooltip ? <TooltipContent>{tooltip}</TooltipContent> : null}
         </Tooltip>
       </td>
+      <td className="px-3 py-1.5 w-[180px] min-w-[180px] max-w-[220px] select-none">
+        <span className="block truncate text-[10px] text-muted-foreground">
+          {waitingOnText}
+        </span>
+      </td>
+      
       <td className="px-[0.4rem] py-1.5 w-auto" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center gap-1 whitespace-nowrap">
           {assignedPeople.length > 0 ? (
@@ -825,7 +906,7 @@ function NewTaskRow({
   const [value, setValue] = useState("");
   return (
     <tr className="border-b opacity-40 hover:opacity-70 transition-opacity">
-      <td className="px-3 py-2" colSpan={9}>
+      <td className="px-3 py-2" colSpan={10}>
         <input
           className="bg-transparent outline-none text-[12px] text-muted-foreground w-full placeholder:text-muted-foreground/60"
           placeholder={disabled ? "Create a section first..." : "+ New Task..."}
@@ -847,7 +928,7 @@ function NewSectionRow({ onAdd }: { onAdd: (name: string) => Section | null }) {
   const [value, setValue] = useState("");
   return (
     <tr className="border-b">
-      <td colSpan={9} className="px-3 py-2">
+      <td colSpan={10} className="px-3 py-2">
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -876,6 +957,22 @@ function NewSectionRow({ onAdd }: { onAdd: (name: string) => Section | null }) {
     </tr>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

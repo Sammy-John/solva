@@ -3,6 +3,7 @@ import type { FormEvent } from 'react'
 import WorkspacePage from '@/pages/Index'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { ProjectToolsPanel } from '@/components/ProjectToolsPanel'
+import { SolvaBrandMark } from '@/components/branding/SolvaBrandMark'
 import {
   createProject,
   deleteProject,
@@ -447,124 +448,158 @@ function App() {
   }
 
   return (
-    <main className="dashboard-shell">
-      {storagePanel}
-      <header className="dashboard-header">
-        <div>
-          <h1>Construction Planner Desktop</h1>
-          <p>
-            Start a new project or open an existing one to continue planning your schedule.
-          </p>
-        </div>
-        <div className="dashboard-header-actions">
-          <button type="button" className="secondary-button" onClick={() => setIsCreateTemplateOpen(true)}>
-            New Template
-          </button>
-          <button type="button" className="primary-button" onClick={() => setIsCreateOpen(true)}>
-            New Project
-          </button>
-        </div>
-      </header>
+    <>
+      <main className="dashboard-layout">
+      <section className="dashboard-left">
+  <div className="dashboard-left-top">
+    <SolvaBrandMark />
+  </div>
 
-      {storageError ? (
-        <section className="status-alert status-alert-error">
-          <strong>Storage Error</strong>
-          <p>{storageError}</p>
-        </section>
-      ) : null}
+  <div className="dashboard-left-middle">
+    <p className="dashboard-tagline">Project planning, made practical.</p>
+    <p className="dashboard-supporting">
+      A clear, fast scheduler for construction teams—set up projects, build schedules, and keep everyone aligned.
+    </p>
 
-      <section className="projects-panel">
-        <div className="projects-panel-header">
-          <h2>Projects</h2>
-        </div>
-        {projectsLoading ? (
-          <div className="empty-state">
-            <p>Loading projects...</p>
-          </div>
-        ) : sortedProjects.length === 0 ? (
-          <div className="empty-state">
-            <p>No projects yet. Create your first project to get started.</p>
-          </div>
-        ) : (
-          <ul className="project-list">
-            {sortedProjects.map((project) => (
-              <li key={project.id} className="project-row">
-                <div>
-                  <h3>{project.name}</h3>
-                  {project.description ? <p>{project.description}</p> : null}
-                </div>
-                <div className="project-row-actions">
-                  <button
-                    type="button"
-                    className="secondary-button"
-                    onClick={() => setActiveProjectId(project.id)}
-                  >
-                    Open
-                  </button>
-                  <button
-                    type="button"
-                    className="secondary-button"
-                    onClick={() => openEditModal(project)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    type="button"
-                    className="danger-button"
-                    onClick={() => handleDeleteProject(project)}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
+    {storageError ? (
+      <section className="status-alert status-alert-error">
+        <strong>Storage Error</strong>
+        <p>{storageError}</p>
       </section>
+    ) : null}
+  </div>
 
-      <section className="projects-panel templates-panel">
-        <div className="projects-panel-header templates-panel-header">
-          <h2>Templates</h2>
-          <button type="button" className="secondary-button" onClick={() => setIsCreateTemplateOpen(true)}>
-            Create Template
-          </button>
-        </div>
-        {templates.length === 0 ? (
-          <div className="empty-state">
-            <p>No templates yet. Create one from blank or from a saved project.</p>
+  <div className="dashboard-left-bottom">{storagePanel}</div>
+</section>
+
+<section className="dashboard-right">
+        <header className="dashboard-right-header">
+          <div>
+            <h1 className="dashboard-right-title font-heading">Projects</h1>
+            <p className="dashboard-right-subtitle">
+              Create a new project or open an existing one.
+            </p>
           </div>
-        ) : (
-          <ul className="project-list">
-            {templates.map((template) => (
-              <li key={template.id} className="project-row">
-                <div>
-                  <h3>{template.name}</h3>
-                  {template.description ? <p>{template.description}</p> : null}
-                  <p className="template-meta">
-                    {template.seed.sections.length} sections · {template.seed.tasks.length} tasks · {template.seed.dependencies.length} links
-                  </p>
-                </div>
-                <div className="project-row-actions">
-                  <button
-                    type="button"
-                    className="secondary-button"
-                    onClick={() => openProjectFromTemplate(template)}
-                  >
-                    Use for New Project
-                  </button>
-                  <button
-                    type="button"
-                    className="danger-button"
-                    onClick={() => handleDeleteTemplate(template)}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
+          <div className="dashboard-header-actions">
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => setIsCreateTemplateOpen(true)}
+            >
+              New Template
+            </button>
+            <button
+              type="button"
+              className="primary-button"
+              onClick={() => setIsCreateOpen(true)}
+            >
+              New Project
+            </button>
+          </div>
+        </header>
+
+        <section className="dashboard-projects">
+  {projectsLoading ? (
+    <div className="empty-state">
+      <p>Loading projects...</p>
+    </div>
+  ) : sortedProjects.length === 0 ? (
+    <div className="empty-state">
+      <p>No projects yet. Create your first project to get started.</p>
+    </div>
+  ) : (
+    <div className="project-grid">
+      {sortedProjects.map((project) => (
+        <article key={project.id} className="project-card">
+          <div className="project-card-body">
+            <h3 className="project-card-title">{project.name}</h3>
+            {project.description ? (
+              <p className="project-card-description">{project.description}</p>
+            ) : null}
+          </div>
+          <div className="project-card-actions">
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => setActiveProjectId(project.id)}
+            >
+              Open
+            </button>
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => openEditModal(project)}
+            >
+              Edit
+            </button>
+            <button
+              type="button"
+              className="danger-button"
+              onClick={() => handleDeleteProject(project)}
+            >
+              Delete
+            </button>
+          </div>
+        </article>
+      ))}
+    </div>
+  )}
+</section>
+
+<section className="dashboard-templates">
+  <div className="dashboard-templates-header">
+    <h2 className="dashboard-section-title font-heading">Templates</h2>
+    <button
+      type="button"
+      className="secondary-button"
+      onClick={() => setIsCreateTemplateOpen(true)}
+    >
+      Create Template
+    </button>
+  </div>
+
+  {templates.length === 0 ? (
+    <div className="empty-state">
+      <p>No templates yet. Create one from blank or from a saved project.</p>
+    </div>
+  ) : (
+    <div className="template-grid">
+      {templates.map((template) => (
+        <article key={template.id} className="template-card">
+          <div className="project-card-body">
+            <h3 className="project-card-title">{template.name}</h3>
+            {template.description ? (
+              <p className="project-card-description">{template.description}</p>
+            ) : null}
+            <p className="template-meta">
+              {template.seed.sections.length} sections ·{ }
+              {template.seed.tasks.length} tasks ·{ }
+              {template.seed.dependencies.length} links
+            </p>
+          </div>
+          <div className="project-card-actions">
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => openProjectFromTemplate(template)}
+            >
+              Use for New Project
+            </button>
+            <button
+              type="button"
+              className="danger-button"
+              onClick={() => handleDeleteTemplate(template)}
+            >
+              Delete
+            </button>
+          </div>
+        </article>
+      ))}
+    </div>
+  )}
+</section>
       </section>
+    </main>
 
       {isCreateOpen ? (
         <div className="modal-backdrop" role="presentation" onClick={closeCreateModal}>
@@ -810,11 +845,13 @@ function App() {
           </section>
         </div>
       ) : null}
-    </main>
+    </>
   )
 }
 
 export default App
+
+
 
 
 

@@ -23,7 +23,7 @@ const baseTask = (overrides: Partial<Task>): Task => ({
   ...overrides,
 });
 
-describe('ScheduleTable pointer move', () => {
+describe('ScheduleTable move mode', () => {
   beforeEach(() => {
     const sections: Section[] = [
       { id: 'sec-a', name: 'Section A', order: 0 },
@@ -43,7 +43,7 @@ describe('ScheduleTable pointer move', () => {
     });
   });
 
-  it('reorders tasks with pointer interaction on move grip', () => {
+  it('reorders tasks with click-to-move mode', () => {
     render(
       <TooltipProvider>
         <ScheduleTable
@@ -57,16 +57,41 @@ describe('ScheduleTable pointer move', () => {
       </TooltipProvider>,
     );
 
-    const dragButtons = screen.getAllByRole('button', { name: 'Drag task' });
-    const task1Row = screen.getByText('Task 1').closest('tr');
+    const moveButtons = screen.getAllByRole('button', { name: 'Move task' });
+    const task1Row = screen.getAllByText('Task 1')[0].closest('tr');
 
     expect(task1Row).not.toBeNull();
 
-    fireEvent.pointerDown(dragButtons[1]);
-    fireEvent.pointerEnter(task1Row!);
-    fireEvent.pointerUp(task1Row!);
+    fireEvent.click(moveButtons[1]);
+    fireEvent.click(task1Row!);
 
     const orderedIds = useScheduleStore.getState().tasks.map((task) => task.id);
     expect(orderedIds.slice(0, 2)).toEqual(['t2', 't1']);
+  });
+  it('cancels move with Escape', () => {
+    render(
+      <TooltipProvider>
+        <ScheduleTable
+          filterType="All"
+          filterGroup="All"
+          filterStatus="All"
+          filterUrgent={false}
+          onSelectTask={() => undefined}
+          onOpenDependencyChain={() => undefined}
+        />
+      </TooltipProvider>,
+    );
+
+    const moveButtons = screen.getAllByRole('button', { name: 'Move task' });
+    const task1Row = screen.getAllByText('Task 1')[0].closest('tr');
+
+    expect(task1Row).not.toBeNull();
+
+    fireEvent.click(moveButtons[1]);
+    fireEvent.keyDown(window, { key: 'Escape' });
+    fireEvent.click(task1Row!);
+
+    const orderedIds = useScheduleStore.getState().tasks.map((task) => task.id);
+    expect(orderedIds.slice(0, 2)).toEqual(['t1', 't2']);
   });
 });

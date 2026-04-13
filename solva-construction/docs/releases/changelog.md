@@ -2,6 +2,32 @@
 
 Tracks completed changes by release and task completion.
 
+
+## 2026-04-14 - Release 1.1.0 (MVP)
+
+**Version:** `1.1.0`
+**Plan Task:** `Release 1.1 - MVP ready for selling`
+
+### Completed
+- Replaced unreliable drag-and-drop with explicit **Move mode** (click grip → click destination).
+- Added clear Move mode feedback + cancellation (Esc + banner) and improved reliability in Tauri.
+- Added Solva branding tokens + fonts (Oswald label, Playfair headings, Lato body).
+- Redesigned Projects dashboard for desktop viewport and Solva color scheme.
+- Reworked Project planning view:
+  - Teams-style left sidebar (snapshot actions, export, guide, settings placeholder)
+  - Project header + filters/toggles (with confirmation for Workdays only)
+- Table upgrades:
+  - Smart Blue table header + section styling
+  - Task-type color applied to Task column only (Inspection > Ordering > Delivery > General)
+  - Added read-only **Waiting On** column from predecessor dependencies
+  - Added inline header help tooltips (`?`) for key columns (especially Move)
+- App now opens **maximized** by default (prod + test configs)
+
+### Verification Notes
+- `npm run release:version:check` PASS
+- `npm run build` PASS
+
+---
 ## 2026-03-28 - Block1 Task 1 Complete
 
 **Version:** `1.0.0`
@@ -290,5 +316,6 @@ Copy this block for each completed release/task:
 
 ### Follow-ups
 - Manual installed-app UX pass for inline date edit behavior and weekend mode interactions on real project data.
+
 
 
