@@ -76,8 +76,8 @@ export function ProjectToolsPanel({
   onOpenDataFolder,
   openFolderError,
 }: ProjectToolsPanelProps) {
-  const [showUpdates, setShowUpdates] = useState(true)
-  const [showData, setShowData] = useState(true)
+  const [showUpdates, setShowUpdates] = useState(false)
+  const [showData, setShowData] = useState(false)
 
   const latestChanges = useMemo(() => getLatestChanges(appVersion), [appVersion])
 

@@ -17,10 +17,18 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["Inter", "sans-serif"],
+        sans: ["Lato", "sans-serif"],
+        heading: ["Playfair Display", "serif"],
+        label: ["Oswald", "sans-serif"],
         mono: ["Source Code Pro", "monospace"],
       },
       colors: {
+        solva: {
+          wine: "#781C24",
+          pine: "#0F5A3A",
+          porcelain: "#FBFEF9",
+          smart: "#23395B",
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

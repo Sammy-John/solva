@@ -27,6 +27,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { SolvaBrandHero } from '@/components/branding/SolvaBrandHero';
 
 interface IndexProps {
   onBackToDashboard: () => void;
@@ -422,6 +423,9 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
         excludeWeekends={excludeWeekends}
         setExcludeWeekends={setExcludeWeekends}
       />
+      <div className="px-4 md:px-6 lg:px-8 pt-4">
+        <SolvaBrandHero />
+      </div>
       <ScheduleHealthSummary />
       {scheduleLoadError ? (
         <section className="px-4 md:px-6 lg:px-8 pt-4">
