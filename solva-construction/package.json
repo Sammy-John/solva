@@ -16,7 +16,7 @@
     "release:manifest": "node scripts/release/publish-manifest.mjs",
     "release:alpha:test": "pwsh -NoProfile -File scripts/release/build-alpha-test.ps1",
     "release:manifest:test": "node scripts/release/publish-manifest.mjs --artifacts-root artifacts/test --latest-manifest artifacts/test/latest.json --installer-pattern \"Construction Planner Desktop Test\"",
-    "release:manifest:github": "node scripts/release/publish-manifest.mjs --base-url https://github.com/Sammy-John/solva/releases/latest/download --omit-version-dir true --url-filename-mode github-dot",
+    "release:manifest:github": "node scripts/release/publish-manifest.mjs --base-url https://github.com/Sammy-John/solva/releases/latest/download --omit-version-dir true --url-filename-mode github-dot --installer-pattern \"Construction Planner Desktop_\"",
     "release:manifest:test:github": "node scripts/release/publish-manifest.mjs --artifacts-root artifacts/test --latest-manifest artifacts/test/test-latest.json --installer-pattern \"Construction Planner Desktop Test\" --base-url https://github.com/Sammy-John/solva/releases/latest/download --omit-version-dir true --url-filename-mode github-dot"
   },
   "dependencies": {
