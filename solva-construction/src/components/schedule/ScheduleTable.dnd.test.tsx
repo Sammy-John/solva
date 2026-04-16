@@ -100,6 +100,50 @@ describe('ScheduleTable move mode', () => {
     expect(taskLabels.indexOf('New Task')).toBeLessThan(taskLabels.indexOf('Task 2'));
   });
 
+  it('shows a centered move popup while keeping the schedule clickable', () => {
+    render(
+      <TooltipProvider>
+        <ScheduleTable
+          filterType="All"
+          filterGroup="All"
+          filterStatus="All"
+          filterUrgent={false}
+          onSelectTask={() => undefined}
+          onOpenDependencyChain={() => undefined}
+        />
+      </TooltipProvider>,
+    );
+
+    const moveButtons = screen.getAllByRole('button', { name: 'Move task' });
+    const task1Row = screen.getAllByText('Task 1')[0].closest('tr');
+
+    expect(task1Row).not.toBeNull();
+
+    fireEvent.click(moveButtons[1]);
+
+    expect(screen.queryByText(/Move mode:/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/Moving Task 2/i)).toBeInTheDocument();
+    expect(screen.getByText(/Click a task to place before it, or click a section header to move to the end\./i)).toBeInTheDocument();
+    expect(screen.getByText(/You can keep using the schedule while this is open\./i)).toBeInTheDocument();
+
+    const moveHeading = screen.getByText(/Moving Task 2/i);
+    const overlayCard = moveHeading.closest('div');
+
+    expect(overlayCard).not.toBeNull();
+    expect(overlayCard?.className).toContain('bg-background');
+    expect(overlayCard?.className).not.toContain('/96');
+    expect(overlayCard?.className).not.toContain('backdrop-blur');
+
+    const overlayViewport = overlayCard?.parentElement;
+    expect(overlayViewport).not.toBeNull();
+    expect(overlayViewport?.className).toContain('fixed');
+
+    fireEvent.click(task1Row!);
+
+    const orderedIds = useScheduleStore.getState().tasks.map((task) => task.id);
+    expect(orderedIds.slice(0, 2)).toEqual(['t2', 't1']);
+  });
+
   it('cancels move with Escape', () => {
     render(
       <TooltipProvider>

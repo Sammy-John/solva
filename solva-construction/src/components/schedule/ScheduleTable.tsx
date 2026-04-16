@@ -235,26 +235,14 @@ export function ScheduleTable({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [moveSourceTaskId]);
   return (
-    <div className="overflow-x-auto rounded-lg border border-border bg-background shadow-sm">
+    <div className="relative overflow-x-auto rounded-lg border border-border bg-background shadow-sm">
       {moveSourceTask ? (
-        <div className="mb-2 rounded-md border border-border bg-muted/40 px-3 py-2">
-          <div className="flex items-center justify-between gap-3">
-            <div className="text-[11px] text-foreground/80">
-              <span className="font-semibold text-foreground">Move mode:</span>{" "}
-              {moveSourceTask.name} — click a task to place before it, or a
-              section header to move to the end.
-              <span className="ml-2 text-muted-foreground">(Esc to cancel)</span>
-            </div>
-            <button
-              type="button"
-              className="inline-flex h-7 items-center rounded-md border border-border bg-background px-2 text-[11px] text-foreground/80 hover:bg-accent"
-              onClick={() => {
-                setMoveSourceTaskId(null);
-                setMoveOverId(null);
-              }}
-            >
-              Cancel
-            </button>
+        <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center px-4 py-8">
+          <div className="pointer-events-none w-full max-w-[520px] rounded-xl border border-primary/35 bg-background px-5 py-4 text-center shadow-2xl ring-1 ring-primary/15">
+            <p className="text-lg font-semibold text-foreground">Moving {moveSourceTask.name}</p>
+            <p className="mt-2 text-sm leading-6 text-foreground/90">Click a task to place before it, or click a section header to move to the end.</p>
+            <p className="mt-2 text-sm font-medium text-primary/90">You can keep using the schedule while this is open.</p>
+            <p className="mt-1 text-xs text-muted-foreground">Press Esc to cancel.</p>
           </div>
         </div>
       ) : null}
@@ -676,8 +664,8 @@ function TaskRow({
           type="button"
           data-move-grip="true"
           className={cn(
-            "inline-flex h-6 w-6 items-center justify-center rounded border border-border text-muted-foreground hover:bg-accent",
-            moveSourceTaskId === task.id && "bg-accent text-foreground",
+            "inline-flex h-6 w-6 items-center justify-center rounded border border-border text-muted-foreground transition-all hover:bg-accent",
+            moveSourceTaskId === task.id && "border-primary bg-primary text-primary-foreground shadow-sm ring-2 ring-primary/35 ring-offset-1 ring-offset-background",
           )}
           aria-label="Move task"
           title={
