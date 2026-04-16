@@ -114,6 +114,7 @@ export function ScheduleTable({
     sections,
     updateTask,
     addTask,
+    addTaskBelow,
     addSection,
     deleteSection,
     reorderTask,
@@ -181,6 +182,24 @@ export function ScheduleTable({
     if (!sourceTaskId) return;
     reorderTask(sourceTaskId, null, targetSectionId);
   };
+  const handleAddTaskBelow = (sourceTask: Task) => {
+    const newTask: Task = {
+      id: `t${Date.now()}`,
+      name: "New Task",
+      taskType: "Internal",
+      sectionId: sourceTask.sectionId,
+      startDate: "",
+      endDate: "",
+      duration: 0,
+      assignedTo: [],
+      userGroup: "Internal",
+      status: "Planned",
+      comments: [],
+    };
+
+    addTaskBelow(sourceTask.id, newTask);
+    queueMicrotask(() => onSelectTask(newTask.id));
+  };
   const sortedSections = [...sections].sort((a, b) => a.order - b.order);
   const sectionGroups = sortedSections.map((section) => {
     const sectionTasks = tasks.filter((task) => task.sectionId === section.id);
@@ -242,6 +261,9 @@ export function ScheduleTable({
       <table className="w-full border-collapse font-sans text-[11px] leading-5">
         <thead>
           <tr className="border-b bg-solva-smart">
+            <th className="px-2 py-2.5 text-center text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[50px]">
+              <div className="inline-flex items-center gap-1"><span>Task</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: Add Task" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">Adds a new task directly below the selected row in the same section.</TooltipContent></Tooltip></div>
+            </th>
             <th className="sticky left-0 z-20 bg-solva-smart px-2 py-2.5 text-center text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[50px]">
               <div className="inline-flex items-center gap-1"><span>Move</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: Move" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">Click the grip to enter Move mode, then click a destination task (places before) or a section header (moves to end).</TooltipContent></Tooltip></div>
             </th>
@@ -261,7 +283,7 @@ export function ScheduleTable({
             <th className="px-[0.4rem] py-2.5 text-left text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-auto">
               <div className="inline-flex items-center gap-1"><span>Assigned</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: Assigned" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">People assigned to the task.</TooltipContent></Tooltip></div>
             </th>
-            <th className="px-[0.4rem] py-2.5 text-left text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[132px] min-w-[132px]">
+            <th className="px-[0.4rem] py-2.5 text-left text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[116px] min-w-[116px]">
               <div className="inline-flex items-center gap-1"><span>Status</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: Status" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">Current progress status.</TooltipContent></Tooltip></div>
             </th>
             <th className="px-3 py-2.5 text-left text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[200px]">
@@ -276,7 +298,7 @@ export function ScheduleTable({
           {tasks.length === 0 ? (
             <tr className="border-b">
               <td
-                colSpan={10}
+                colSpan={11}
                 className="px-3 py-6 text-sm text-muted-foreground"
               >
                 No tasks yet. Create your first task to begin.
@@ -299,6 +321,7 @@ export function ScheduleTable({
                 onToggle={() => toggleSection(section.id)}
                 onDelete={() => deleteSection(section.id)}
                 onDropOnSection={(sourceTaskId) => handleDropOnSection(sourceTaskId, section.id)}
+                onAddTaskBelow={handleAddTaskBelow}
                 people={people}
                 dependencies={dependencies}
                 invalidDeps={invalidDeps}
@@ -352,6 +375,7 @@ interface SectionBlockProps {
   onToggle: () => void;
   onDelete: () => void;
   onDropOnSection: (sourceTaskId: string | null) => void;
+  onAddTaskBelow: (task: Task) => void;
   people: any[];
   dependencies: any[];
   invalidDeps: string[];
@@ -386,6 +410,7 @@ function SectionBlock({
   onToggle,
   onDelete,
   onDropOnSection,
+  onAddTaskBelow,
   people,
   dependencies,
   invalidDeps,
@@ -429,7 +454,7 @@ function SectionBlock({
           if (moveOverId === section.id) setMoveOverId(null);
         }}
       >
-        <td colSpan={10} className="px-3 py-2">
+        <td colSpan={11} className="px-3 py-2">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               {isCollapsed ? (
@@ -508,6 +533,7 @@ function SectionBlock({
             moveOverId={moveOverId}
             setMoveSourceTaskId={setMoveSourceTaskId}
             setMoveOverId={setMoveOverId}
+            onAddTaskBelow={onAddTaskBelow}
             onDropOnTask={onDropOnTask}
           />
         ))}
@@ -531,6 +557,7 @@ interface TaskRowProps {
   ) => void;
   onSelectTask: (id: string) => void;
   onOpenDependencyChain: (id: string) => void;
+  onAddTaskBelow: (task: Task) => void;
   allTasks: Task[];
   moveSourceTaskId: string | null;
   moveOverId: string | null;
@@ -555,6 +582,7 @@ function TaskRow({
   onInlineEdit,
   onSelectTask,
   onOpenDependencyChain,
+  onAddTaskBelow,
   allTasks,
   moveSourceTaskId,
   moveOverId,
@@ -623,6 +651,23 @@ function TaskRow({
         if (moveOverId === task.id) setMoveOverId(null);
       }}
     >
+      <td
+        className="px-2 py-1.5 text-center"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          type="button"
+          className="inline-flex h-6 w-6 items-center justify-center rounded border border-border/70 text-muted-foreground/70 hover:bg-accent hover:text-foreground transition-colors"
+          aria-label="Add task below"
+          title="Add task below"
+          onClick={(e) => {
+            e.stopPropagation();
+            onAddTaskBelow(task);
+          }}
+        >
+          <Plus className="h-3.5 w-3.5" />
+        </button>
+      </td>
       <td
         className="px-2 py-1.5 text-center"
         onClick={(e) => e.stopPropagation()}
@@ -906,7 +951,7 @@ function NewTaskRow({
   const [value, setValue] = useState("");
   return (
     <tr className="border-b opacity-40 hover:opacity-70 transition-opacity">
-      <td className="px-3 py-2" colSpan={10}>
+      <td className="px-3 py-2" colSpan={11}>
         <input
           className="bg-transparent outline-none text-[12px] text-muted-foreground w-full placeholder:text-muted-foreground/60"
           placeholder={disabled ? "Create a section first..." : "+ New Task..."}
@@ -928,7 +973,7 @@ function NewSectionRow({ onAdd }: { onAdd: (name: string) => Section | null }) {
   const [value, setValue] = useState("");
   return (
     <tr className="border-b">
-      <td colSpan={10} className="px-3 py-2">
+      <td colSpan={11} className="px-3 py-2">
         <div className="flex items-center gap-2">
           <button
             type="button"

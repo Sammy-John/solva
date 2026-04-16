@@ -37,6 +37,7 @@ interface ScheduleState {
   ) => void;
 
   addTask: (task: Task) => void;
+  addTaskBelow: (sourceTaskId: string, task: Task) => void;
   updateTask: (id: string, updates: Partial<Task>) => void;
   deleteTask: (id: string) => void;
   reorderTask: (
@@ -183,6 +184,20 @@ export const useScheduleStore = create<ScheduleState>((set, get) => ({
 
   addTask: (task) =>
     set((state) => ({ tasks: [...state.tasks, normalizeTask(task)] })),
+
+  addTaskBelow: (sourceTaskId, task) =>
+    set((state) => {
+      const sourceIndex = state.tasks.findIndex((entry) => entry.id === sourceTaskId);
+      const normalizedTask = normalizeTask(task);
+
+      if (sourceIndex < 0) {
+        return { tasks: [...state.tasks, normalizedTask] };
+      }
+
+      const nextTasks = [...state.tasks];
+      nextTasks.splice(sourceIndex + 1, 0, normalizedTask);
+      return { tasks: nextTasks };
+    }),
 
   updateTask: (id, updates) => {
     const state = get();

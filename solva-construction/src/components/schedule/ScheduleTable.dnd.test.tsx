@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 
@@ -68,6 +68,38 @@ describe('ScheduleTable move mode', () => {
     const orderedIds = useScheduleStore.getState().tasks.map((task) => task.id);
     expect(orderedIds.slice(0, 2)).toEqual(['t2', 't1']);
   });
+  it('creates a new task below the clicked row', () => {
+    const onSelectTask = vi.fn();
+
+    render(
+      <TooltipProvider>
+        <ScheduleTable
+          filterType="All"
+          filterGroup="All"
+          filterStatus="All"
+          filterUrgent={false}
+          onSelectTask={onSelectTask}
+          onOpenDependencyChain={() => undefined}
+        />
+      </TooltipProvider>,
+    );
+
+    fireEvent.click(screen.getAllByRole('button', { name: 'Add task below' })[0]);
+
+    const tasks = useScheduleStore.getState().tasks;
+    expect(tasks.map((task) => task.id)).toHaveLength(3);
+    expect(tasks[1].sectionId).toBe('sec-a');
+    expect(tasks[1].name).toBe('New Task');
+
+    const taskLabels = screen
+      .getAllByText(/Task|New Task/)
+      .map((node) => node.textContent)
+      .filter((value): value is string => Boolean(value));
+
+    expect(taskLabels.indexOf('New Task')).toBeGreaterThan(taskLabels.indexOf('Task 1'));
+    expect(taskLabels.indexOf('New Task')).toBeLessThan(taskLabels.indexOf('Task 2'));
+  });
+
   it('cancels move with Escape', () => {
     render(
       <TooltipProvider>

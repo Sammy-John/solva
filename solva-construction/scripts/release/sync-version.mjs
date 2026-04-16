@@ -13,11 +13,30 @@ const tauriConfigPaths = [
   path.join(rootDir, 'src-tauri', 'tauri.conf.json'),
   path.join(rootDir, 'src-tauri', 'tauri.test.conf.json'),
 ];
+const cargoTomlPath = path.join(rootDir, 'src-tauri', 'Cargo.toml');
 
 const readJson = async (filePath) => JSON.parse(await readFile(filePath, 'utf8'));
 
 const writeJson = async (filePath, value) => {
   await writeFile(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
+};
+
+const readCargoVersion = async (filePath) => {
+  const cargoToml = await readFile(filePath, 'utf8');
+  const match = cargoToml.match(/(^version\s*=\s*")([^"]+)(")/m);
+  if (!match) {
+    throw new Error(`${path.relative(rootDir, filePath)} version is missing or invalid.`);
+  }
+
+  return {
+    cargoToml,
+    version: match[2],
+  };
+};
+
+const writeCargoVersion = async (filePath, cargoToml, version) => {
+  const updated = cargoToml.replace(/(^version\s*=\s*")([^"]+)(")/m, `$1${version}$3`);
+  await writeFile(filePath, updated, 'utf8');
 };
 
 const fileExists = async (filePath) => {
@@ -70,6 +89,7 @@ const main = async () => {
     cfgPath,
     cfg: await readJson(cfgPath),
   })));
+  const cargo = await readCargoVersion(cargoTomlPath);
 
   for (const { cfgPath, cfg } of configs) {
     if (typeof cfg.version !== 'string' || !cfg.version.trim()) {
@@ -82,6 +102,10 @@ const main = async () => {
     const mismatches = configs
       .filter(({ cfg }) => cfg.version !== packageVersion)
       .map(({ cfgPath, cfg }) => `${path.relative(rootDir, cfgPath)}=${cfg.version}`);
+
+    if (cargo.version !== packageVersion) {
+      mismatches.push(`${path.relative(rootDir, cargoTomlPath)}=${cargo.version}`);
+    }
 
     if (mismatches.length > 0) {
       console.error(`Version mismatch: package.json=${packageVersion} ${mismatches.join(' ')}`);
@@ -97,6 +121,9 @@ const main = async () => {
     await writeJson(cfgPath, cfg);
     console.log(`Updated ${path.relative(rootDir, cfgPath)} version -> ${packageVersion}`);
   }
+
+  await writeCargoVersion(cargoTomlPath, cargo.cargoToml, packageVersion);
+  console.log(`Updated ${path.relative(rootDir, cargoTomlPath)} version -> ${packageVersion}`);
 };
 
 main().catch((error) => {
