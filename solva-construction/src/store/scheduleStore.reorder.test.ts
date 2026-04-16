@@ -25,6 +25,7 @@ describe('scheduleStore task placement', () => {
       dependencies: [],
       people: [],
       cascadeNotification: null,
+      blockedTaskEdit: null,
       tasks: [],
     });
   });
@@ -41,6 +42,7 @@ describe('scheduleStore task placement', () => {
       dependencies: [],
       people: [],
       cascadeNotification: null,
+      blockedTaskEdit: null,
       tasks: [
         task({ id: 'a1', name: 'A1', sectionId: 'sec-a' }),
         task({ id: 'a2', name: 'A2', sectionId: 'sec-a' }),
@@ -71,6 +73,7 @@ describe('scheduleStore task placement', () => {
       dependencies: [],
       people: [],
       cascadeNotification: null,
+      blockedTaskEdit: null,
       tasks: [
         task({ id: 'a1', name: 'A1', sectionId: 'sec-a' }),
         task({ id: 'a2', name: 'A2', sectionId: 'sec-a' }),

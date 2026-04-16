@@ -40,6 +40,7 @@ describe('ScheduleTable move mode', () => {
       dependencies: [],
       people: [],
       cascadeNotification: null,
+      blockedTaskEdit: null,
     });
   });
 
@@ -171,3 +172,53 @@ describe('ScheduleTable move mode', () => {
     expect(orderedIds.slice(0, 2)).toEqual(['t1', 't2']);
   });
 });
+
+  it('shows blocked edit guidance with a go-to-blocker action for constrained start dates', () => {
+    useScheduleStore.setState({
+      excludeWeekends: true,
+      sections: [{ id: 'sec-a', name: 'Section A', order: 0 }],
+      tasks: [
+        baseTask({ id: 'pred', name: 'Predecessor', sectionId: 'sec-a', startDate: '2026-04-01', endDate: '2026-04-05', duration: 5 }),
+        baseTask({ id: 'succ', name: 'Successor', sectionId: 'sec-a', startDate: '2026-04-10', endDate: '2026-04-10', duration: 1 }),
+      ],
+      dependencies: [
+        {
+          id: 'd1',
+          predecessorId: 'pred',
+          successorId: 'succ',
+          lagDays: 0,
+          autoShift: true,
+          notes: '',
+        },
+      ],
+      people: [],
+      cascadeNotification: null,
+      blockedTaskEdit: null,
+    });
+
+    const onSelectTask = vi.fn();
+
+    render(
+      <TooltipProvider>
+        <ScheduleTable
+          filterType="All"
+          filterGroup="All"
+          filterStatus="All"
+          filterUrgent={false}
+          onSelectTask={onSelectTask}
+          onOpenDependencyChain={() => undefined}
+        />
+      </TooltipProvider>,
+    );
+
+    fireEvent.change(screen.getAllByDisplayValue('2026-04-10')[0], {
+      target: { value: '2026-04-02' },
+    });
+
+    expect(screen.getAllByText(/Blocked by dependency/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Earliest allowed start: 2026-04-05/i).length).toBeGreaterThan(0);
+    const blockerButtons = screen.getAllByRole('button', { name: /Go to Predecessor/i });
+    fireEvent.click(blockerButtons[blockerButtons.length - 1]);
+    expect(onSelectTask).toHaveBeenCalledWith('pred');
+  });
+

@@ -252,7 +252,7 @@ export interface CascadeResult {
   movementSummaries: CascadeMovementSummary[];
 }
 
-interface AutoShiftConstraint {
+export interface AutoShiftConstraint {
   earliestStart: string;
   dependencyId: string;
   predecessorId: string;
@@ -260,7 +260,7 @@ interface AutoShiftConstraint {
   lagDays: number;
 }
 
-const computeEarliestAutoShiftConstraint = (
+export const getStrongestAutoShiftConstraint = (
   taskId: string,
   dependencies: Dependency[],
   taskMap: Map<string, Task>,
@@ -323,14 +323,14 @@ export function cascadeDependencies(
     const current = taskMap.get(currentId);
     if (!current) continue;
 
-    const constraint = computeEarliestAutoShiftConstraint(
+    const constraint = getStrongestAutoShiftConstraint(
       currentId,
       dependencies,
       taskMap,
       excludeWeekends,
     );
 
-    if (constraint && current.startDate < constraint.earliestStart) {
+    if (constraint && current.startDate !== constraint.earliestStart) {
       const originalStartDate = current.startDate;
       current.startDate = constraint.earliestStart;
       current.endDate = recalcEndDate(

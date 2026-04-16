@@ -119,6 +119,8 @@ export function ScheduleTable({
     deleteSection,
     reorderTask,
     cascadeNotification,
+    blockedTaskEdit,
+    dismissBlockedTaskEdit,
     excludeWeekends,
   } = useScheduleStore();
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(
@@ -164,7 +166,10 @@ export function ScheduleTable({
     if (field === "assignedTo") updates.assignedTo = value as string[];
     if (field === "userGroup") updates.userGroup = value as UserGroup;
     if (field === "status") updates.status = value as TaskStatus;
-    updateTask(taskId, updates);
+    const result = updateTask(taskId, updates);
+    if (!result.blockedTaskEdit) {
+      dismissBlockedTaskEdit();
+    }
     setEditingCell(null);
   };
   const handleDropOnTask = (
@@ -326,6 +331,8 @@ export function ScheduleTable({
                 setMoveSourceTaskId={setMoveSourceTaskId}
                 setMoveOverId={setMoveOverId}
                 onDropOnTask={handleDropOnTask}
+                blockedTaskEdit={blockedTaskEdit}
+                onDismissBlockedTaskEdit={dismissBlockedTaskEdit}
               />
             );
           })}
@@ -388,6 +395,15 @@ interface SectionBlockProps {
     targetTaskId: string,
     targetSectionId: string,
   ) => void;
+  blockedTaskEdit: {
+    taskId: string;
+    field: "startDate";
+    blockerTaskId: string;
+    blockerTaskName: string;
+    earliestAllowedStart: string;
+    requestedStartDate: string;
+  } | null;
+  onDismissBlockedTaskEdit: () => void;
 }
 function SectionBlock({
   section,
@@ -415,6 +431,8 @@ function SectionBlock({
   setMoveSourceTaskId,
   setMoveOverId,
   onDropOnTask,
+  blockedTaskEdit,
+  onDismissBlockedTaskEdit,
 }: SectionBlockProps) {
   return (
     <>
@@ -523,6 +541,8 @@ function SectionBlock({
             setMoveOverId={setMoveOverId}
             onAddTaskBelow={onAddTaskBelow}
             onDropOnTask={onDropOnTask}
+            blockedTaskEdit={blockedTaskEdit}
+            onDismissBlockedTaskEdit={onDismissBlockedTaskEdit}
           />
         ))}
     </>
@@ -556,6 +576,15 @@ interface TaskRowProps {
     targetTaskId: string,
     targetSectionId: string,
   ) => void;
+  blockedTaskEdit: {
+    taskId: string;
+    field: "startDate";
+    blockerTaskId: string;
+    blockerTaskName: string;
+    earliestAllowedStart: string;
+    requestedStartDate: string;
+  } | null;
+  onDismissBlockedTaskEdit: () => void;
 }
 function TaskRow({
   task,
@@ -577,6 +606,8 @@ function TaskRow({
   setMoveSourceTaskId,
   setMoveOverId,
   onDropOnTask,
+  blockedTaskEdit,
+  onDismissBlockedTaskEdit,
 }: TaskRowProps) {
   const urgency = getUrgency(
     task.taskType,
@@ -606,6 +637,10 @@ function TaskRow({
   const assignedPeople = people.filter((p: any) =>
     task.assignedTo.includes(p.id),
   );
+  const blockedStartEdit =
+    blockedTaskEdit && blockedTaskEdit.taskId === task.id && blockedTaskEdit.field === "startDate"
+      ? blockedTaskEdit
+      : null;
   const assignablePeople = people.filter(
     (p: any) => !task.assignedTo.includes(p.id),
   );
@@ -735,7 +770,7 @@ function TaskRow({
         </div>
       </td>
       <td
-        className="px-[0.4rem] py-1.5 w-[100px] text-center"
+        className="relative px-[0.4rem] py-1.5 w-[100px] text-center"
         onClick={(e) => e.stopPropagation()}
       >
         <Tooltip>
@@ -744,6 +779,7 @@ function TaskRow({
               className={cn(
                 "rounded pl-0 pr-[0.4rem] py-[0.2rem] text-[10px] inline-flex justify-center",
                 urgencyClass(urgency),
+                blockedStartEdit && "ring-1 ring-amber-500/60 bg-amber-50",
               )}
             >
               <input
@@ -758,6 +794,38 @@ function TaskRow({
           </TooltipTrigger>
           {tooltip ? <TooltipContent>{tooltip}</TooltipContent> : null}
         </Tooltip>
+        {blockedStartEdit ? (
+          <div className="absolute left-0 top-full z-30 mt-1 w-[260px] rounded-lg border border-amber-300 bg-background p-3 text-left shadow-lg">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-amber-700">
+              Blocked by dependency
+            </p>
+            <p className="mt-1 text-xs text-foreground">
+              Earliest allowed start: {blockedStartEdit.earliestAllowedStart}
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {task.name} could not move to {blockedStartEdit.requestedStartDate} because {blockedStartEdit.blockerTaskName} must finish first.
+            </p>
+            <div className="mt-2 flex gap-2">
+              <button
+                type="button"
+                className="inline-flex items-center rounded-md border border-border px-2 py-1 text-[11px] font-medium text-foreground hover:bg-accent"
+                onClick={() => {
+                  onSelectTask(blockedStartEdit.blockerTaskId);
+                  onDismissBlockedTaskEdit();
+                }}
+              >
+                Go to {blockedStartEdit.blockerTaskName}
+              </button>
+              <button
+                type="button"
+                className="inline-flex items-center rounded-md px-2 py-1 text-[11px] text-muted-foreground hover:bg-accent"
+                onClick={onDismissBlockedTaskEdit}
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        ) : null}
       </td>
       <td
         className="px-2 py-1.5 w-[48px] text-center"

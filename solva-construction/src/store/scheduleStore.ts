@@ -14,11 +14,25 @@ import {
   shouldAutoDelayTask,
   createsDependencyCycle,
   CascadeMovementSummary,
+  getStrongestAutoShiftConstraint,
 } from "@/lib/scheduling";
 
 interface DependencyMutationResult {
   ok: boolean;
   error?: string;
+}
+
+export interface BlockedTaskEdit {
+  taskId: string;
+  field: "startDate";
+  blockerTaskId: string;
+  blockerTaskName: string;
+  earliestAllowedStart: string;
+  requestedStartDate: string;
+}
+
+interface TaskUpdateResult {
+  blockedTaskEdit: BlockedTaskEdit | null;
 }
 
 interface ScheduleState {
@@ -28,6 +42,7 @@ interface ScheduleState {
   dependencies: Dependency[];
   sections: Section[];
   cascadeNotification: { message: string; affectedIds: string[]; details: string[] } | null;
+  blockedTaskEdit: BlockedTaskEdit | null;
 
   setScheduleData: (
     tasks: Task[],
@@ -38,7 +53,7 @@ interface ScheduleState {
 
   addTask: (task: Task) => void;
   addTaskBelow: (sourceTaskId: string, task: Task) => void;
-  updateTask: (id: string, updates: Partial<Task>) => void;
+  updateTask: (id: string, updates: Partial<Task>) => TaskUpdateResult;
   deleteTask: (id: string) => void;
   reorderTask: (
     taskId: string,
@@ -62,6 +77,7 @@ interface ScheduleState {
 
   setExcludeWeekends: (excludeWeekends: boolean) => void;
   dismissCascadeNotification: () => void;
+  dismissBlockedTaskEdit: () => void;
 }
 
 const initialPeople: Person[] = [];
@@ -172,6 +188,7 @@ export const useScheduleStore = create<ScheduleState>((set, get) => ({
   dependencies: initialDependencies,
   sections: initialSections,
   cascadeNotification: null,
+  blockedTaskEdit: null,
 
   setScheduleData: (tasks, sections, dependencies, people) =>
     set({
@@ -180,6 +197,7 @@ export const useScheduleStore = create<ScheduleState>((set, get) => ({
       dependencies,
       people,
       cascadeNotification: null,
+      blockedTaskEdit: null,
     }),
 
   addTask: (task) =>
@@ -201,6 +219,7 @@ export const useScheduleStore = create<ScheduleState>((set, get) => ({
 
   updateTask: (id, updates) => {
     const state = get();
+    const requestedStartDate = typeof updates.startDate === "string" ? updates.startDate : null;
     const tasks = state.tasks.map((task) => {
       if (task.id !== id) return task;
       const updated = { ...task, ...updates };
@@ -271,7 +290,32 @@ export const useScheduleStore = create<ScheduleState>((set, get) => ({
       result.movementSummaries,
     );
 
-    set({ tasks: finalTasks, cascadeNotification: notification });
+    const finalTaskMap = new Map(finalTasks.map((task) => [task.id, task]));
+    const strongestConstraint = getStrongestAutoShiftConstraint(
+      id,
+      state.dependencies,
+      finalTaskMap,
+      state.excludeWeekends,
+    );
+    const blockedTaskEdit =
+      requestedStartDate && strongestConstraint && requestedStartDate < strongestConstraint.earliestStart
+        ? {
+            taskId: id,
+            field: "startDate" as const,
+            blockerTaskId: strongestConstraint.predecessorId,
+            blockerTaskName: strongestConstraint.predecessorName,
+            earliestAllowedStart: strongestConstraint.earliestStart,
+            requestedStartDate,
+          }
+        : null;
+
+    set({
+      tasks: finalTasks,
+      cascadeNotification: notification,
+      blockedTaskEdit,
+    });
+
+    return { blockedTaskEdit };
   },
 
   deleteTask: (id) =>
@@ -490,8 +534,10 @@ export const useScheduleStore = create<ScheduleState>((set, get) => ({
         excludeWeekends,
         tasks: cascadedTasks.map(normalizeTask),
         cascadeNotification: null,
+        blockedTaskEdit: null,
       };
     }),
 
   dismissCascadeNotification: () => set({ cascadeNotification: null }),
+  dismissBlockedTaskEdit: () => set({ blockedTaskEdit: null }),
 }));
