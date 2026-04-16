@@ -114,10 +114,13 @@ export function ScheduleTable({
     sections,
     updateTask,
     addTask,
+    addTaskBelow,
     addSection,
     deleteSection,
     reorderTask,
     cascadeNotification,
+    blockedTaskEdit,
+    dismissBlockedTaskEdit,
     excludeWeekends,
   } = useScheduleStore();
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(
@@ -163,7 +166,10 @@ export function ScheduleTable({
     if (field === "assignedTo") updates.assignedTo = value as string[];
     if (field === "userGroup") updates.userGroup = value as UserGroup;
     if (field === "status") updates.status = value as TaskStatus;
-    updateTask(taskId, updates);
+    const result = updateTask(taskId, updates);
+    if (!result.blockedTaskEdit) {
+      dismissBlockedTaskEdit();
+    }
     setEditingCell(null);
   };
   const handleDropOnTask = (
@@ -180,6 +186,24 @@ export function ScheduleTable({
   ) => {
     if (!sourceTaskId) return;
     reorderTask(sourceTaskId, null, targetSectionId);
+  };
+  const handleAddTaskBelow = (sourceTask: Task) => {
+    const newTask: Task = {
+      id: `t${Date.now()}`,
+      name: "New Task",
+      taskType: "Internal",
+      sectionId: sourceTask.sectionId,
+      startDate: "",
+      endDate: "",
+      duration: 0,
+      assignedTo: [],
+      userGroup: "Internal",
+      status: "Planned",
+      comments: [],
+    };
+
+    addTaskBelow(sourceTask.id, newTask);
+    queueMicrotask(() => onSelectTask(newTask.id));
   };
   const sortedSections = [...sections].sort((a, b) => a.order - b.order);
   const sectionGroups = sortedSections.map((section) => {
@@ -216,32 +240,23 @@ export function ScheduleTable({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [moveSourceTaskId]);
   return (
-    <div className="overflow-x-auto rounded-lg border border-border bg-background shadow-sm">
+    <div className="relative overflow-x-auto rounded-lg border border-border bg-background shadow-sm">
       {moveSourceTask ? (
-        <div className="mb-2 rounded-md border border-border bg-muted/40 px-3 py-2">
-          <div className="flex items-center justify-between gap-3">
-            <div className="text-[11px] text-foreground/80">
-              <span className="font-semibold text-foreground">Move mode:</span>{" "}
-              {moveSourceTask.name} — click a task to place before it, or a
-              section header to move to the end.
-              <span className="ml-2 text-muted-foreground">(Esc to cancel)</span>
-            </div>
-            <button
-              type="button"
-              className="inline-flex h-7 items-center rounded-md border border-border bg-background px-2 text-[11px] text-foreground/80 hover:bg-accent"
-              onClick={() => {
-                setMoveSourceTaskId(null);
-                setMoveOverId(null);
-              }}
-            >
-              Cancel
-            </button>
+        <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center px-4 py-8">
+          <div className="pointer-events-none w-full max-w-[520px] rounded-xl border border-primary/35 bg-background px-5 py-4 text-center shadow-2xl ring-1 ring-primary/15">
+            <p className="text-lg font-semibold text-foreground">Moving {moveSourceTask.name}</p>
+            <p className="mt-2 text-sm leading-6 text-foreground/90">Click a task to place before it, or click a section header to move to the end.</p>
+            <p className="mt-2 text-sm font-medium text-primary/90">You can keep using the schedule while this is open.</p>
+            <p className="mt-1 text-xs text-muted-foreground">Press Esc to cancel.</p>
           </div>
         </div>
       ) : null}
       <table className="w-full border-collapse font-sans text-[11px] leading-5">
         <thead>
           <tr className="border-b bg-solva-smart">
+            <th className="px-2 py-2.5 text-center text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[50px]">
+              <div className="inline-flex items-center gap-1"><span>Task</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: Add Task" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">Adds a new task directly below the selected row in the same section.</TooltipContent></Tooltip></div>
+            </th>
             <th className="sticky left-0 z-20 bg-solva-smart px-2 py-2.5 text-center text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[50px]">
               <div className="inline-flex items-center gap-1"><span>Move</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: Move" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">Click the grip to enter Move mode, then click a destination task (places before) or a section header (moves to end).</TooltipContent></Tooltip></div>
             </th>
@@ -261,7 +276,7 @@ export function ScheduleTable({
             <th className="px-[0.4rem] py-2.5 text-left text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-auto">
               <div className="inline-flex items-center gap-1"><span>Assigned</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: Assigned" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">People assigned to the task.</TooltipContent></Tooltip></div>
             </th>
-            <th className="px-[0.4rem] py-2.5 text-left text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[132px] min-w-[132px]">
+            <th className="px-[0.4rem] py-2.5 text-left text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[116px] min-w-[116px]">
               <div className="inline-flex items-center gap-1"><span>Status</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: Status" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">Current progress status.</TooltipContent></Tooltip></div>
             </th>
             <th className="px-3 py-2.5 text-left text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[200px]">
@@ -276,7 +291,7 @@ export function ScheduleTable({
           {tasks.length === 0 ? (
             <tr className="border-b">
               <td
-                colSpan={10}
+                colSpan={11}
                 className="px-3 py-6 text-sm text-muted-foreground"
               >
                 No tasks yet. Create your first task to begin.
@@ -299,6 +314,7 @@ export function ScheduleTable({
                 onToggle={() => toggleSection(section.id)}
                 onDelete={() => deleteSection(section.id)}
                 onDropOnSection={(sourceTaskId) => handleDropOnSection(sourceTaskId, section.id)}
+                onAddTaskBelow={handleAddTaskBelow}
                 people={people}
                 dependencies={dependencies}
                 invalidDeps={invalidDeps}
@@ -315,6 +331,8 @@ export function ScheduleTable({
                 setMoveSourceTaskId={setMoveSourceTaskId}
                 setMoveOverId={setMoveOverId}
                 onDropOnTask={handleDropOnTask}
+                blockedTaskEdit={blockedTaskEdit}
+                onDismissBlockedTaskEdit={dismissBlockedTaskEdit}
               />
             );
           })}
@@ -352,6 +370,7 @@ interface SectionBlockProps {
   onToggle: () => void;
   onDelete: () => void;
   onDropOnSection: (sourceTaskId: string | null) => void;
+  onAddTaskBelow: (task: Task) => void;
   people: any[];
   dependencies: any[];
   invalidDeps: string[];
@@ -376,6 +395,15 @@ interface SectionBlockProps {
     targetTaskId: string,
     targetSectionId: string,
   ) => void;
+  blockedTaskEdit: {
+    taskId: string;
+    field: "startDate";
+    blockerTaskId: string;
+    blockerTaskName: string;
+    earliestAllowedStart: string;
+    requestedStartDate: string;
+  } | null;
+  onDismissBlockedTaskEdit: () => void;
 }
 function SectionBlock({
   section,
@@ -386,6 +414,7 @@ function SectionBlock({
   onToggle,
   onDelete,
   onDropOnSection,
+  onAddTaskBelow,
   people,
   dependencies,
   invalidDeps,
@@ -402,6 +431,8 @@ function SectionBlock({
   setMoveSourceTaskId,
   setMoveOverId,
   onDropOnTask,
+  blockedTaskEdit,
+  onDismissBlockedTaskEdit,
 }: SectionBlockProps) {
   return (
     <>
@@ -429,7 +460,7 @@ function SectionBlock({
           if (moveOverId === section.id) setMoveOverId(null);
         }}
       >
-        <td colSpan={10} className="px-3 py-2">
+        <td colSpan={11} className="px-3 py-2">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               {isCollapsed ? (
@@ -508,7 +539,10 @@ function SectionBlock({
             moveOverId={moveOverId}
             setMoveSourceTaskId={setMoveSourceTaskId}
             setMoveOverId={setMoveOverId}
+            onAddTaskBelow={onAddTaskBelow}
             onDropOnTask={onDropOnTask}
+            blockedTaskEdit={blockedTaskEdit}
+            onDismissBlockedTaskEdit={onDismissBlockedTaskEdit}
           />
         ))}
     </>
@@ -531,6 +565,7 @@ interface TaskRowProps {
   ) => void;
   onSelectTask: (id: string) => void;
   onOpenDependencyChain: (id: string) => void;
+  onAddTaskBelow: (task: Task) => void;
   allTasks: Task[];
   moveSourceTaskId: string | null;
   moveOverId: string | null;
@@ -541,6 +576,15 @@ interface TaskRowProps {
     targetTaskId: string,
     targetSectionId: string,
   ) => void;
+  blockedTaskEdit: {
+    taskId: string;
+    field: "startDate";
+    blockerTaskId: string;
+    blockerTaskName: string;
+    earliestAllowedStart: string;
+    requestedStartDate: string;
+  } | null;
+  onDismissBlockedTaskEdit: () => void;
 }
 function TaskRow({
   task,
@@ -555,12 +599,15 @@ function TaskRow({
   onInlineEdit,
   onSelectTask,
   onOpenDependencyChain,
+  onAddTaskBelow,
   allTasks,
   moveSourceTaskId,
   moveOverId,
   setMoveSourceTaskId,
   setMoveOverId,
   onDropOnTask,
+  blockedTaskEdit,
+  onDismissBlockedTaskEdit,
 }: TaskRowProps) {
   const urgency = getUrgency(
     task.taskType,
@@ -590,6 +637,10 @@ function TaskRow({
   const assignedPeople = people.filter((p: any) =>
     task.assignedTo.includes(p.id),
   );
+  const blockedStartEdit =
+    blockedTaskEdit && blockedTaskEdit.taskId === task.id && blockedTaskEdit.field === "startDate"
+      ? blockedTaskEdit
+      : null;
   const assignablePeople = people.filter(
     (p: any) => !task.assignedTo.includes(p.id),
   );
@@ -629,10 +680,27 @@ function TaskRow({
       >
         <button
           type="button"
+          className="inline-flex h-6 w-6 items-center justify-center rounded border border-border/70 text-muted-foreground/70 hover:bg-accent hover:text-foreground transition-colors"
+          aria-label="Add task below"
+          title="Add task below"
+          onClick={(e) => {
+            e.stopPropagation();
+            onAddTaskBelow(task);
+          }}
+        >
+          <Plus className="h-3.5 w-3.5" />
+        </button>
+      </td>
+      <td
+        className="px-2 py-1.5 text-center"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          type="button"
           data-move-grip="true"
           className={cn(
-            "inline-flex h-6 w-6 items-center justify-center rounded border border-border text-muted-foreground hover:bg-accent",
-            moveSourceTaskId === task.id && "bg-accent text-foreground",
+            "inline-flex h-6 w-6 items-center justify-center rounded border border-border text-muted-foreground transition-all hover:bg-accent",
+            moveSourceTaskId === task.id && "border-primary bg-primary text-primary-foreground shadow-sm ring-2 ring-primary/35 ring-offset-1 ring-offset-background",
           )}
           aria-label="Move task"
           title={
@@ -702,7 +770,7 @@ function TaskRow({
         </div>
       </td>
       <td
-        className="px-[0.4rem] py-1.5 w-[100px] text-center"
+        className="relative px-[0.4rem] py-1.5 w-[100px] text-center"
         onClick={(e) => e.stopPropagation()}
       >
         <Tooltip>
@@ -711,6 +779,7 @@ function TaskRow({
               className={cn(
                 "rounded pl-0 pr-[0.4rem] py-[0.2rem] text-[10px] inline-flex justify-center",
                 urgencyClass(urgency),
+                blockedStartEdit && "ring-1 ring-amber-500/60 bg-amber-50",
               )}
             >
               <input
@@ -725,6 +794,38 @@ function TaskRow({
           </TooltipTrigger>
           {tooltip ? <TooltipContent>{tooltip}</TooltipContent> : null}
         </Tooltip>
+        {blockedStartEdit ? (
+          <div className="absolute left-0 top-full z-30 mt-1 w-[260px] rounded-lg border border-amber-300 bg-background p-3 text-left shadow-lg">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-amber-700">
+              Blocked by dependency
+            </p>
+            <p className="mt-1 text-xs text-foreground">
+              Earliest allowed start: {blockedStartEdit.earliestAllowedStart}
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {task.name} could not move to {blockedStartEdit.requestedStartDate} because {blockedStartEdit.blockerTaskName} must finish first.
+            </p>
+            <div className="mt-2 flex gap-2">
+              <button
+                type="button"
+                className="inline-flex items-center rounded-md border border-border px-2 py-1 text-[11px] font-medium text-foreground hover:bg-accent"
+                onClick={() => {
+                  onSelectTask(blockedStartEdit.blockerTaskId);
+                  onDismissBlockedTaskEdit();
+                }}
+              >
+                Go to {blockedStartEdit.blockerTaskName}
+              </button>
+              <button
+                type="button"
+                className="inline-flex items-center rounded-md px-2 py-1 text-[11px] text-muted-foreground hover:bg-accent"
+                onClick={onDismissBlockedTaskEdit}
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        ) : null}
       </td>
       <td
         className="px-2 py-1.5 w-[48px] text-center"
@@ -906,7 +1007,7 @@ function NewTaskRow({
   const [value, setValue] = useState("");
   return (
     <tr className="border-b opacity-40 hover:opacity-70 transition-opacity">
-      <td className="px-3 py-2" colSpan={10}>
+      <td className="px-3 py-2" colSpan={11}>
         <input
           className="bg-transparent outline-none text-[12px] text-muted-foreground w-full placeholder:text-muted-foreground/60"
           placeholder={disabled ? "Create a section first..." : "+ New Task..."}
@@ -928,7 +1029,7 @@ function NewSectionRow({ onAdd }: { onAdd: (name: string) => Section | null }) {
   const [value, setValue] = useState("");
   return (
     <tr className="border-b">
-      <td colSpan={10} className="px-3 py-2">
+      <td colSpan={11} className="px-3 py-2">
         <div className="flex items-center gap-2">
           <button
             type="button"

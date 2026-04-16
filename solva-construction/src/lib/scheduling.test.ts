@@ -261,6 +261,44 @@ describe('cascadeDependencies', () => {
     expect(new Set(summaryTaskIds).size).toBe(summaryTaskIds.length);
   });
 
+
+  it('pulls auto-shift successors earlier when a predecessor moves earlier', () => {
+    const tasks: Task[] = [
+      baseTask({
+        id: 'pred',
+        name: 'Pred',
+        startDate: '2026-04-01',
+        endDate: '2026-04-01',
+        duration: 1,
+      }),
+      baseTask({
+        id: 'succ',
+        name: 'Succ',
+        startDate: '2026-04-10',
+        endDate: '2026-04-10',
+        duration: 1,
+      }),
+    ];
+
+    const deps: Dependency[] = [
+      {
+        id: 'd1',
+        predecessorId: 'pred',
+        successorId: 'succ',
+        lagDays: 0,
+        autoShift: true,
+        notes: '',
+      },
+    ];
+
+    const result = cascadeDependencies(tasks, deps, 'pred');
+    const successor = result.updatedTasks.find((task) => task.id === 'succ');
+
+    expect(successor?.startDate).toBe('2026-04-01');
+    expect(successor?.endDate).toBe('2026-04-01');
+    expect(result.affectedIds).toContain('succ');
+  });
+
   it('leaves unrelated tasks unchanged', () => {
     const tasks: Task[] = [
       baseTask({

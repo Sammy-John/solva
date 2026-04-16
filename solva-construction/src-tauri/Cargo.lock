@@ -347,7 +347,7 @@ dependencies = [
 
 [[package]]
 name = "construction_planner_desktop"
-version = "0.1.0"
+version = "1.1.1"
 dependencies = [
  "chrono",
  "rusqlite",
