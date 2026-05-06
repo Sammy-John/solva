@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Solva Construction Planner is a desktop scheduling table for builders who need dependencies, suppliers, deliveries, inspections, and task notes in one practical plan." />
+  <meta property="og:title" content="Solva Construction Planner" />
+  <meta property="og:description" content="A table-first desktop construction planner for schedules, dependencies, suppliers, deliveries, inspections, and comments." />
+  <meta property="og:type" content="website" />
+  <title>Solva Construction Planner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Oswald:wght@500;600;700&family=Playfair+Display:wght@600;700&family=Source+Code+Pro:wght@500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <script defer src="js/main.js"></script>
+</head>
+<body>
+  <div id="top"></div>
+
+  <header class="site-header" data-header>
+    <div class="container header-inner">
+      <a class="brand" href="#top" aria-label="Solva Construction Planner home">
+        <img class="brand-mark" src="assets/solva_logo.png" alt="Solva" />
+        <span class="brand-product">Construction Planner</span>
+      </a>
+
+      <button class="nav-toggle" type="button" aria-label="Open navigation" aria-controls="site-nav" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav class="site-nav" id="site-nav" aria-label="Primary navigation">
+        <a href="#preview">Preview</a>
+        <a href="#fit">Product fit</a>
+        <a href="#workflow">Workflow</a>
+        <a href="#access">Access</a>
+      </nav>
+
+      <a class="header-cta" href="#access">Join the beta</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero section">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">Desktop planning for builders</p>
+          <h1>Construction schedules that behave like working tables.</h1>
+          <p class="hero-text">
+            Solva gives builders, schedulers, suppliers, and internal teams a practical place to plan work, link dependencies, watch deliveries, track inspections, and keep notes close to the task.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary btn-angled" href="#access"><span>Request beta access</span></a>
+            <a class="btn btn-secondary" href="#preview">See the table</a>
+          </div>
+          <ul class="hero-proof" aria-label="Product highlights">
+            <li>FS dependency links</li>
+            <li>Ordering and delivery urgency</li>
+            <li>Inspection milestones</li>
+          </ul>
+        </div>
+
+        <div class="hero-console" id="preview" aria-label="Construction schedule table preview">
+          <div class="console-topbar">
+            <div>
+              <p class="console-kicker">Live project board</p>
+              <h2>Brown Town build</h2>
+            </div>
+            <div class="console-status">
+              <span class="dot dot-red"></span>
+              3 critical
+            </div>
+          </div>
+
+          <div class="health-strip">
+            <span><strong>2</strong> delayed</span>
+            <span><strong>4</strong> due this week</span>
+            <span><strong>7</strong> links active</span>
+          </div>
+
+          <div class="schedule-frame" role="img" aria-label="Table with construction schedule rows">
+            <div class="schedule-row schedule-head">
+              <span>Task</span>
+              <span>Start</span>
+              <span>Days</span>
+              <span>End</span>
+              <span>Waiting on</span>
+              <span>Status</span>
+            </div>
+            <div class="section-label">Frame and roof</div>
+            <div class="schedule-row">
+              <span class="task-name internal">Wall framing</span>
+              <span>May 06</span>
+              <span>5d</span>
+              <span>May 12</span>
+              <span>Slab cure</span>
+              <span><b class="status booked">Booked</b></span>
+            </div>
+            <div class="schedule-row row-alert">
+              <span class="task-name delivery">Truss delivery</span>
+              <span>May 12</span>
+              <span>1d</span>
+              <span class="urgent-red">May 12</span>
+              <span>Order trusses</span>
+              <span><b class="status delayed">Delayed</b></span>
+            </div>
+            <div class="schedule-row">
+              <span class="task-name internal">Roof install</span>
+              <span>May 13</span>
+              <span>3d</span>
+              <span>May 15</span>
+              <span>Truss delivery</span>
+              <span><b class="status planned">Planned</b></span>
+            </div>
+            <div class="section-label">Services and inspections</div>
+            <div class="schedule-row">
+              <span class="task-name ordering">Order switchboard</span>
+              <span>May 14</span>
+              <span>1d</span>
+              <span class="urgent-orange">May 14</span>
+              <span>Electrical rough-in</span>
+              <span><b class="status progress">In progress</b></span>
+            </div>
+            <div class="schedule-row">
+              <span class="task-name inspection">Pre-line inspection</span>
+              <span>May 24</span>
+              <span>0d</span>
+              <span>May 24</span>
+              <span>Plumbing rough-in</span>
+              <span><b class="status planned">Planned</b></span>
+            </div>
+          </div>
+
+          <div class="cascade-card">
+            <span class="cascade-icon">-></span>
+            <p><strong>Cascade preview:</strong> Truss delivery moved 2 linked tasks.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section outcomes" id="fit">
+      <div class="container">
+        <div class="section-head centered">
+          <p class="eyebrow">Built around site reality</p>
+          <h2>Not another calendar. Not a miniature Primavera.</h2>
+          <p>
+            Solva sits in the practical middle: simple enough for a builder's weekly planning rhythm, structured enough to make dependency slips, supplier commitments, and inspections visible before they cost a day.
+          </p>
+        </div>
+
+        <div class="outcome-grid">
+          <article class="outcome-card">
+            <span class="card-index">01</span>
+            <h3>Table-first planning</h3>
+            <p>Tasks stay in rows with clear dates, days, assignees, comments, sections, and status. It feels like a real schedule, not a generic task board.</p>
+          </article>
+          <article class="outcome-card">
+            <span class="card-index">02</span>
+            <h3>Dependencies that explain themselves</h3>
+            <p>Create finish-then-start links, add buffer days, and see what a task is waiting on without decoding spreadsheet notes.</p>
+          </article>
+          <article class="outcome-card">
+            <span class="card-index">03</span>
+            <h3>Procurement cues</h3>
+            <p>Ordering and delivery rows carry urgency colour so long-lead items and late deliveries stand out in the main plan.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="site-proof" aria-label="Construction context">
+      <div class="container site-proof-grid">
+        <figure class="site-photo">
+          <img src="assets/Gemini_Generated_Image_cyvfsvcyvfsvcyvf.png" alt="A construction site exterior used as project context for the planning tool" loading="lazy" />
+        </figure>
+
+        <div class="blueprint-panel">
+          <p class="eyebrow">From site work to schedule logic</p>
+          <h2>Built to feel like the board on the wall, only smarter.</h2>
+          <p>
+            The visual language stays close to real construction planning: sections, dates, dependencies, supplier commitments, and inspection checkpoints. The page uses site imagery for context, but the working schedule remains the centre of gravity.
+          </p>
+          <div class="blueprint-notes" aria-label="Construction planning notes">
+            <span>Predecessor: slab cure</span>
+            <span>Delivery: trusses</span>
+            <span>Inspection: pre-line</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section workflow" id="workflow">
+      <div class="container workflow-grid">
+        <div class="section-head">
+          <p class="eyebrow">One schedule, fewer handoffs</p>
+          <h2>The daily workflow builders actually need.</h2>
+          <p>Start with a project, build the task chain, assign the right people, then use the table to keep the week honest.</p>
+        </div>
+
+        <ol class="workflow-list">
+          <li>
+            <span>Create the build structure</span>
+            Add sections for slab, frame, roof, services, fitoff, inspections, and handover.
+          </li>
+          <li>
+            <span>Link the sequence</span>
+            Connect orders, deliveries, internal work, and inspection milestones with lightweight dependencies.
+          </li>
+          <li>
+            <span>Watch the plan move</span>
+            When a linked task slips, downstream work is highlighted so the scheduler knows what changed.
+          </li>
+          <li>
+            <span>Keep notes with the task</span>
+            Comments, supplier names, phone numbers, and trade context stay attached to the row.
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section features">
+      <div class="container">
+        <div class="feature-strip">
+          <div>
+            <span class="feature-tag">Internal</span>
+            Site work, admin, and handover tasks.
+          </div>
+          <div>
+            <span class="feature-tag delivery-tag">Delivery</span>
+            Supplier arrivals that can block site work.
+          </div>
+          <div>
+            <span class="feature-tag order-tag">Ordering</span>
+            Procurement actions with urgency windows.
+          </div>
+          <div>
+            <span class="feature-tag inspection-tag">Inspection</span>
+            Milestones that deserve their own row.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section access" id="access">
+      <div class="container access-grid">
+        <div class="access-copy">
+          <p class="eyebrow">Private beta</p>
+          <h2>Shape the construction planner before it goes public.</h2>
+          <p>
+            Solva Construction Planner is being prepared for controlled beta use. The next step is tightening polish, starter templates, and dependency behavior with real builder feedback.
+          </p>
+        </div>
+
+        <div class="access-cards">
+          <article>
+            <h3>For builders</h3>
+            <p>Plan jobs, spot late supply items, and keep subcontractor commitments visible.</p>
+          </article>
+          <article class="featured-access">
+            <h3>For schedulers</h3>
+            <p>Manage dependency chains and update the table without rebuilding the plan from scratch.</p>
+            <a class="btn btn-primary" href="mailto:hello@teknabu.com?subject=Solva%20Construction%20Planner%20beta">Request beta access</a>
+          </article>
+          <article>
+            <h3>For suppliers</h3>
+            <p>Make ordering and delivery tasks obvious in the same plan the builder uses.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section faq">
+      <div class="container narrow">
+        <div class="section-head centered">
+          <h2>Questions worth asking early.</h2>
+        </div>
+
+        <div class="faq-list">
+          <details>
+            <summary>Is this a full CPM tool?</summary>
+            <p>No. The target is a practical builder scheduler: dependency-driven enough to be useful, simple enough to use every week.</p>
+          </details>
+          <details>
+            <summary>Is it desktop-first?</summary>
+            <p>Yes. The product is designed around a dense schedule table that works best on a desktop or laptop.</p>
+          </details>
+          <details>
+            <summary>What makes it construction-specific?</summary>
+            <p>Task types, supplier/internal grouping, inspection rows, delivery and ordering urgency, comments, and workflow links all map to builder scheduling rather than generic project management.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div>
+        <a class="brand footer-brand" href="#top">
+          <img class="brand-mark" src="assets/solva_logo.png" alt="Solva" />
+          <span class="brand-product">Construction Planner</span>
+        </a>
+        <p>Practical scheduling software by <a href="https://teknabu.com" rel="noopener">studio teknabu</a>.</p>
+      </div>
+      <div class="footer-links">
+        <a href="#preview">Preview</a>
+        <a href="#workflow">Workflow</a>
+        <a href="mailto:hello@teknabu.com">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <a class="back-to-top" href="#top" aria-label="Back to top">Top</a>
+</body>
+</html>
