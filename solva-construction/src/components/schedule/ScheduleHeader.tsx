@@ -91,6 +91,7 @@ export function ScheduleHeader({
             <SelectItem value="Planned">Planned</SelectItem>
             <SelectItem value="Booked">Booked</SelectItem>
             <SelectItem value="In Progress">In Progress</SelectItem>
+            <SelectItem value="Due for Review">Due for Review</SelectItem>
             <SelectItem value="Completed">Completed</SelectItem>
             <SelectItem value="Delayed">Delayed</SelectItem>
           </SelectContent>

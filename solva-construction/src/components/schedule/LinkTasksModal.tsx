@@ -426,7 +426,7 @@ export function LinkTasksModal({
                 <div className="flex items-end pb-1">
                   <div className="flex items-center gap-2">
                     <Switch checked={autoShift} onCheckedChange={setAutoShift} />
-                    <Label className="text-xs">Auto-move following task</Label>
+                    <Label className="text-xs">{dependencyUxLabels.autoShiftSwitch}</Label>
                   </div>
                 </div>
               </div>
@@ -461,8 +461,8 @@ export function LinkTasksModal({
                   <div className="text-[11px] text-amber-700 flex items-center gap-1">
                     <TriangleAlert className="h-3.5 w-3.5" />
                     {autoShift
-                      ? 'Saving will move the following task to meet this rule.'
-                      : 'This creates a schedule conflict warning.'}
+                      ? 'Saving will auto-shift the following task later to meet this rule.'
+                      : 'Saving keeps dates in place and highlights this conflict.'}
                   </div>
                 ) : null}
               </div>

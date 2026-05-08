@@ -134,6 +134,40 @@ const getDaysToEndDate = (endDate: string): number | null => {
   return differenceInCalendarDays(parsedEnd, new Date());
 };
 
+export function getConservativeStatusForDate(
+  task: Pick<Task, "startDate" | "endDate" | "status">,
+  today: string | Date = new Date(),
+): TaskStatus {
+  if (task.status === "Completed" || task.status === "Delayed") {
+    return task.status;
+  }
+
+  if (!task.startDate || !task.endDate) {
+    return task.status;
+  }
+
+  const parsedStart = parseISO(task.startDate);
+  const parsedEnd = parseISO(task.endDate);
+  const parsedToday = typeof today === "string" ? parseISO(today) : today;
+
+  if (!isValid(parsedStart) || !isValid(parsedEnd) || !isValid(parsedToday)) {
+    return task.status;
+  }
+
+  if (
+    differenceInCalendarDays(parsedToday, parsedStart) >= 0 &&
+    differenceInCalendarDays(parsedEnd, parsedToday) >= 0
+  ) {
+    return "In Progress";
+  }
+
+  if (differenceInCalendarDays(parsedToday, parsedEnd) > 0) {
+    return "Due for Review";
+  }
+
+  return task.status;
+}
+
 export function isSupplyTaskType(taskType: TaskType): boolean {
   return (
     taskType === "Ordering" ||
@@ -260,11 +294,16 @@ export interface AutoShiftConstraint {
   lagDays: number;
 }
 
-export const getStrongestAutoShiftConstraint = (
+interface CascadeOptions {
+  ignoreCompletedPredecessorConstraints?: boolean;
+}
+
+const computeEarliestAutoShiftConstraint = (
   taskId: string,
   dependencies: Dependency[],
   taskMap: Map<string, Task>,
   excludeWeekends: boolean,
+  options: CascadeOptions = {},
 ): AutoShiftConstraint | null => {
   let selected: AutoShiftConstraint | null = null;
 
@@ -273,6 +312,12 @@ export const getStrongestAutoShiftConstraint = (
 
     const predecessor = taskMap.get(dep.predecessorId);
     if (!predecessor) continue;
+    if (
+      options.ignoreCompletedPredecessorConstraints &&
+      predecessor.status === "Completed"
+    ) {
+      continue;
+    }
 
     const constrainedStart = addScheduleDays(
       predecessor.endDate,
@@ -300,6 +345,7 @@ export function cascadeDependencies(
   dependencies: Dependency[],
   changedTaskId: string,
   excludeWeekends = false,
+  options: CascadeOptions = {},
 ): CascadeResult {
   const taskMap = new Map(tasks.map((t) => [t.id, { ...t }]));
   const affectedSet = new Set<string>();
@@ -328,9 +374,14 @@ export function cascadeDependencies(
       dependencies,
       taskMap,
       excludeWeekends,
+      options,
     );
 
-    if (constraint && current.startDate !== constraint.earliestStart) {
+    if (
+      current.status !== "Completed" &&
+      constraint &&
+      current.startDate < constraint.earliestStart
+    ) {
       const originalStartDate = current.startDate;
       current.startDate = constraint.earliestStart;
       current.endDate = recalcEndDate(
@@ -355,7 +406,10 @@ export function cascadeDependencies(
     }
 
     const successors = dependencies.filter(
-      (d) => d.predecessorId === currentId && d.autoShift,
+      (d) =>
+        d.predecessorId === currentId &&
+        d.autoShift &&
+        taskMap.get(d.successorId)?.status !== "Completed",
     );
 
     for (const dep of successors) {
@@ -459,7 +513,7 @@ export function getDependencyConflictDetails(
       earliestAllowedStart,
       actualStart: successor.startDate,
       message: `${successor.name} starts ${successor.startDate} but must be ${earliestAllowedStart} or later because ${predecessor.name} finishes first${lagPhrase}.`,
-      suggestion: `Move ${successor.name} to ${earliestAllowedStart} or turn on auto-move.`,
+      suggestion: `Move ${successor.name} to ${earliestAllowedStart} or turn on Auto-shift.`,
     });
   }
 

@@ -66,6 +66,8 @@
     --status-booked-bg: 355 62% 95%;
     --status-inprogress: 142 71% 45%;
     --status-inprogress-bg: 138 76% 93%;
+    --status-review: 25 95% 35%;
+    --status-review-bg: 29 100% 92%;
     --status-completed: 154 71% 21%;
     --status-completed-bg: 154 24% 93%;
     --status-delayed: 0 84% 55%;
@@ -153,6 +155,10 @@
   .status-inprogress {
     background-color: hsl(var(--status-inprogress-bg));
     color: hsl(var(--status-inprogress));
+  }
+  .status-review {
+    background-color: hsl(var(--status-review-bg));
+    color: hsl(var(--status-review));
   }
   .status-completed {
     background-color: hsl(var(--status-completed-bg));

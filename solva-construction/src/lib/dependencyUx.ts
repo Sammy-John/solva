@@ -3,6 +3,8 @@ export const dependencyUxLabels = {
   followingTask: 'Task that starts after',
   gapDays: 'Gap after first task (days)',
   links: 'Task Links',
+  autoShiftSwitch: 'Auto-shift following task',
+  autoShiftMode: 'Auto-shift mode',
 } as const;
 
 export const formatDependencyRule = (lagDays: number): string => {
@@ -17,8 +19,8 @@ export const formatDependencyRule = (lagDays: number): string => {
 
 export const formatAutoMoveSummary = (autoShift: boolean): string =>
   autoShift
-    ? 'Auto-move ON: following task will move later if needed.'
-    : 'Auto-move OFF: schedule conflicts are allowed but highlighted.';
+    ? 'Auto-shift: when the first task moves later, the linked following task moves later to keep this rule.'
+    : 'Warning only: the link stays visible, dates stay put, and conflicts are highlighted.';
 
 export const formatAutoMoveTag = (autoShift: boolean): string =>
-  autoShift ? 'Auto-move' : 'Manual move';
+  autoShift ? 'Auto-shift' : 'Warning only';

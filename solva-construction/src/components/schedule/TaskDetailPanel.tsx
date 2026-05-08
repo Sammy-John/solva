@@ -7,6 +7,12 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -16,9 +22,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Trash2, ArrowDown, Pencil, X } from "lucide-react";
+import { HelpCircle, Trash2, Pencil, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { formatAutoMoveTag, formatDependencyRule } from "@/lib/dependencyUx";
+import { dependencyQuickGuide } from "@/lib/dependencyGuide";
+import {
+  dependencyUxLabels,
+  formatAutoMoveSummary,
+  formatAutoMoveTag,
+  formatDependencyRule,
+} from "@/lib/dependencyUx";
 import { getDependencyConflictDetails } from "@/lib/scheduling";
 
 interface TaskDetailPanelProps {
@@ -32,6 +44,7 @@ const statusClass = (s: TaskStatus) => {
     Planned: "status-planned",
     Booked: "status-booked",
     "In Progress": "status-inprogress",
+    "Due for Review": "status-review",
     Completed: "status-completed",
     Delayed: "status-delayed",
   };
@@ -77,6 +90,7 @@ export function TaskDetailPanel({ taskId, onClose, onQuickAddDependency }: TaskD
   const [autoMoveCurrentTask, setAutoMoveCurrentTask] = useState<boolean>(true);
   const [editingDependencyId, setEditingDependencyId] = useState<string | null>(null);
   const [dependencyFormError, setDependencyFormError] = useState<string>("");
+  const [dependencyGuideOpen, setDependencyGuideOpen] = useState(false);
 
   const task = tasks.find((t) => t.id === taskId);
 
@@ -202,6 +216,7 @@ export function TaskDetailPanel({ taskId, onClose, onQuickAddDependency }: TaskD
   };
 
   return (
+    <>
     <Sheet
       open={!!taskId}
       onOpenChange={(open) => {
@@ -283,6 +298,7 @@ export function TaskDetailPanel({ taskId, onClose, onQuickAddDependency }: TaskD
                       "Planned",
                       "Booked",
                       "In Progress",
+                      "Due for Review",
                       "Completed",
                       "Delayed",
                     ] as TaskStatus[]
@@ -446,9 +462,19 @@ export function TaskDetailPanel({ taskId, onClose, onQuickAddDependency }: TaskD
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Dependencies
-              </span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Dependencies
+                </span>
+                <button
+                  type="button"
+                  className="inline-flex h-6 w-6 items-center justify-center rounded-sm text-muted-foreground hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  aria-label="Open dependency guide"
+                  onClick={() => setDependencyGuideOpen(true)}
+                >
+                  <HelpCircle className="h-3.5 w-3.5" />
+                </button>
+              </div>
               <Button
                 type="button"
                 variant="outline"
@@ -504,7 +530,7 @@ export function TaskDetailPanel({ taskId, onClose, onQuickAddDependency }: TaskD
                   />
                 </div>
                 <div>
-                  <LabelText text="Move this task if needed" />
+                  <LabelText text={dependencyUxLabels.autoShiftMode} />
                   <Select
                     value={autoMoveCurrentTask ? "yes" : "no"}
                     onValueChange={(value) => setAutoMoveCurrentTask(value === "yes")}
@@ -513,12 +539,16 @@ export function TaskDetailPanel({ taskId, onClose, onQuickAddDependency }: TaskD
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="yes">Yes</SelectItem>
-                      <SelectItem value="no">No</SelectItem>
+                      <SelectItem value="yes">{formatAutoMoveTag(true)}</SelectItem>
+                      <SelectItem value="no">{formatAutoMoveTag(false)}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
+
+              <p className="text-xs text-muted-foreground">
+                {formatAutoMoveSummary(autoMoveCurrentTask)}
+              </p>
 
               {dependencyFormError ? (
                 <p className="text-xs text-destructive">{dependencyFormError}</p>
@@ -710,6 +740,25 @@ export function TaskDetailPanel({ taskId, onClose, onQuickAddDependency }: TaskD
         </div>
       </SheetContent>
     </Sheet>
+    <Dialog open={dependencyGuideOpen} onOpenChange={setDependencyGuideOpen}>
+      <DialogContent className="sm:max-w-[520px]">
+        <DialogHeader>
+          <DialogTitle>Dependency guide</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-3 text-sm text-muted-foreground">
+          {dependencyQuickGuide.map((item) => (
+            <div key={item.title}>
+              <p className="font-medium text-foreground">{item.title}</p>
+              <p>{item.body}</p>
+            </div>
+          ))}
+        </div>
+        <div className="flex justify-end pt-2">
+          <Button onClick={() => setDependencyGuideOpen(false)}>Got it</Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }
 
