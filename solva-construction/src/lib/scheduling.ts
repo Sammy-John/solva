@@ -298,7 +298,7 @@ interface CascadeOptions {
   ignoreCompletedPredecessorConstraints?: boolean;
 }
 
-const computeEarliestAutoShiftConstraint = (
+export const getStrongestAutoShiftConstraint = (
   taskId: string,
   dependencies: Dependency[],
   taskMap: Map<string, Task>,

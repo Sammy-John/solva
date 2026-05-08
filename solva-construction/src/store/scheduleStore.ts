@@ -88,6 +88,20 @@ const initialSections: Section[] = [];
 const userGroupFromTaskType = (taskType: Task["taskType"]): UserGroup =>
   taskType === "Delivery" || taskType === "Ordering" ? "Suppliers" : "Internal";
 
+const normalizeInspectionMilestone = <T extends Pick<Task, "taskType" | "startDate" | "endDate" | "duration">>(
+  task: T,
+): T => {
+  if (task.taskType !== "Inspection") return task;
+
+  const milestoneDate = task.startDate || task.endDate;
+  return {
+    ...task,
+    startDate: milestoneDate,
+    endDate: milestoneDate,
+    duration: 0,
+  };
+};
+
 const normalizeAssignedTo = (assignedTo: unknown): string[] => {
   if (Array.isArray(assignedTo)) {
     return assignedTo.filter(
@@ -104,13 +118,13 @@ const normalizeAssignedTo = (assignedTo: unknown): string[] => {
 };
 
 const normalizeTask = (task: Task): Task => {
-  const normalizedTask: Task = {
+  const normalizedTask: Task = normalizeInspectionMilestone({
     ...task,
     assignedTo: normalizeAssignedTo(
       (task as { assignedTo?: unknown }).assignedTo,
     ),
     userGroup: userGroupFromTaskType(task.taskType),
-  };
+  });
 
   normalizedTask.status = getConservativeStatusForDate(normalizedTask);
 
@@ -244,7 +258,7 @@ export const useScheduleStore = create<ScheduleState>((set, get) => ({
           : "";
       }
 
-      return updated;
+      return normalizeInspectionMilestone(updated);
     });
 
     const result = cascadeDependencies(

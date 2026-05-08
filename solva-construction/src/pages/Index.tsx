@@ -20,6 +20,8 @@ import { useScheduleStore } from '@/store/scheduleStore';
 import { TaskType, UserGroup, TaskStatus } from '@/types/scheduling';
 import { getConservativeStatusForDate } from '@/lib/scheduling';
 import { dependencyQuickGuide } from '@/lib/dependencyGuide';
+import { getSnapshotRestoreConfirmationMessage } from '@/lib/snapshotCopy';
+import { WorkspaceSettingsDialog } from '@/components/schedule/WorkspaceSettingsDialog';
 import {
   Dialog,
   DialogContent,
@@ -217,7 +219,10 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
     }
 
     const shouldLoad = window.confirm(
-      `Load snapshot "${snapshot.label}" from ${formatSnapshotTimestamp(snapshot.createdAt)}? This will replace the current schedule view.`,
+      getSnapshotRestoreConfirmationMessage({
+        label: snapshot.label,
+        createdAtLabel: formatSnapshotTimestamp(snapshot.createdAt),
+      }),
     );
 
     if (!shouldLoad) {
@@ -757,19 +762,12 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
           </div>
         </DialogContent>
       </Dialog>
-      <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
-        <DialogContent className="sm:max-w-[520px]">
-          <DialogHeader>
-            <DialogTitle>Settings</DialogTitle>
-          </DialogHeader>
-          <p className="text-sm text-muted-foreground">Settings isn't active yet in this version.</p>
-          <div className="flex justify-end pt-2">
-            <Button variant="outline" onClick={() => setSettingsOpen(false)}>
-              Close
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <WorkspaceSettingsDialog
+        open={settingsOpen}
+        onOpenChange={setSettingsOpen}
+        excludeWeekends={excludeWeekends}
+        onToggleWorkdaysOnly={handleToggleWorkdaysOnly}
+      />
 
       <LinkTasksModal
         open={linkModalOpen}

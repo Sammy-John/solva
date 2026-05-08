@@ -137,6 +137,7 @@ export function PeopleModal({ open, onOpenChange }: PeopleModalProps) {
                     variant="ghost"
                     size="sm"
                     className="h-6 w-6 p-0 text-muted-foreground hover:text-primary opacity-0 group-hover:opacity-100"
+                    aria-label={`Edit ${p.name}`}
                     onClick={(e) => {
                       e.stopPropagation();
                       startEdit(p);
@@ -148,8 +149,10 @@ export function PeopleModal({ open, onOpenChange }: PeopleModalProps) {
                     variant="ghost"
                     size="sm"
                     className="h-6 w-6 p-0 text-destructive opacity-0 group-hover:opacity-100"
+                    aria-label={`Delete ${p.name}`}
                     onClick={(e) => {
                       e.stopPropagation();
+                      if (!window.confirm(`Delete person "${p.name}"? This will remove them from any assigned tasks.`)) return;
                       removePerson(p.id);
                     }}
                   >

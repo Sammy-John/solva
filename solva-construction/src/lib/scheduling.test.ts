@@ -407,7 +407,7 @@ describe('cascadeDependencies', () => {
   });
 
 
-  it('pulls auto-shift successors earlier when a predecessor moves earlier', () => {
+  it('keeps buffered auto-shift successors in place when a predecessor moves earlier', () => {
     const tasks: Task[] = [
       baseTask({
         id: 'pred',
@@ -439,9 +439,9 @@ describe('cascadeDependencies', () => {
     const result = cascadeDependencies(tasks, deps, 'pred');
     const successor = result.updatedTasks.find((task) => task.id === 'succ');
 
-    expect(successor?.startDate).toBe('2026-04-01');
-    expect(successor?.endDate).toBe('2026-04-01');
-    expect(result.affectedIds).toContain('succ');
+    expect(successor?.startDate).toBe('2026-04-10');
+    expect(successor?.endDate).toBe('2026-04-10');
+    expect(result.affectedIds).not.toContain('succ');
   });
 
   it('leaves unrelated tasks unchanged', () => {

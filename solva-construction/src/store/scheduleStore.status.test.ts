@@ -103,4 +103,56 @@ describe('scheduleStore setScheduleData status normalization', () => {
       'Planned',
     ]);
   });
+
+  it('normalizes inspection tasks to same-day zero-duration milestones on load', () => {
+    useScheduleStore.getState().setScheduleData(
+      [
+        task({
+          id: 'inspection',
+          taskType: 'Inspection',
+          startDate: '2026-06-10',
+          endDate: '2026-06-14',
+          duration: 4,
+        }),
+      ],
+      sections,
+      [],
+      [],
+    );
+
+    expect(useScheduleStore.getState().tasks[0]).toMatchObject({
+      taskType: 'Inspection',
+      startDate: '2026-06-10',
+      endDate: '2026-06-10',
+      duration: 0,
+    });
+  });
+
+  it('keeps inspection tasks as same-day zero-duration milestones when edited', () => {
+    useScheduleStore.getState().setScheduleData(
+      [
+        task({
+          id: 'inspection',
+          taskType: 'Inspection',
+          startDate: '2026-06-10',
+          endDate: '2026-06-10',
+          duration: 0,
+        }),
+      ],
+      sections,
+      [],
+      [],
+    );
+
+    useScheduleStore.getState().updateTask('inspection', {
+      duration: 3,
+      endDate: '2026-06-15',
+    });
+
+    expect(useScheduleStore.getState().tasks[0]).toMatchObject({
+      startDate: '2026-06-10',
+      endDate: '2026-06-10',
+      duration: 0,
+    });
+  });
 });

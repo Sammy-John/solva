@@ -730,6 +730,7 @@ export function TaskDetailPanel({ taskId, onClose, onQuickAddDependency }: TaskD
             size="sm"
             className="text-destructive hover:text-destructive hover:bg-destructive/10 w-full"
             onClick={() => {
+              if (!window.confirm(`Delete task "${task.name}"? This cannot be undone.`)) return;
               deleteTask(task.id);
               onClose();
             }}
