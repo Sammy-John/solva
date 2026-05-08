@@ -5,9 +5,6 @@ export default {
   content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
   prefix: "",
   theme: {
-    fontSize: {
-      sm: "0.625rem",
-    },
     container: {
       center: true,
       padding: "2rem",
@@ -18,7 +15,6 @@ export default {
     extend: {
       fontFamily: {
         sans: ["Lato", "sans-serif"],
-        heading: ["Playfair Display", "serif"],
         label: ["Oswald", "sans-serif"],
         mono: ["Source Code Pro", "monospace"],
       },

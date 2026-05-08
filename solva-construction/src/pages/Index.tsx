@@ -453,7 +453,7 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
               draggable={false}
             />
             <div className="absolute inset-0 flex items-end justify-end p-2">
-              <span className="inline-flex items-center gap-1.5 rounded-md border border-white/15 bg-black/35 px-2 py-1 text-[11px] font-semibold">
+              <span className="inline-flex items-center gap-1.5 rounded-md border border-white/15 bg-black/35 px-2 py-1 text-xs font-semibold">
                 <ImageIcon className="h-3.5 w-3.5" />
                 Change
               </span>
@@ -538,7 +538,7 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
         <header className="px-6 py-4 border-b border-border bg-solva-porcelain">
   <div className="flex flex-wrap items-center justify-between gap-4">
     <div className="min-w-0 flex items-baseline gap-3">
-      <h1 className="font-heading text-3xl text-solva-smart truncate">{projectName}</h1>
+      <h1 className="text-3xl font-bold text-solva-smart truncate">{projectName}</h1>
       {projectDescription ? (
         <p className="text-sm text-solva-smart/70 truncate">{projectDescription}</p>
       ) : null}
@@ -567,7 +567,7 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
       </Button>
 
       <div className="flex items-center gap-2">
-        <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-solva-smart/70">Type</span>
+        <span className="text-xs font-bold uppercase tracking-[0.12em] text-solva-smart/70">Type</span>
         <select
           className="h-9 rounded-md border border-solva-smart/20 bg-white px-3 text-sm text-solva-smart"
           value={filterType}
@@ -582,7 +582,7 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
       </div>
 
       <div className="flex items-center gap-2">
-        <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-solva-smart/70">Group</span>
+        <span className="text-xs font-bold uppercase tracking-[0.12em] text-solva-smart/70">Group</span>
         <select
           className="h-9 rounded-md border border-solva-smart/20 bg-white px-3 text-sm text-solva-smart"
           value={filterGroup}
@@ -595,7 +595,7 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
       </div>
 
       <div className="flex items-center gap-2">
-        <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-solva-smart/70">Status</span>
+        <span className="text-xs font-bold uppercase tracking-[0.12em] text-solva-smart/70">Status</span>
         <select
           className="h-9 rounded-md border border-solva-smart/20 bg-white px-3 text-sm text-solva-smart"
           value={filterStatus}
@@ -868,12 +868,3 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
 };
 
 export default Index;
-
-
-
-
-
-
-
-
-

@@ -475,7 +475,7 @@ function App() {
 <section className="dashboard-right">
         <header className="dashboard-right-header">
           <div>
-            <h1 className="dashboard-right-title font-heading">Projects</h1>
+            <h1 className="dashboard-right-title">Projects</h1>
             <p className="dashboard-right-subtitle">
               Create a new project or open an existing one.
             </p>
@@ -548,7 +548,7 @@ function App() {
 
 <section className="dashboard-templates">
   <div className="dashboard-templates-header">
-    <h2 className="dashboard-section-title font-heading">Templates</h2>
+    <h2 className="dashboard-section-title">Templates</h2>
     <button
       type="button"
       className="secondary-button"

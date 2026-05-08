@@ -238,7 +238,7 @@ export function TaskDetailPanel({ taskId, onClose, onQuickAddDependency }: TaskD
         <div className="mt-4 space-y-5">
           <div className="flex items-center gap-3">
             <div>
-              <span className="text-[10px] text-muted-foreground block mb-1">
+              <span className="text-xs text-muted-foreground block mb-1">
                 Type
               </span>
               <Select
@@ -274,7 +274,7 @@ export function TaskDetailPanel({ taskId, onClose, onQuickAddDependency }: TaskD
               </Select>
             </div>
             <div>
-              <span className="text-[10px] text-muted-foreground block mb-1">
+              <span className="text-xs text-muted-foreground block mb-1">
                 Status
               </span>
               <Select
@@ -380,7 +380,7 @@ export function TaskDetailPanel({ taskId, onClose, onQuickAddDependency }: TaskD
                     <button
                       key={person.id}
                       type="button"
-                      className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-[11px]"
+                      className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-xs"
                       onClick={() =>
                         updateTask(task.id, {
                           assignedTo: task.assignedTo.filter(
@@ -594,7 +594,7 @@ export function TaskDetailPanel({ taskId, onClose, onQuickAddDependency }: TaskD
                           {formatDependencyRule(dep.lagDays)} {formatAutoMoveTag(dep.autoShift)}.
                         </p>
                         {conflict ? (
-                          <p className="text-[11px] text-amber-700 mt-1">
+                          <p className="text-xs text-amber-700 mt-1">
                             {conflict.message} {conflict.suggestion}
                           </p>
                         ) : null}
@@ -765,9 +765,5 @@ export function TaskDetailPanel({ taskId, onClose, onQuickAddDependency }: TaskD
 }
 
 function LabelText({ text }: { text: string }) {
-  return <span className="text-[10px] text-muted-foreground">{text}</span>;
+  return <span className="text-xs text-muted-foreground">{text}</span>;
 }
-
-
-
-

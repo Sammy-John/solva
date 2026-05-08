@@ -128,7 +128,7 @@ export function PeopleModal({ open, onOpenChange }: PeopleModalProps) {
                   )}
                   <span className="text-sm font-medium">{p.name}</span>
                   {p.trade && (
-                    <span className="text-[10px] text-muted-foreground">
+                    <span className="text-xs text-muted-foreground">
                       {p.trade}
                     </span>
                   )}

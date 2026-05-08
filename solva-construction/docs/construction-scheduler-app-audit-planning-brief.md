@@ -48,8 +48,8 @@ Implemented on `feature/patch-1.2`:
 - Snapshot restore wording still says it replaces the "current schedule view" even though autosave makes it the active saved schedule shortly after restore.
 - Templates remain localStorage-only while projects/schedules/snapshots use SQLite in Tauri.
 - Several UI paths still use `Date.now()` IDs: sections in `scheduleStore.ts`, tasks in `ScheduleTable.tsx`, dependencies in `LinkTasksModal.tsx` and `TaskDetailPanel.tsx`, and people in `PeopleModal.tsx`.
-- `ScheduleTableDnd.tsx` remains as a duplicate/legacy table implementation.
-- Styling is still split across Tailwind/Radix UI, `src/index.css`, and large legacy/custom blocks in `src/App.css`.
+- The duplicate legacy `ScheduleTableDnd.tsx` implementation has been removed.
+- Styling has been consolidated around Tailwind/Radix UI tokens, `src/index.css` design variables, and a slimmer operational `src/App.css` shell layer.
 
 ## Public Readiness Verdict
 
@@ -136,17 +136,17 @@ Release 1.2 risks:
 
 ## Visual Design And Styling Audit
 
-The workspace still has the right product direction: compact table, strong construction-flavoured palette, practical controls, and real imagery. The dashboard and app shell still carry prototype/design-system inconsistencies.
+The workspace still has the right product direction: compact table, strong construction-flavoured palette, practical controls, and real imagery. The 1.2 branch now removes the largest prototype/design-system inconsistencies before adding more features.
 
 1.2 polish targets:
 
 - README has been replaced with product-specific setup, storage, test, build, and release notes.
-- Consolidate styling between Tailwind/Radix, `src/index.css`, and `src/App.css`.
-- Revisit typography. Playfair and broad dashboard styling still make parts of the app feel more editorial than operational.
-- Increase the smallest table text where possible. Dense is good; `text-[10px]` everywhere is hard to scan.
-- Standardize task-type and urgency colour semantics in one token layer.
-- Reduce table header help-icon noise.
-- Remove or retire `ScheduleTableDnd.tsx` once the current table is confirmed as the only supported table.
+- [x] Consolidate styling between Tailwind/Radix, `src/index.css`, and `src/App.css`.
+- [x] Revisit typography by removing Playfair/display-heading drift and keeping the app on operational sans/label fonts.
+- [x] Increase the smallest schedule-table and schedule-modal text from 10px micro-type to `text-xs` or larger.
+- [x] Keep task-type, urgency, and status colours in the `src/index.css` token layer.
+- [x] Remove the duplicate legacy `ScheduleTableDnd.tsx` implementation and stale patch script.
+- [x] Reduce table header help-icon noise by removing per-column help buttons from the primary schedule header.
 
 ## Release 1.2 Scope Recommendation
 
@@ -168,7 +168,8 @@ The workspace still has the right product direction: compact table, strong const
 - [x] Make Waiting On cells open dependency details directly.
 - [x] Clearly document templates as local browser/app preference seed data.
 - [x] Add regression tests for ID generation, Attention filter behavior, and Waiting On dependency-chain access.
-- Consolidate visual tokens and remove stale CSS/duplicate table code.
+- [x] Consolidate visual tokens and remove stale CSS/duplicate table code.
+- [x] Add design-system guardrail tests for typography drift, Tailwind text sizing, duplicate table removal, and schedule-table micro-type.
 - Add or broaden regression tests for inspection milestones, delete confirmation/undo, snapshot restore wording, and starter template creation.
 
 ### P2 - Later Than 1.2
@@ -205,4 +206,4 @@ The workspace still has the right product direction: compact table, strong const
 - `src/components/schedule/ScheduleHealthSummary.tsx`: summary naming if filters/status labels change.
 - `src/lib/scheduleDb.ts` and `src-tauri/src/main.rs`: storage clarity, JSON validation, template SQLite support if chosen.
 - `src/index.css`, `src/App.css`, `tailwind.config.ts`: visual token consolidation and stale style cleanup.
-- `src/components/schedule/ScheduleTableDnd.tsx`: remove or explicitly retire.
+- `src/lib/designSystem.test.ts`: guard against reintroducing removed design-system drift.
