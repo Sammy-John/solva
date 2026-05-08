@@ -286,7 +286,7 @@ export interface CascadeResult {
   movementSummaries: CascadeMovementSummary[];
 }
 
-interface AutoShiftConstraint {
+export interface AutoShiftConstraint {
   earliestStart: string;
   dependencyId: string;
   predecessorId: string;
@@ -369,7 +369,7 @@ export function cascadeDependencies(
     const current = taskMap.get(currentId);
     if (!current) continue;
 
-    const constraint = computeEarliestAutoShiftConstraint(
+    const constraint = getStrongestAutoShiftConstraint(
       currentId,
       dependencies,
       taskMap,

@@ -25,7 +25,13 @@
     "targets": [
       "nsis"
     ],
-    "createUpdaterArtifacts": true
+    "createUpdaterArtifacts": true,
+    "windows": {
+      "nsis": {
+        "startMenuFolder": "Construction Planner Desktop Test",
+        "installerHooks": "./windows/test-installer-hooks.nsh"
+      }
+    }
   },
   "plugins": {
     "updater": {

@@ -3,6 +3,37 @@
 Tracks completed changes by release and task completion.
 
 
+## 2026-04-16 - Release 1.1.1
+
+**Version:** `1.1.1`
+**Plan Task:** `Patch release - schedule editing clarity + dependency cascade fix`
+
+### Completed
+- Added a new `Task` action column before `Move` and narrowed the `Status` column to free up schedule space.
+- Added inline `+` action on task rows to create a new task directly below the clicked row in the same section.
+- Refined Move mode UX:
+  - removed persistent move label/banner
+  - strengthened active move button state
+  - moved guidance into a centered viewport popup that stays visible while the schedule remains clickable
+- Fixed dependency cascade behavior so auto-shift successors now move earlier as well as later when upstream dates or durations change.
+- Added lightweight blocked-edit guidance for constrained start-date edits:
+  - anchored callout on the edited cell
+  - earliest allowed date
+  - blocker task name
+  - direct `Go to blocker` action
+- Synced app/build metadata to `1.1.1` across app and Tauri config used for release packaging.
+
+### Verification Notes
+- `npm run test` PASS (`31 passed`)
+- `npm run build` PASS
+- `npm run release:alpha:test` PASS
+- `npm run release:alpha` PASS
+
+### Follow-ups
+- Gather client feedback on the blocked-edit callout before expanding the same pattern to duration/end-date edits.
+- Publish/update production release manifest when ready for hosted updater rollout.
+
+---
 ## 2026-04-14 - Release 1.1.0 (MVP)
 
 **Version:** `1.1.0`
