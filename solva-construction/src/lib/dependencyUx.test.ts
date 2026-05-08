@@ -3,6 +3,7 @@ import {
   dependencyUxLabels,
   formatDependencyRule,
   formatAutoMoveSummary,
+  formatAutoMoveTag,
 } from '@/lib/dependencyUx';
 
 describe('dependencyUx', () => {
@@ -21,12 +22,17 @@ describe('dependencyUx', () => {
     );
   });
 
-  it('formats auto-move summary', () => {
+  it('formats auto-shift summary', () => {
     expect(formatAutoMoveSummary(true)).toBe(
-      'Auto-move ON: following task will move later if needed.',
+      'Auto-shift: when the first task moves later, the linked following task moves later to keep this rule.',
     );
     expect(formatAutoMoveSummary(false)).toBe(
-      'Auto-move OFF: schedule conflicts are allowed but highlighted.',
+      'Warning only: the link stays visible, dates stay put, and conflicts are highlighted.',
     );
+  });
+
+  it('formats auto-shift tags', () => {
+    expect(formatAutoMoveTag(true)).toBe('Auto-shift');
+    expect(formatAutoMoveTag(false)).toBe('Warning only');
   });
 });

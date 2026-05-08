@@ -4,6 +4,7 @@ export type TaskStatus =
   | "Planned"
   | "Booked"
   | "In Progress"
+  | "Due for Review"
   | "Completed"
   | "Delayed";
 

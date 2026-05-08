@@ -57,6 +57,7 @@ const statusClass = (s: TaskStatus) => {
     Planned: "status-planned",
     Booked: "status-booked",
     "In Progress": "status-inprogress",
+    "Due for Review": "status-review",
     Completed: "status-completed",
     Delayed: "status-delayed",
   };
@@ -858,6 +859,7 @@ function TaskRow({
                 "Planned",
                 "Booked",
                 "In Progress",
+                "Due for Review",
                 "Completed",
                 "Delayed",
               ] as TaskStatus[]

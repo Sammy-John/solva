@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import {
   cascadeDependencies,
   createsDependencyCycle,
+  getConservativeStatusForDate,
+  getDependencyConflictDetails,
   getUrgency,
   getUrgencyTooltip,
   hasMissingSupplyDates,
@@ -131,6 +133,149 @@ describe('cascadeDependencies', () => {
       constrainedByTaskName: 'Pred 2',
       dependencyId: 'd2',
       lagDays: 2,
+    });
+  });
+
+  it('does not pull a buffered auto-shift successor earlier', () => {
+    const tasks: Task[] = [
+      baseTask({
+        id: 'pred',
+        name: 'Predecessor',
+        startDate: '2026-02-01',
+        endDate: '2026-02-05',
+        duration: 5,
+      }),
+      baseTask({
+        id: 'succ',
+        name: 'Buffered Successor',
+        startDate: '2026-02-10',
+        endDate: '2026-02-11',
+        duration: 2,
+      }),
+    ];
+
+    const deps: Dependency[] = [
+      {
+        id: 'd-buffer',
+        predecessorId: 'pred',
+        successorId: 'succ',
+        lagDays: 0,
+        autoShift: true,
+        notes: '',
+      },
+    ];
+
+    const result = cascadeDependencies(tasks, deps, 'pred');
+    const successor = result.updatedTasks.find((task) => task.id === 'succ');
+
+    expect(successor?.startDate).toBe('2026-02-10');
+    expect(successor?.endDate).toBe('2026-02-11');
+    expect(result.affectedIds).not.toContain('succ');
+    expect(result.movementSummaries.map((item) => item.taskId)).not.toContain('succ');
+  });
+
+  it('does not auto-move completed successors or continue cascading through them', () => {
+    const tasks: Task[] = [
+      baseTask({
+        id: 'pred',
+        name: 'Predecessor',
+        startDate: '2026-03-01',
+        endDate: '2026-03-10',
+        duration: 10,
+      }),
+      baseTask({
+        id: 'done',
+        name: 'Completed Successor',
+        startDate: '2026-03-02',
+        endDate: '2026-03-03',
+        duration: 2,
+        status: 'Completed',
+      }),
+      baseTask({
+        id: 'tail',
+        name: 'Downstream Successor',
+        startDate: '2026-03-01',
+        endDate: '2026-03-01',
+        duration: 1,
+      }),
+    ];
+
+    const deps: Dependency[] = [
+      {
+        id: 'd-completed',
+        predecessorId: 'pred',
+        successorId: 'done',
+        lagDays: 0,
+        autoShift: true,
+        notes: '',
+      },
+      {
+        id: 'd-tail',
+        predecessorId: 'done',
+        successorId: 'tail',
+        lagDays: 0,
+        autoShift: true,
+        notes: '',
+      },
+    ];
+
+    const result = cascadeDependencies(tasks, deps, 'pred');
+    const completed = result.updatedTasks.find((task) => task.id === 'done');
+    const downstream = result.updatedTasks.find((task) => task.id === 'tail');
+
+    expect(completed?.startDate).toBe('2026-03-02');
+    expect(completed?.endDate).toBe('2026-03-03');
+    expect(downstream?.startDate).toBe('2026-03-01');
+    expect(downstream?.endDate).toBe('2026-03-01');
+    expect(result.affectedIds).toEqual([]);
+    expect(result.movementSummaries).toEqual([]);
+  });
+
+  it('lets a completed changed predecessor push incomplete auto-shift successors', () => {
+    const tasks: Task[] = [
+      baseTask({
+        id: 'done-pred',
+        name: 'Completed Predecessor',
+        startDate: '2026-03-01',
+        endDate: '2026-03-10',
+        duration: 10,
+        status: 'Completed',
+      }),
+      baseTask({
+        id: 'succ',
+        name: 'Incomplete Successor',
+        startDate: '2026-03-02',
+        endDate: '2026-03-03',
+        duration: 2,
+      }),
+    ];
+
+    const deps: Dependency[] = [
+      {
+        id: 'd-completed-pred',
+        predecessorId: 'done-pred',
+        successorId: 'succ',
+        lagDays: 0,
+        autoShift: true,
+        notes: '',
+      },
+    ];
+
+    const result = cascadeDependencies(tasks, deps, 'done-pred');
+    const predecessor = result.updatedTasks.find((task) => task.id === 'done-pred');
+    const successor = result.updatedTasks.find((task) => task.id === 'succ');
+
+    expect(predecessor?.startDate).toBe('2026-03-01');
+    expect(predecessor?.endDate).toBe('2026-03-10');
+    expect(successor?.startDate).toBe('2026-03-10');
+    expect(successor?.endDate).toBe('2026-03-11');
+    expect(result.affectedIds).toEqual(['succ']);
+    expect(result.movementSummaries[0]).toMatchObject({
+      taskId: 'succ',
+      fromStartDate: '2026-03-02',
+      toStartDate: '2026-03-10',
+      constrainedByTaskId: 'done-pred',
+      dependencyId: 'd-completed-pred',
     });
   });
 
@@ -321,6 +466,99 @@ describe('date-critical urgency parity', () => {
   it('returns urgency and tooltip copy for inspection', () => {
     expect(getUrgency('Inspection', '2099-01-10', 'Planned', '2099-01-01')).toBe('green');
     expect(getUrgencyTooltip('Inspection', '2099-01-10', 'Planned', '2099-01-01')).toContain('Inspection due in');
+  });
+});
+
+describe('getConservativeStatusForDate', () => {
+  it('marks incomplete non-delayed tasks as in progress when today is within the date range', () => {
+    const task = baseTask({
+      startDate: '2026-05-05',
+      endDate: '2026-05-07',
+      status: 'Planned',
+    });
+
+    expect(getConservativeStatusForDate(task, '2026-05-05')).toBe('In Progress');
+    expect(getConservativeStatusForDate(task, '2026-05-06')).toBe('In Progress');
+    expect(getConservativeStatusForDate(task, '2026-05-07')).toBe('In Progress');
+  });
+
+  it('marks incomplete non-delayed tasks as due for review after the end date', () => {
+    const task = baseTask({
+      startDate: '2026-05-01',
+      endDate: '2026-05-05',
+      status: 'Booked',
+    });
+
+    expect(getConservativeStatusForDate(task, '2026-05-06')).toBe('Due for Review');
+  });
+
+  it('does not auto-overwrite completed or delayed tasks', () => {
+    const task = baseTask({
+      startDate: '2026-05-01',
+      endDate: '2026-05-05',
+      status: 'Completed',
+    });
+
+    expect(getConservativeStatusForDate(task, '2026-05-06')).toBe('Completed');
+    expect(getConservativeStatusForDate({ ...task, status: 'Delayed' }, '2026-05-06')).toBe('Delayed');
+  });
+
+  it('keeps the current status when dates are missing', () => {
+    const task = baseTask({
+      startDate: '',
+      endDate: '2026-05-05',
+      status: 'Booked',
+    });
+
+    expect(getConservativeStatusForDate(task, '2026-05-06')).toBe('Booked');
+    expect(getConservativeStatusForDate({ ...task, startDate: '2026-05-01', endDate: '' }, '2026-05-06')).toBe('Booked');
+  });
+
+  it('keeps the current status when dates are invalid', () => {
+    const task = baseTask({
+      startDate: '2026-05-01',
+      endDate: '2026-05-05',
+      status: 'Booked',
+    });
+
+    expect(getConservativeStatusForDate({ ...task, startDate: 'not-a-date' }, '2026-05-06')).toBe('Booked');
+    expect(getConservativeStatusForDate({ ...task, endDate: 'not-a-date' }, '2026-05-06')).toBe('Booked');
+    expect(getConservativeStatusForDate(task, 'not-a-date')).toBe('Booked');
+  });
+});
+
+describe('getDependencyConflictDetails', () => {
+  it('suggests Auto-shift wording for warning-only dependency conflicts', () => {
+    const tasks: Task[] = [
+      baseTask({
+        id: 'pred',
+        name: 'First Task',
+        startDate: '2026-06-01',
+        endDate: '2026-06-05',
+        duration: 5,
+      }),
+      baseTask({
+        id: 'succ',
+        name: 'Following Task',
+        startDate: '2026-06-03',
+        endDate: '2026-06-04',
+        duration: 2,
+      }),
+    ];
+    const deps: Dependency[] = [
+      {
+        id: 'd-warning',
+        predecessorId: 'pred',
+        successorId: 'succ',
+        lagDays: 0,
+        autoShift: false,
+        notes: '',
+      },
+    ];
+
+    expect(getDependencyConflictDetails(tasks, deps)[0]?.suggestion).toBe(
+      'Move Following Task to 2026-06-05 or turn on Auto-shift.',
+    );
   });
 });
 

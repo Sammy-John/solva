@@ -11,7 +11,7 @@ import {
   cascadeDependencies,
   recalcEndDate,
   recalcDuration,
-  shouldAutoDelayTask,
+  getConservativeStatusForDate,
   createsDependencyCycle,
   CascadeMovementSummary,
 } from "@/lib/scheduling";
@@ -95,9 +95,7 @@ const normalizeTask = (task: Task): Task => {
     userGroup: userGroupFromTaskType(task.taskType),
   };
 
-  if (shouldAutoDelayTask(normalizedTask)) {
-    normalizedTask.status = "Delayed";
-  }
+  normalizedTask.status = getConservativeStatusForDate(normalizedTask);
 
   return normalizedTask;
 };
@@ -442,6 +440,7 @@ export const useScheduleStore = create<ScheduleState>((set, get) => ({
   setExcludeWeekends: (excludeWeekends) =>
     set((state) => {
       const recalculatedTasks = state.tasks.map((task) => {
+        if (task.status === "Completed") return task;
         if (!task.startDate) return task;
         const normalizedDuration = Math.max(0, Math.floor(task.duration || 0));
         if (normalizedDuration === 0) return task;
@@ -453,10 +452,15 @@ export const useScheduleStore = create<ScheduleState>((set, get) => ({
       });
 
       let cascadedTasks = recalculatedTasks;
+      const taskMap = new Map(cascadedTasks.map((task) => [task.id, task]));
       const autoShiftRoots = Array.from(
         new Set(
           state.dependencies
-            .filter((dep) => dep.autoShift)
+            .filter(
+              (dep) =>
+                dep.autoShift &&
+                taskMap.get(dep.predecessorId)?.status !== "Completed",
+            )
             .map((dep) => dep.predecessorId),
         ),
       );
@@ -467,6 +471,7 @@ export const useScheduleStore = create<ScheduleState>((set, get) => ({
           state.dependencies,
           rootTaskId,
           excludeWeekends,
+          { ignoreCompletedPredecessorConstraints: true },
         );
         cascadedTasks = cascade.updatedTasks;
       }

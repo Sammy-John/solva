@@ -8,7 +8,11 @@ import {
 } from '@/components/ui/dialog';
 import { ArrowRight, Workflow } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { formatAutoMoveTag, formatDependencyRule } from '@/lib/dependencyUx';
+import {
+  formatAutoMoveSummary,
+  formatAutoMoveTag,
+  formatDependencyRule,
+} from '@/lib/dependencyUx';
 
 interface DependencyChainModalProps {
   taskId: string | null;
@@ -215,6 +219,9 @@ export function DependencyChainModal({
                             </span>
                           ) : null}
                         </div>
+                        <p className="mt-1 text-[11px] text-muted-foreground">
+                          {formatAutoMoveSummary(dep.autoShift)}
+                        </p>
                       </div>
                     );
                   })}

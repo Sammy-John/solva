@@ -18,7 +18,8 @@ import {
 } from '@/lib/scheduleDb';
 import { useScheduleStore } from '@/store/scheduleStore';
 import { TaskType, UserGroup, TaskStatus } from '@/types/scheduling';
-import { shouldAutoDelayTask } from '@/lib/scheduling';
+import { getConservativeStatusForDate } from '@/lib/scheduling';
+import { dependencyQuickGuide } from '@/lib/dependencyGuide';
 import {
   Dialog,
   DialogContent,
@@ -92,6 +93,7 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
   const [snapshots, setSnapshots] = useState<ScheduleSnapshotSummary[]>([]);
   const [snapshotsLoading, setSnapshotsLoading] = useState(false);
   const [selectedSnapshotId, setSelectedSnapshotId] = useState('');
+  const [scheduleHelpOpen, setScheduleHelpOpen] = useState(false);
 
   const tasks = useScheduleStore((state) => state.tasks);
   const sections = useScheduleStore((state) => state.sections);
@@ -112,6 +114,7 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
     setSelectedTaskId(null);
     setDepChainTaskId(null);
     setSnapshotModalOpen(false);
+    setScheduleHelpOpen(false);
     setSnapshots([]);
     setSelectedSnapshotId('');
     setScheduleData([], [], [], []);
@@ -128,6 +131,7 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
           schedule.dependencies,
           schedule.people,
         );
+        setScheduleHelpOpen(true);
         loadedSuccessfully = true;
       } catch (error) {
         const message = formatError(error);
@@ -153,8 +157,9 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
     if (!isScheduleReady) return;
 
     tasks.forEach((task) => {
-      if (task.status !== 'Delayed' && shouldAutoDelayTask(task)) {
-        updateTask(task.id, { status: 'Delayed' });
+      const nextStatus = getConservativeStatusForDate(task);
+      if (nextStatus !== task.status) {
+        updateTask(task.id, { status: nextStatus });
       }
     });
   }, [isScheduleReady, tasks, updateTask]);
@@ -595,6 +600,7 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
           <option value="Planned">Planned</option>
           <option value="Booked">Booked</option>
           <option value="In Progress">In Progress</option>
+          <option value="Due for Review">Due for Review</option>
           <option value="Completed">Completed</option>
           <option value="Delayed">Delayed</option>
         </select>
@@ -687,10 +693,21 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
               </details>
 
               <details className="rounded-lg border border-solva-smart/15 bg-white p-3">
-                <summary className="cursor-pointer font-semibold">Dependencies &amp; Waiting On</summary>
+                <summary className="cursor-pointer font-semibold">Status Review</summary>
                 <p className="mt-2 text-sm text-solva-smart/80">
-                  Use Links to add predecessor/successor relationships. The Waiting On column shows the predecessor task names for each task (read-only).
+                  In Progress can appear when a task reaches its date range. Due for Review means the planned end date has passed and needs a decision. Use Delayed only when it is a real schedule delay, and Completed when the task is done.
                 </p>
+              </details>
+
+              <details className="rounded-lg border border-solva-smart/15 bg-white p-3">
+                <summary className="cursor-pointer font-semibold">Dependencies &amp; Waiting On</summary>
+                <div className="mt-2 space-y-2 text-sm text-solva-smart/80">
+                  {dependencyQuickGuide.map((item) => (
+                    <p key={item.title}>
+                      <span className="font-semibold text-solva-smart">{item.title}:</span> {item.body}
+                    </p>
+                  ))}
+                </div>
               </details>
 
               <details className="rounded-lg border border-solva-smart/15 bg-white p-3">
@@ -718,6 +735,28 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
           </div>
         </SheetContent>
       </Sheet>
+      <Dialog open={scheduleHelpOpen} onOpenChange={setScheduleHelpOpen}>
+        <DialogContent className="sm:max-w-[560px]">
+          <DialogHeader>
+            <DialogTitle>Schedule flexibility updates</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 text-sm text-muted-foreground">
+            <p>
+              The scheduler now keeps dependency links visible while giving you more control when site dates change.
+            </p>
+            <div className="space-y-2">
+              <p><strong className="text-foreground">In Progress</strong> appears when a task reaches its date range.</p>
+              <p><strong className="text-foreground">Due for Review</strong> means the planned end date passed and needs a decision.</p>
+              <p><strong className="text-foreground">Completed</strong> tasks stay in the chain but do not auto-move.</p>
+              <p><strong className="text-foreground">Auto-shift</strong> moves linked tasks later when predecessors move later.</p>
+              <p><strong className="text-foreground">Warning only</strong> keeps the link visible but keeps dates in place.</p>
+            </div>
+          </div>
+          <div className="flex justify-end pt-2">
+            <Button onClick={() => setScheduleHelpOpen(false)}>Got it</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
       <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
         <DialogContent className="sm:max-w-[520px]">
           <DialogHeader>

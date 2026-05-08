@@ -1,7 +1,7 @@
 import { useScheduleStore } from "@/store/scheduleStore";
 import { getUrgency, isPastDue, hasMissingSupplyDates } from "@/lib/scheduling";
 import { differenceInCalendarDays, parseISO } from "date-fns";
-import { AlertTriangle, CheckCircle2, Clock, Truck } from "lucide-react";
+import { AlertTriangle, CheckCircle2, ClipboardCheck, Clock, Truck } from "lucide-react";
 
 export function ScheduleHealthSummary() {
   const { tasks } = useScheduleStore();
@@ -27,6 +27,7 @@ export function ScheduleHealthSummary() {
   }).length;
 
   const delayed = tasks.filter((t) => t.status === "Delayed").length;
+  const needsReview = tasks.filter((t) => t.status === "Due for Review").length;
   const completed = tasks.filter((t) => t.status === "Completed").length;
 
   const items = [
@@ -50,6 +51,13 @@ export function ScheduleHealthSummary() {
       count: delayed,
       className: "text-destructive",
       show: delayed > 0,
+    },
+    {
+      icon: ClipboardCheck,
+      label: "need" + (needsReview === 1 ? "s" : "") + " review",
+      count: needsReview,
+      className: "text-[hsl(var(--status-review))]",
+      show: needsReview > 0,
     },
     {
       icon: CheckCircle2,
