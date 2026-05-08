@@ -16,6 +16,7 @@ import {
   hasMissingSupplyDates,
   isPastDue,
 } from "@/lib/scheduling";
+import { createEntityId } from "@/lib/ids";
 import {
   MessageSquare,
   AlertTriangle,
@@ -286,7 +287,7 @@ export function ScheduleTable({
             onAdd={(name) => {
               if (sortedSections.length === 0) return;
               addTask({
-                id: `t${Date.now()}`,
+                id: createEntityId("task"),
                 name: name.trim(),
                 taskType: "Internal",
                 sectionId: sortedSections[sortedSections.length - 1].id,

@@ -32,6 +32,7 @@ import {
   formatDependencyRule,
 } from "@/lib/dependencyUx";
 import { getDependencyConflictDetails } from "@/lib/scheduling";
+import { createEntityId } from "@/lib/ids";
 
 interface TaskDetailPanelProps {
   taskId: string | null;
@@ -188,7 +189,7 @@ export function TaskDetailPanel({ taskId, onClose, onQuickAddDependency }: TaskD
     }
 
     const result = addDependency({
-      id: `d${Date.now()}`,
+      id: createEntityId("dep"),
       predecessorId: dependsOnTaskId,
       successorId: task.id,
       lagDays,

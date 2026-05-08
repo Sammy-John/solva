@@ -16,6 +16,7 @@ import {
   CascadeMovementSummary,
   getStrongestAutoShiftConstraint,
 } from "@/lib/scheduling";
+import { createEntityId } from "@/lib/ids";
 
 interface DependencyMutationResult {
   ok: boolean;
@@ -380,7 +381,7 @@ export const useScheduleStore = create<ScheduleState>((set, get) => ({
     if (alreadyExists) return null;
 
     const nextSection: Section = {
-      id: `sec-${Date.now()}`,
+      id: createEntityId("sec"),
       name: trimmed,
       order: state.sections.length,
     };

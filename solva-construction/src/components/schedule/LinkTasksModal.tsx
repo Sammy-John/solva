@@ -32,6 +32,7 @@ import {
   formatAutoMoveTag,
   formatDependencyRule,
 } from '@/lib/dependencyUx';
+import { createEntityId } from '@/lib/ids';
 
 interface LinkTasksModalProps {
   open: boolean;
@@ -254,7 +255,7 @@ export function LinkTasksModal({
     }
 
     const result = addDependency({
-      id: `d${Date.now()}`,
+      id: createEntityId('dep'),
       predecessorId,
       successorId,
       lagDays,

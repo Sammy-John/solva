@@ -44,6 +44,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { createEntityId } from "@/lib/ids";
 interface ScheduleTableProps {
   filterType: TaskType | "All";
   filterGroup: UserGroup | "All";
@@ -142,7 +143,7 @@ export function ScheduleTable({
     if (filterStatus !== "All" && t.status !== filterStatus) return false;
     if (filterUrgent) {
       const u = getUrgency(t.taskType, t.endDate, t.status, t.startDate);
-      if (u !== "red") return false;
+      if (u !== "red" && u !== "orange") return false;
     }
     return true;
   });
@@ -166,6 +167,7 @@ export function ScheduleTable({
     if (field === "duration") updates.duration = Number(value);
     if (field === "assignedTo") updates.assignedTo = value as string[];
     if (field === "userGroup") updates.userGroup = value as UserGroup;
+    if (field === "taskType") updates.taskType = value as TaskType;
     if (field === "status") updates.status = value as TaskStatus;
     const result = updateTask(taskId, updates);
     if (!result.blockedTaskEdit) {
@@ -190,7 +192,7 @@ export function ScheduleTable({
   };
   const handleAddTaskBelow = (sourceTask: Task) => {
     const newTask: Task = {
-      id: `t${Date.now()}`,
+      id: createEntityId("task"),
       name: "New Task",
       taskType: "Internal",
       sectionId: sourceTask.sectionId,
@@ -342,7 +344,7 @@ export function ScheduleTable({
             onAdd={(name) => {
               if (sortedSections.length === 0) return;
               addTask({
-                id: `t${Date.now()}`,
+                id: createEntityId("task"),
                 name: name.trim(),
                 taskType: "Internal",
                 sectionId: sortedSections[sortedSections.length - 1].id,
@@ -736,7 +738,25 @@ function TaskRow({
               </TooltipContent>
             </Tooltip>
           ) : null}
-          {taskTypeIcon(task.taskType)}
+          <Select
+            value={task.taskType}
+            onValueChange={(value) => onInlineEdit(task.id, "taskType", value)}
+          >
+            <SelectTrigger
+              aria-label={`Change task type for ${task.name}`}
+              className="h-6 w-6 min-w-[24px] border-0 bg-transparent p-0 shadow-none text-muted-foreground hover:text-foreground"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {taskTypeIcon(task.taskType)}
+            </SelectTrigger>
+            <SelectContent>
+              {(["Internal", "Ordering", "Delivery", "Inspection"] as TaskType[]).map((type) => (
+                <SelectItem key={type} value={type}>
+                  {type}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           {editingCell?.id === task.id && editingCell?.field === "name" ? (
             <input
               autoFocus
@@ -881,9 +901,23 @@ function TaskRow({
         </Tooltip>
       </td>
       <td className="px-3 py-1.5 w-[180px] min-w-[180px] max-w-[220px] select-none">
-        <span className="block truncate text-[10px] text-muted-foreground">
-          {waitingOnText}
-        </span>
+        {waitingOnText ? (
+          <button
+            type="button"
+            className="block max-w-[190px] truncate text-left text-[10px] text-primary hover:underline"
+            aria-label={`Open dependency chain for ${task.name}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpenDependencyChain(task.id);
+            }}
+          >
+            {waitingOnText}
+          </button>
+        ) : (
+          <span className="block truncate text-[10px] text-muted-foreground">
+            {waitingOnText}
+          </span>
+        )}
       </td>
       
       <td className="px-[0.4rem] py-1.5 w-auto" onClick={(e) => e.stopPropagation()}>

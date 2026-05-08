@@ -613,7 +613,7 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
 
       <div className="flex items-center gap-2 rounded-md border border-solva-smart/15 bg-white px-3 py-2">
         <Switch id="filter-urgent" checked={filterUrgent} onCheckedChange={setFilterUrgent} />
-        <Label htmlFor="filter-urgent" className="text-sm text-solva-smart">Urgent</Label>
+        <Label htmlFor="filter-urgent" className="text-sm text-solva-smart">Attention</Label>
       </div>
 
       <div className="flex items-center gap-2 rounded-md border border-solva-smart/15 bg-white px-3 py-2">
@@ -725,7 +725,7 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
               <details className="rounded-lg border border-solva-smart/15 bg-white p-3">
                 <summary className="cursor-pointer font-semibold">Filters</summary>
                 <p className="mt-2 text-sm text-solva-smart/80">
-                  Use Type/Group/Status to narrow the table. Urgent highlights tasks needing attention.
+                  Use Type/Group/Status to narrow the table. Attention shows red and orange date-critical tasks.
                   Workdays only changes scheduling calculations and asks for confirmation.
                 </p>
               </details>

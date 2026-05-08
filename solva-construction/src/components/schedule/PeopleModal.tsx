@@ -18,6 +18,7 @@ import {
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { createEntityId } from "@/lib/ids";
 
 interface PeopleModalProps {
   open: boolean;
@@ -75,7 +76,7 @@ export function PeopleModal({ open, onOpenChange }: PeopleModalProps) {
       updatePerson(editingId, data);
     } else {
       addPerson({
-        id: `p${Date.now()}`,
+        id: createEntityId("person"),
         userGroup: tab,
         ...data,
       } as Person);

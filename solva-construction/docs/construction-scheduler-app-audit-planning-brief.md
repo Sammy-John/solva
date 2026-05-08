@@ -17,6 +17,9 @@ Implemented on `feature/patch-1.2`:
 - Task delete and people delete now require confirmation.
 - Snapshot restore copy now states that restore overwrites the active saved schedule.
 - Storage clarity is included in Settings and README.
+- Remaining timestamp-based runtime IDs have been moved to a `crypto.randomUUID()` helper for sections, tasks, dependencies, and people.
+- The main schedule table now supports inline task type editing, an `Attention` filter that includes red and orange urgency rows, and a clickable `Waiting On` cell that opens the dependency chain.
+- Template storage is explicitly documented as localStorage-backed reusable seeds.
 
 ## 1.1.2 Implementation Check
 
@@ -70,8 +73,8 @@ Strong fit:
 
 Weak fit for 1.2:
 
-- First-run value is too low. A blank schedule does not demonstrate construction-specific workflows such as preliminaries, slab, frame, roof, services, linings, fitoff, inspections, handover, ordering, and delivery links.
-- Inspection is not yet a true milestone-by-convention. Release 1.2 should enforce duration `0` and `startDate === endDate` for `Inspection` tasks.
+- First-run value is now stronger because the built-in starter schedule demonstrates construction-specific workflows such as preliminaries, slab, frame, roof, services, linings, fitoff, inspections, handover, ordering, and delivery links.
+- Inspection is now treated as a milestone-by-convention through store normalization: duration `0` and `startDate === endDate` for `Inspection` tasks.
 - The task model still derives `userGroup` from task type, which is simple but blocks real-world exceptions like supplier inspections or internal pickup/delivery tasks.
 - Procurement visibility is date-threshold based only. That is acceptable for 1.2, but supplier lead-time metadata should remain a later feature unless users specifically ask for it.
 
@@ -88,10 +91,10 @@ Weak fit for 1.2:
 
 ### Gaps For 1.2
 
-- Settings is still a dead-end. Either wire the existing Workdays-only control and storage/status information into Settings, or remove the Settings entry from the release build.
-- Task type is editable in the detail drawer, but not inline in the main table. For a table-first scheduler, type should be directly editable where users scan tasks.
-- The "Urgent" filter only communicates "urgent" broadly. Rename it to "Critical" if it only shows red items, or expand it to include orange and red as an attention filter.
-- Waiting On and Chain cells should open dependency detail directly or expose a small popover. They are useful but still too read-only.
+- Settings is now active with Workdays-only scheduling control and storage/status information.
+- Task type is now editable inline in the main table.
+- The old "Urgent" filter is now labelled `Attention` and includes orange and red urgency rows.
+- The `Waiting On` cell now opens the dependency chain directly when a predecessor exists.
 - Move mode works, but it remains unusual. Keep the current safe move mode, but reduce overlay heaviness and make the active mode bar calmer.
 - Sidebar image upload is ephemeral object-URL state. Persist it as a project image or remove the upload affordance from release builds.
 
@@ -109,7 +112,7 @@ Remaining risks:
 
 - Finish-to-start with `lagDays: 0` still permits same-day successor starts because the constraint uses predecessor end date plus zero lag. Decide whether 1.2 keeps same-day FS or changes new-link preview/default copy to make this explicit.
 - Confirm-and-override for dependency-violating date edits remains incomplete. Release 1.2 should either implement a real confirmation flow or explicitly keep the current snap/block behavior and update copy accordingly.
-- Inspection milestone behavior is not enforced. Users can set nonzero durations and separate start/end dates on inspection tasks.
+- Inspection milestone behavior is enforced through schedule-store normalization.
 - Explicitly setting a task to `Delayed` still cascades `Delayed` status to successors. This may be right, but 1.2 should make the UI copy clear because it is a high-impact action.
 - `getConservativeStatusForDate()` uses `new Date()` by default, so day-sensitive UI and tests need controlled-date coverage around midnight/timezone-sensitive cases.
 - Runtime saved JSON validation is still weak. Corrupt schedule blobs can appear as empty fallback data in places, which can feel like data loss.
@@ -125,9 +128,9 @@ Persistence strengths:
 
 Release 1.2 risks:
 
-- Templates are localStorage-only in `src/lib/templatesDb.ts`, unlike project schedules and snapshots.
+- Templates are still localStorage-only in `src/lib/templatesDb.ts`, unlike project schedules and snapshots, but this is now documented in README and Settings as reusable schedule seed data.
 - Browser preview and installed app can show different data sources. This is expected technically, but the UI/docs should say it plainly.
-- Snapshot restore becomes the current saved schedule after autosave. Wording should say "Restore snapshot and overwrite current schedule."
+- Snapshot restore now states that restore overwrites the current active schedule.
 - `clear_project_people` remains a risky backend command surface if ever wired incorrectly.
 - `stripSamplePeople()` in `scheduleDb.ts` can silently remove specific sample names/IDs from older or migrated data.
 
@@ -137,7 +140,7 @@ The workspace still has the right product direction: compact table, strong const
 
 1.2 polish targets:
 
-- Replace default README and remove Vite/React starter residue.
+- README has been replaced with product-specific setup, storage, test, build, and release notes.
 - Consolidate styling between Tailwind/Radix, `src/index.css`, and `src/App.css`.
 - Revisit typography. Playfair and broad dashboard styling still make parts of the app feel more editorial than operational.
 - Increase the smallest table text where possible. Dense is good; `text-[10px]` everywhere is hard to scan.
@@ -159,13 +162,14 @@ The workspace still has the right product direction: compact table, strong const
 
 ### P1 - Strong 1.2 Polish
 
-- Replace remaining `Date.now()` IDs with `crypto.randomUUID()`.
-- Add inline task type editing to the main table.
-- Rename or broaden the Urgent filter.
-- Make Waiting On/Chain cells open dependency details directly.
-- Persist templates in SQLite or clearly document/export them as local browser/app preference data.
+- [x] Replace remaining `Date.now()` IDs with `crypto.randomUUID()`.
+- [x] Add inline task type editing to the main table.
+- [x] Rename or broaden the Urgent filter.
+- [x] Make Waiting On cells open dependency details directly.
+- [x] Clearly document templates as local browser/app preference seed data.
+- [x] Add regression tests for ID generation, Attention filter behavior, and Waiting On dependency-chain access.
 - Consolidate visual tokens and remove stale CSS/duplicate table code.
-- Add regression tests for inspection milestones, delete confirmation/undo, snapshot restore wording, starter template creation, and ID generation helpers.
+- Add or broaden regression tests for inspection milestones, delete confirmation/undo, snapshot restore wording, and starter template creation.
 
 ### P2 - Later Than 1.2
 

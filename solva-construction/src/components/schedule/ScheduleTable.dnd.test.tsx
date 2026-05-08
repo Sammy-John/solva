@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 
 import { ScheduleTable } from '@/components/schedule/ScheduleTable';
@@ -24,6 +24,11 @@ const baseTask = (overrides: Partial<Task>): Task => ({
 });
 
 describe('ScheduleTable move mode', () => {
+  afterEach(() => {
+    cleanup();
+    vi.useRealTimers();
+  });
+
   beforeEach(() => {
     const sections: Section[] = [
       { id: 'sec-a', name: 'Section A', order: 0 },
@@ -143,6 +148,98 @@ describe('ScheduleTable move mode', () => {
 
     const orderedIds = useScheduleStore.getState().tasks.map((task) => task.id);
     expect(orderedIds.slice(0, 2)).toEqual(['t2', 't1']);
+  });
+
+  it('includes orange urgency rows in the attention filter', () => {
+    useScheduleStore.setState({
+      excludeWeekends: true,
+      sections: [{ id: 'sec-a', name: 'Section A', order: 0 }],
+      tasks: [
+        baseTask({
+          id: 'orange',
+          name: 'Delivery approaching',
+          taskType: 'Delivery',
+          sectionId: 'sec-a',
+          startDate: '2026-05-01',
+          endDate: '2026-05-13',
+        }),
+        baseTask({
+          id: 'quiet',
+          name: 'Future delivery',
+          taskType: 'Delivery',
+          sectionId: 'sec-a',
+          startDate: '2026-05-01',
+          endDate: '2099-01-01',
+        }),
+      ],
+      dependencies: [],
+      people: [],
+      cascadeNotification: null,
+      blockedTaskEdit: null,
+    });
+
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-05-08T12:00:00Z'));
+
+    render(
+      <TooltipProvider>
+        <ScheduleTable
+          filterType="All"
+          filterGroup="All"
+          filterStatus="All"
+          filterUrgent={true}
+          onSelectTask={() => undefined}
+          onOpenDependencyChain={() => undefined}
+        />
+      </TooltipProvider>,
+    );
+
+    expect(screen.getAllByText('Delivery approaching').length).toBeGreaterThan(0);
+    expect(screen.queryByText('Future delivery')).not.toBeInTheDocument();
+
+  });
+
+  it('opens dependency chain from the Waiting On cell', () => {
+    const onOpenDependencyChain = vi.fn();
+
+    useScheduleStore.setState({
+      excludeWeekends: true,
+      sections: [{ id: 'sec-a', name: 'Section A', order: 0 }],
+      tasks: [
+        baseTask({ id: 'pred', name: 'Frame inspection', sectionId: 'sec-a' }),
+        baseTask({ id: 'succ', name: 'Install linings', sectionId: 'sec-a' }),
+      ],
+      dependencies: [
+        {
+          id: 'dep-1',
+          predecessorId: 'pred',
+          successorId: 'succ',
+          lagDays: 0,
+          autoShift: true,
+          notes: '',
+        },
+      ],
+      people: [],
+      cascadeNotification: null,
+      blockedTaskEdit: null,
+    });
+
+    render(
+      <TooltipProvider>
+        <ScheduleTable
+          filterType="All"
+          filterGroup="All"
+          filterStatus="All"
+          filterUrgent={false}
+          onSelectTask={() => undefined}
+          onOpenDependencyChain={onOpenDependencyChain}
+        />
+      </TooltipProvider>,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /Open dependency chain for Install linings/i }));
+
+    expect(onOpenDependencyChain).toHaveBeenCalledWith('succ');
   });
 
   it('cancels move with Escape', () => {

@@ -24,6 +24,8 @@ npm run tauri
 
 Installed builds store projects, schedules, and snapshots in SQLite through Tauri commands. Browser preview uses localStorage fallback data, so preview data can differ from installed app data.
 
+Templates currently live in app/browser localStorage as reusable schedule seeds. Projects created from templates are saved into the active project schedule store.
+
 ## Current Release Focus
 
 Version `1.2` focuses on release polish: a construction starter schedule, inspection milestone semantics, active Settings, safer destructive actions, clearer snapshot restore copy, and product-specific documentation.
