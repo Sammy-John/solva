@@ -11,8 +11,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Oswald:wght@500;600;700&family=Playfair+Display:wght@600;700&family=Source+Code+Pro:wght@500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../landing-page/css/styles.css" />
-  <script defer src="../landing-page/js/main.js"></script>
+  <link rel="stylesheet" href="/solva-construction/landing-page/css/styles.css" />
+  <script defer src="/solva-construction/landing-page/js/main.js"></script>
 </head>
 <body>
   <div id="top"></div>
@@ -20,7 +20,7 @@
   <header class="site-header" data-header>
     <div class="container header-inner">
       <a class="brand" href="#top" aria-label="Solva Construction Planner home">
-        <img class="brand-mark" src="../landing-page/assets/solva_logo.png" alt="Solva" />
+        <img class="brand-mark" src="/solva-construction/landing-page/assets/solva_logo.png" alt="Solva" />
         <span class="brand-product">Construction Planner</span>
       </a>
 
@@ -61,81 +61,11 @@
           </ul>
         </div>
 
-        <div class="hero-console" id="preview" aria-label="Construction schedule table preview">
-          <div class="console-topbar">
-            <div>
-              <p class="console-kicker">Live project board</p>
-              <h2>Brown Town build</h2>
-            </div>
-            <div class="console-status">
-              <span class="dot dot-red"></span>
-              3 critical
-            </div>
-          </div>
-
-          <div class="health-strip">
-            <span><strong>2</strong> delayed</span>
-            <span><strong>4</strong> due this week</span>
-            <span><strong>7</strong> links active</span>
-          </div>
-
-          <div class="schedule-frame" role="img" aria-label="Table with construction schedule rows">
-            <div class="schedule-row schedule-head">
-              <span>Task</span>
-              <span>Start</span>
-              <span>Days</span>
-              <span>End</span>
-              <span>Waiting on</span>
-              <span>Status</span>
-            </div>
-            <div class="section-label">Frame and roof</div>
-            <div class="schedule-row">
-              <span class="task-name internal">Wall framing</span>
-              <span>May 06</span>
-              <span>5d</span>
-              <span>May 12</span>
-              <span>Slab cure</span>
-              <span><b class="status booked">Booked</b></span>
-            </div>
-            <div class="schedule-row row-alert">
-              <span class="task-name delivery">Truss delivery</span>
-              <span>May 12</span>
-              <span>1d</span>
-              <span class="urgent-red">May 12</span>
-              <span>Order trusses</span>
-              <span><b class="status delayed">Delayed</b></span>
-            </div>
-            <div class="schedule-row">
-              <span class="task-name internal">Roof install</span>
-              <span>May 13</span>
-              <span>3d</span>
-              <span>May 15</span>
-              <span>Truss delivery</span>
-              <span><b class="status planned">Planned</b></span>
-            </div>
-            <div class="section-label">Services and inspections</div>
-            <div class="schedule-row">
-              <span class="task-name ordering">Order switchboard</span>
-              <span>May 14</span>
-              <span>1d</span>
-              <span class="urgent-orange">May 14</span>
-              <span>Electrical rough-in</span>
-              <span><b class="status progress">In progress</b></span>
-            </div>
-            <div class="schedule-row">
-              <span class="task-name inspection">Pre-line inspection</span>
-              <span>May 24</span>
-              <span>0d</span>
-              <span>May 24</span>
-              <span>Plumbing rough-in</span>
-              <span><b class="status planned">Planned</b></span>
-            </div>
-          </div>
-
-          <div class="cascade-card">
-            <span class="cascade-icon">-></span>
-            <p><strong>Cascade preview:</strong> Truss delivery moved 2 linked tasks.</p>
-          </div>
+        <div class="hero-console-image" id="preview">
+          <img
+            src="/solva-construction/landing-page/assets/solva-construction-snip.JPG"
+            alt="Construction scheduling dashboard preview showing project timeline, task statuses, delays, and dependency tracking"
+          />
         </div>
       </div>
     </section>
@@ -173,7 +103,7 @@
     <section class="site-proof" aria-label="Construction context">
       <div class="container site-proof-grid">
         <figure class="site-photo">
-          <img src="../landing-page/assets/Gemini_Generated_Image_cyvfsvcyvfsvcyvf.png" alt="A construction site exterior used as project context for the planning tool" loading="lazy" />
+          <img src="/solva-construction/landing-page/assets/Gemini_Generated_Image_cyvfsvcyvfsvcyvf.png" alt="A construction site exterior used as project context for the planning tool" loading="lazy" />
         </figure>
 
         <div class="blueprint-panel">
@@ -299,7 +229,7 @@
     <div class="container footer-inner">
       <div>
         <a class="brand footer-brand" href="#top">
-          <img class="brand-mark" src="../landing-page/assets/solva_logo.png" alt="Solva" />
+          <img class="brand-mark" src="/solva-construction/landing-page/assets/solva_logo.png" alt="Solva" />
           <span class="brand-product">Construction Planner</span>
         </a>
         <p>Practical scheduling software by <a href="https://teknabu.com" rel="noopener">studio teknabu</a>.</p>
