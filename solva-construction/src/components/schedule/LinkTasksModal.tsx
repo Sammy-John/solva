@@ -32,6 +32,7 @@ import {
   formatAutoMoveTag,
   formatDependencyRule,
 } from '@/lib/dependencyUx';
+import { createEntityId } from '@/lib/ids';
 
 interface LinkTasksModalProps {
   open: boolean;
@@ -254,7 +255,7 @@ export function LinkTasksModal({
     }
 
     const result = addDependency({
-      id: `d${Date.now()}`,
+      id: createEntityId('dep'),
       predecessorId,
       successorId,
       lagDays,
@@ -458,7 +459,7 @@ export function LinkTasksModal({
                   </div>
                 ) : null}
                 {successorStartsTooEarly ? (
-                  <div className="text-[11px] text-amber-700 flex items-center gap-1">
+                  <div className="text-xs text-amber-700 flex items-center gap-1">
                     <TriangleAlert className="h-3.5 w-3.5" />
                     {autoShift
                       ? 'Saving will auto-shift the following task later to meet this rule.'
@@ -529,26 +530,26 @@ export function LinkTasksModal({
                             <span className="text-muted-foreground mx-1">{'->'}</span>
                             {successor?.name ?? 'Unknown'}
                             {isRowEditing ? (
-                              <span className="ml-2 text-[10px] rounded bg-primary/10 px-1.5 py-0.5 text-primary align-middle">
+                              <span className="ml-2 text-xs rounded bg-primary/10 px-1.5 py-0.5 text-primary align-middle">
                                 Editing
                               </span>
                             ) : null}
                           </p>
                           <div className="flex flex-wrap gap-1 mt-1">
                             {predecessorSection ? (
-                              <span className="text-[10px] rounded bg-muted px-1.5 py-0.5 text-muted-foreground">
+                              <span className="text-xs rounded bg-muted px-1.5 py-0.5 text-muted-foreground">
                                 From: {predecessorSection.name}
                               </span>
                             ) : null}
                             {successorSection ? (
-                              <span className="text-[10px] rounded bg-muted px-1.5 py-0.5 text-muted-foreground">
+                              <span className="text-xs rounded bg-muted px-1.5 py-0.5 text-muted-foreground">
                                 To: {successorSection.name}
                               </span>
                             ) : null}
-                            <span className="text-[10px] rounded bg-primary/10 px-1.5 py-0.5 text-primary">
+                            <span className="text-xs rounded bg-primary/10 px-1.5 py-0.5 text-primary">
                               {formatDependencyRule(dep.lagDays)}
                             </span>
-                            <span className="text-[10px] rounded bg-muted px-1.5 py-0.5 text-muted-foreground">
+                            <span className="text-xs rounded bg-muted px-1.5 py-0.5 text-muted-foreground">
                               {formatAutoMoveTag(dep.autoShift)}
                             </span>
                           </div>
@@ -593,4 +594,3 @@ export function LinkTasksModal({
     </Dialog>
   );
 }
-

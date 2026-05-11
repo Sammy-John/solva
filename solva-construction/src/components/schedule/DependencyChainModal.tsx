@@ -157,17 +157,17 @@ export function DependencyChainModal({
                           {task.name}
                         </span>
                         {upstreamIds.has(task.id) ? (
-                          <span className="text-[10px] rounded bg-muted px-1.5 py-0.5 text-muted-foreground">
+                          <span className="text-xs rounded bg-muted px-1.5 py-0.5 text-muted-foreground">
                             Upstream
                           </span>
                         ) : null}
                         {downstreamIds.has(task.id) ? (
-                          <span className="text-[10px] rounded bg-muted px-1.5 py-0.5 text-muted-foreground">
+                          <span className="text-xs rounded bg-muted px-1.5 py-0.5 text-muted-foreground">
                             Downstream
                           </span>
                         ) : null}
                       </div>
-                      <div className="mt-1 text-[11px] text-muted-foreground">
+                      <div className="mt-1 text-xs text-muted-foreground">
                         {task.startDate || 'No start'} {'->'} {task.endDate || 'No end'}
                       </div>
                     </div>
@@ -201,7 +201,7 @@ export function DependencyChainModal({
                           <ArrowRight className="h-3 w-3 text-muted-foreground" />
                           <span>{successor?.name ?? 'Unknown'}</span>
                         </div>
-                        <div className="mt-1 flex flex-wrap gap-1.5 text-[11px] text-muted-foreground">
+                        <div className="mt-1 flex flex-wrap gap-1.5 text-xs text-muted-foreground">
                           <span className="rounded bg-muted px-1.5 py-0.5">
                             Rule: {formatDependencyRule(dep.lagDays)}
                           </span>
@@ -219,7 +219,7 @@ export function DependencyChainModal({
                             </span>
                           ) : null}
                         </div>
-                        <p className="mt-1 text-[11px] text-muted-foreground">
+                        <p className="mt-1 text-xs text-muted-foreground">
                           {formatAutoMoveSummary(dep.autoShift)}
                         </p>
                       </div>
@@ -238,4 +238,3 @@ export function DependencyChainModal({
     </Dialog>
   );
 }
-

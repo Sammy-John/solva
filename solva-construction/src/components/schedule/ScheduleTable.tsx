@@ -29,7 +29,6 @@ import {
   Truck,
   ShoppingCart,
   ClipboardCheck,
-  HelpCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -44,6 +43,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { createEntityId } from "@/lib/ids";
 interface ScheduleTableProps {
   filterType: TaskType | "All";
   filterGroup: UserGroup | "All";
@@ -142,7 +142,7 @@ export function ScheduleTable({
     if (filterStatus !== "All" && t.status !== filterStatus) return false;
     if (filterUrgent) {
       const u = getUrgency(t.taskType, t.endDate, t.status, t.startDate);
-      if (u !== "red") return false;
+      if (u !== "red" && u !== "orange") return false;
     }
     return true;
   });
@@ -166,6 +166,7 @@ export function ScheduleTable({
     if (field === "duration") updates.duration = Number(value);
     if (field === "assignedTo") updates.assignedTo = value as string[];
     if (field === "userGroup") updates.userGroup = value as UserGroup;
+    if (field === "taskType") updates.taskType = value as TaskType;
     if (field === "status") updates.status = value as TaskStatus;
     const result = updateTask(taskId, updates);
     if (!result.blockedTaskEdit) {
@@ -190,7 +191,7 @@ export function ScheduleTable({
   };
   const handleAddTaskBelow = (sourceTask: Task) => {
     const newTask: Task = {
-      id: `t${Date.now()}`,
+      id: createEntityId("task"),
       name: "New Task",
       taskType: "Internal",
       sectionId: sourceTask.sectionId,
@@ -252,39 +253,39 @@ export function ScheduleTable({
           </div>
         </div>
       ) : null}
-      <table className="w-full border-collapse font-sans text-[11px] leading-5">
+      <table className="w-full border-collapse font-sans text-xs leading-5">
         <thead>
           <tr className="border-b bg-solva-smart">
-            <th className="px-2 py-2.5 text-center text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[50px]">
-              <div className="inline-flex items-center gap-1"><span>Task</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: Add Task" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">Adds a new task directly below the selected row in the same section.</TooltipContent></Tooltip></div>
+            <th className="px-2 py-2.5 text-center text-xs font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[50px]">
+              Task
             </th>
-            <th className="sticky left-0 z-20 bg-solva-smart px-2 py-2.5 text-center text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[50px]">
-              <div className="inline-flex items-center gap-1"><span>Move</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: Move" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">Click the grip to enter Move mode, then click a destination task (places before) or a section header (moves to end).</TooltipContent></Tooltip></div>
+            <th className="sticky left-0 z-20 bg-solva-smart px-2 py-2.5 text-center text-xs font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[50px]">
+              Move
             </th>
-            <th className="px-3 py-2.5 text-left text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-auto">
-              <div className="inline-flex items-center gap-1"><span>Task</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: Task" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">Task name and type. Double-click the name to edit (disabled while moving).</TooltipContent></Tooltip></div>
+            <th className="px-3 py-2.5 text-left text-xs font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-auto">
+              Task
             </th>
-            <th className="px-[0.4rem] py-2.5 text-left text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[100px]">
-              <div className="inline-flex items-center gap-1"><span>Start</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: Start" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">Start date for the task.</TooltipContent></Tooltip></div>
+            <th className="px-[0.4rem] py-2.5 text-left text-xs font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[100px]">
+              Start
             </th>
-            <th className="px-2 py-2.5 text-center text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[48px]">
-              <div className="inline-flex items-center gap-1"><span>Days</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: Days" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">Duration in workdays.</TooltipContent></Tooltip></div>
+            <th className="px-2 py-2.5 text-center text-xs font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[48px]">
+              Days
             </th>
-            <th className="px-[0.4rem] py-2.5 text-left text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[100px]">
-              <div className="inline-flex items-center gap-1"><span>End</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: End" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">End date for the task.</TooltipContent></Tooltip></div>
+            <th className="px-[0.4rem] py-2.5 text-left text-xs font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[100px]">
+              End
             </th>
-            <th className="px-3 py-2.5 text-left text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[180px] min-w-[180px]"><div className="inline-flex items-center gap-1"><span>Waiting On</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: Waiting On" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">Shows predecessor tasks this task depends on (read-only).</TooltipContent></Tooltip></div></th>
-            <th className="px-[0.4rem] py-2.5 text-left text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-auto">
-              <div className="inline-flex items-center gap-1"><span>Assigned</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: Assigned" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">People assigned to the task.</TooltipContent></Tooltip></div>
+            <th className="px-3 py-2.5 text-left text-xs font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[180px] min-w-[180px]">Waiting On</th>
+            <th className="px-[0.4rem] py-2.5 text-left text-xs font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-auto">
+              Assigned
             </th>
-            <th className="px-[0.4rem] py-2.5 text-left text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[116px] min-w-[116px]">
-              <div className="inline-flex items-center gap-1"><span>Status</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: Status" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">Current progress status.</TooltipContent></Tooltip></div>
+            <th className="px-[0.4rem] py-2.5 text-left text-xs font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[116px] min-w-[116px]">
+              Status
             </th>
-            <th className="px-3 py-2.5 text-left text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[200px]">
-              <div className="inline-flex items-center gap-1"><span>Comment</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: Comment" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">First comment/notes preview.</TooltipContent></Tooltip></div>
+            <th className="px-3 py-2.5 text-left text-xs font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[200px]">
+              Comment
             </th>
-            <th className="px-3 py-2.5 text-center text-[11px] font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[60px]">
-              <div className="inline-flex items-center gap-1"><span>Chain</span><Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex items-center justify-center rounded-sm text-solva-porcelain/80 hover:text-solva-porcelain focus:outline-none focus:ring-2 focus:ring-solva-porcelain/30" aria-label="Help: Chain" onClick={(e) => e.stopPropagation()}><HelpCircle className="h-3.5 w-3.5" /></button></TooltipTrigger><TooltipContent className="max-w-[240px]">Opens dependency chain view for this task.</TooltipContent></Tooltip></div>
+            <th className="px-3 py-2.5 text-center text-xs font-semibold text-solva-porcelain/90 uppercase tracking-[0.08em] w-[60px]">
+              Chain
             </th>
           </tr>
         </thead>
@@ -342,7 +343,7 @@ export function ScheduleTable({
             onAdd={(name) => {
               if (sortedSections.length === 0) return;
               addTask({
-                id: `t${Date.now()}`,
+                id: createEntityId("task"),
                 name: name.trim(),
                 taskType: "Internal",
                 sectionId: sortedSections[sortedSections.length - 1].id,
@@ -469,7 +470,7 @@ function SectionBlock({
               ) : (
                 <ChevronDown className="h-3.5 w-3.5 text-solva-smart/70" />
               )}
-              <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-solva-smart">
+              <span className="text-xs font-bold uppercase tracking-[0.12em] text-solva-smart">
                 {section.name}
               </span>
               {criticalCount > 0 ? (
@@ -484,7 +485,7 @@ function SectionBlock({
                   </TooltipContent>
                 </Tooltip>
               ) : null}
-              <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-background px-1.5 text-[10px] font-semibold text-muted-foreground">
+              <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-background px-1.5 text-xs font-semibold text-muted-foreground">
                 {tasks.length}
               </span>
             </div>
@@ -495,7 +496,7 @@ function SectionBlock({
               <button
                 type="button"
                 className={cn(
-                  "inline-flex items-center gap-1 rounded px-2 py-1 text-[11px] transition-colors",
+                  "inline-flex items-center gap-1 rounded px-2 py-1 text-xs transition-colors",
                   hasTasksInSection
                     ? "text-muted-foreground/60 bg-muted cursor-not-allowed"
                     : "text-destructive hover:bg-destructive/10",
@@ -511,7 +512,7 @@ function SectionBlock({
                 <Trash2 className="h-3 w-3" /> Delete Section
               </button>
               {hasTasksInSection ? (
-                <span className="text-[10px] text-muted-foreground">
+                <span className="text-xs text-muted-foreground">
                   Contains tasks
                 </span>
               ) : null}
@@ -648,7 +649,7 @@ function TaskRow({
   return (
     <tr
       className={cn(
-        "border-b border-border/60 cursor-pointer transition-colors group text-foreground text-[10px] leading-4",
+        "border-b border-border/60 cursor-pointer transition-colors group text-foreground text-xs leading-4",
         "hover:bg-muted/20",
         isAffected && "cascade-highlight",
         isMoveOver && "ring-2 ring-primary/40",
@@ -736,11 +737,29 @@ function TaskRow({
               </TooltipContent>
             </Tooltip>
           ) : null}
-          {taskTypeIcon(task.taskType)}
+          <Select
+            value={task.taskType}
+            onValueChange={(value) => onInlineEdit(task.id, "taskType", value)}
+          >
+            <SelectTrigger
+              aria-label={`Change task type for ${task.name}`}
+              className="h-6 w-6 min-w-[24px] border-0 bg-transparent p-0 shadow-none text-muted-foreground hover:text-foreground"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {taskTypeIcon(task.taskType)}
+            </SelectTrigger>
+            <SelectContent>
+              {(["Internal", "Ordering", "Delivery", "Inspection"] as TaskType[]).map((type) => (
+                <SelectItem key={type} value={type}>
+                  {type}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           {editingCell?.id === task.id && editingCell?.field === "name" ? (
             <input
               autoFocus
-              className="bg-transparent border-b border-primary outline-none w-full text-[10px]"
+              className="bg-transparent border-b border-primary outline-none w-full text-xs"
               defaultValue={task.name}
               onClick={(e) => e.stopPropagation()}
               onBlur={(e) => onInlineEdit(task.id, "name", e.target.value)}
@@ -753,7 +772,7 @@ function TaskRow({
           ) : (
             <span
               className={cn(
-                "whitespace-nowrap text-[10px] leading-4",
+                "whitespace-nowrap text-xs leading-4",
                 taskTypeNameClass(task.taskType),
               )}
               onDoubleClick={(e) => {
@@ -778,14 +797,14 @@ function TaskRow({
           <TooltipTrigger asChild>
             <div
               className={cn(
-                "rounded pl-0 pr-[0.4rem] py-[0.2rem] text-[10px] inline-flex justify-center",
+                "rounded pl-0 pr-[0.4rem] py-[0.2rem] text-xs inline-flex justify-center",
                 urgencyClass(urgency),
                 blockedStartEdit && "ring-1 ring-amber-500/60 bg-amber-50",
               )}
             >
               <input
                 type="date"
-                className="bg-transparent outline-none text-[10px] w-[92px] cursor-pointer"
+                className="bg-transparent outline-none text-xs w-[92px] cursor-pointer"
                 value={task.startDate}
                 onChange={(e) =>
                   onInlineEdit(task.id, "startDate", e.target.value)
@@ -797,7 +816,7 @@ function TaskRow({
         </Tooltip>
         {blockedStartEdit ? (
           <div className="absolute left-0 top-full z-30 mt-1 w-[260px] rounded-lg border border-amber-300 bg-background p-3 text-left shadow-lg">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-amber-700">
+            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-amber-700">
               Blocked by dependency
             </p>
             <p className="mt-1 text-xs text-foreground">
@@ -809,7 +828,7 @@ function TaskRow({
             <div className="mt-2 flex gap-2">
               <button
                 type="button"
-                className="inline-flex items-center rounded-md border border-border px-2 py-1 text-[11px] font-medium text-foreground hover:bg-accent"
+                className="inline-flex items-center rounded-md border border-border px-2 py-1 text-xs font-medium text-foreground hover:bg-accent"
                 onClick={() => {
                   onSelectTask(blockedStartEdit.blockerTaskId);
                   onDismissBlockedTaskEdit();
@@ -819,7 +838,7 @@ function TaskRow({
               </button>
               <button
                 type="button"
-                className="inline-flex items-center rounded-md px-2 py-1 text-[11px] text-muted-foreground hover:bg-accent"
+                className="inline-flex items-center rounded-md px-2 py-1 text-xs text-muted-foreground hover:bg-accent"
                 onClick={onDismissBlockedTaskEdit}
               >
                 Dismiss
@@ -837,7 +856,7 @@ function TaskRow({
             autoFocus
             type="number"
             min={0}
-            className="bg-transparent border-b border-primary outline-none w-10 text-[10px] text-center"
+            className="bg-transparent border-b border-primary outline-none w-10 text-xs text-center"
             defaultValue={task.duration}
             onBlur={(e) => onInlineEdit(task.id, "duration", e.target.value)}
             onKeyDown={(e) => {
@@ -848,7 +867,7 @@ function TaskRow({
           />
         ) : (
           <span
-            className="text-[10px] cursor-text text-muted-foreground hover:text-foreground transition-colors"
+            className="text-xs cursor-text text-muted-foreground hover:text-foreground transition-colors"
             onClick={() => setEditingCell({ id: task.id, field: "duration" })}
           >
             {task.duration}d
@@ -863,13 +882,13 @@ function TaskRow({
           <TooltipTrigger asChild>
             <div
               className={cn(
-                "rounded pl-0 pr-[0.4rem] py-[0.2rem] text-[10px] inline-flex justify-center",
+                "rounded pl-0 pr-[0.4rem] py-[0.2rem] text-xs inline-flex justify-center",
                 urgencyClass(urgency),
               )}
             >
               <input
                 type="date"
-                className="bg-transparent outline-none text-[10px] w-[92px] cursor-pointer"
+                className="bg-transparent outline-none text-xs w-[92px] cursor-pointer"
                 value={task.endDate}
                 onChange={(e) =>
                   onInlineEdit(task.id, "endDate", e.target.value)
@@ -881,20 +900,34 @@ function TaskRow({
         </Tooltip>
       </td>
       <td className="px-3 py-1.5 w-[180px] min-w-[180px] max-w-[220px] select-none">
-        <span className="block truncate text-[10px] text-muted-foreground">
-          {waitingOnText}
-        </span>
+        {waitingOnText ? (
+          <button
+            type="button"
+            className="block max-w-[190px] truncate text-left text-xs text-primary hover:underline"
+            aria-label={`Open dependency chain for ${task.name}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpenDependencyChain(task.id);
+            }}
+          >
+            {waitingOnText}
+          </button>
+        ) : (
+          <span className="block truncate text-xs text-muted-foreground">
+            {waitingOnText}
+          </span>
+        )}
       </td>
       
       <td className="px-[0.4rem] py-1.5 w-auto" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center gap-1 whitespace-nowrap">
           {assignedPeople.length > 0 ? (
             assignedPeople.map((p: any, idx: number) => (
-              <span key={p.id} className="inline-flex items-center gap-[2px] text-[10px] text-foreground/90">
+              <span key={p.id} className="inline-flex items-center gap-[2px] text-xs text-foreground/90">
                 <span>{p.name}</span>
                 <button
                   type="button"
-                  className="text-[10px] leading-none text-muted-foreground hover:text-destructive"
+                  className="text-xs leading-none text-muted-foreground hover:text-destructive"
                   onClick={() =>
                     onInlineEdit(
                       task.id,
@@ -910,7 +943,7 @@ function TaskRow({
               </span>
             ))
           ) : (
-            <span className="text-[10px] text-muted-foreground">Unassigned</span>
+            <span className="text-xs text-muted-foreground">Unassigned</span>
           )}
 
           <Select
@@ -921,7 +954,7 @@ function TaskRow({
             }}
           >
             <SelectTrigger className="h-5 w-5 min-w-[20px] border-0 bg-transparent shadow-none px-0 justify-center text-muted-foreground hover:text-foreground">
-              <span className="text-[11px] leading-none">+</span>
+              <span className="text-xs leading-none">+</span>
             </SelectTrigger>
             <SelectContent>
               {assignablePeople.length > 0 ? (
@@ -944,10 +977,10 @@ function TaskRow({
           value={task.status}
           onValueChange={(v) => onInlineEdit(task.id, "status", v)}
         >
-          <SelectTrigger className="h-6 text-[10px] border-0 bg-transparent shadow-none px-0 [&>span]:whitespace-nowrap">
+          <SelectTrigger className="h-6 text-xs border-0 bg-transparent shadow-none px-0 [&>span]:whitespace-nowrap">
             <span
               className={cn(
-                "px-[0.4rem] py-[0.2rem] rounded-full font-medium text-[10px] whitespace-nowrap",
+                "px-[0.4rem] py-[0.2rem] rounded-full font-medium text-xs whitespace-nowrap",
                 statusClass(task.status),
               )}
             >
@@ -973,7 +1006,7 @@ function TaskRow({
         </Select>
       </td>
       <td className="px-3 py-1.5 w-[200px] max-w-[200px]">
-        <span className="text-[10px] text-muted-foreground truncate block max-w-[190px]">
+        <span className="text-xs text-muted-foreground truncate block max-w-[190px]">
           {task.comments[0] || ""}
         </span>
       </td>
@@ -983,7 +1016,7 @@ function TaskRow({
       >
         <button
           className={cn(
-            "inline-flex items-center gap-1 text-[10px] px-[0.4rem] py-[0.2rem] rounded-md transition-colors",
+            "inline-flex items-center gap-1 text-xs px-[0.4rem] py-[0.2rem] rounded-md transition-colors",
             chainCount > 0
               ? "text-primary hover:bg-primary/10"
               : "text-muted-foreground/40 hover:text-muted-foreground",
@@ -992,7 +1025,7 @@ function TaskRow({
         >
           <Workflow className="h-3 w-3" />
           {chainCount > 0 ? (
-            <span className="text-[10px] font-medium">{chainCount}</span>
+            <span className="text-xs font-medium">{chainCount}</span>
           ) : null}
         </button>
       </td>
@@ -1060,45 +1093,3 @@ function NewSectionRow({ onAdd }: { onAdd: (name: string) => Section | null }) {
     </tr>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

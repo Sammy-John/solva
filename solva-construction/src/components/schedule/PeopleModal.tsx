@@ -18,6 +18,7 @@ import {
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { createEntityId } from "@/lib/ids";
 
 interface PeopleModalProps {
   open: boolean;
@@ -75,7 +76,7 @@ export function PeopleModal({ open, onOpenChange }: PeopleModalProps) {
       updatePerson(editingId, data);
     } else {
       addPerson({
-        id: `p${Date.now()}`,
+        id: createEntityId("person"),
         userGroup: tab,
         ...data,
       } as Person);
@@ -127,7 +128,7 @@ export function PeopleModal({ open, onOpenChange }: PeopleModalProps) {
                   )}
                   <span className="text-sm font-medium">{p.name}</span>
                   {p.trade && (
-                    <span className="text-[10px] text-muted-foreground">
+                    <span className="text-xs text-muted-foreground">
                       {p.trade}
                     </span>
                   )}
@@ -137,6 +138,7 @@ export function PeopleModal({ open, onOpenChange }: PeopleModalProps) {
                     variant="ghost"
                     size="sm"
                     className="h-6 w-6 p-0 text-muted-foreground hover:text-primary opacity-0 group-hover:opacity-100"
+                    aria-label={`Edit ${p.name}`}
                     onClick={(e) => {
                       e.stopPropagation();
                       startEdit(p);
@@ -148,8 +150,10 @@ export function PeopleModal({ open, onOpenChange }: PeopleModalProps) {
                     variant="ghost"
                     size="sm"
                     className="h-6 w-6 p-0 text-destructive opacity-0 group-hover:opacity-100"
+                    aria-label={`Delete ${p.name}`}
                     onClick={(e) => {
                       e.stopPropagation();
+                      if (!window.confirm(`Delete person "${p.name}"? This will remove them from any assigned tasks.`)) return;
                       removePerson(p.id);
                     }}
                   >

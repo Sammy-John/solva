@@ -20,6 +20,8 @@ import { useScheduleStore } from '@/store/scheduleStore';
 import { TaskType, UserGroup, TaskStatus } from '@/types/scheduling';
 import { getConservativeStatusForDate } from '@/lib/scheduling';
 import { dependencyQuickGuide } from '@/lib/dependencyGuide';
+import { getSnapshotRestoreConfirmationMessage } from '@/lib/snapshotCopy';
+import { WorkspaceSettingsDialog } from '@/components/schedule/WorkspaceSettingsDialog';
 import {
   Dialog,
   DialogContent,
@@ -217,7 +219,10 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
     }
 
     const shouldLoad = window.confirm(
-      `Load snapshot "${snapshot.label}" from ${formatSnapshotTimestamp(snapshot.createdAt)}? This will replace the current schedule view.`,
+      getSnapshotRestoreConfirmationMessage({
+        label: snapshot.label,
+        createdAtLabel: formatSnapshotTimestamp(snapshot.createdAt),
+      }),
     );
 
     if (!shouldLoad) {
@@ -448,7 +453,7 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
               draggable={false}
             />
             <div className="absolute inset-0 flex items-end justify-end p-2">
-              <span className="inline-flex items-center gap-1.5 rounded-md border border-white/15 bg-black/35 px-2 py-1 text-[11px] font-semibold">
+              <span className="inline-flex items-center gap-1.5 rounded-md border border-white/15 bg-black/35 px-2 py-1 text-xs font-semibold">
                 <ImageIcon className="h-3.5 w-3.5" />
                 Change
               </span>
@@ -533,7 +538,7 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
         <header className="px-6 py-4 border-b border-border bg-solva-porcelain">
   <div className="flex flex-wrap items-center justify-between gap-4">
     <div className="min-w-0 flex items-baseline gap-3">
-      <h1 className="font-heading text-3xl text-solva-smart truncate">{projectName}</h1>
+      <h1 className="text-3xl font-bold text-solva-smart truncate">{projectName}</h1>
       {projectDescription ? (
         <p className="text-sm text-solva-smart/70 truncate">{projectDescription}</p>
       ) : null}
@@ -562,7 +567,7 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
       </Button>
 
       <div className="flex items-center gap-2">
-        <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-solva-smart/70">Type</span>
+        <span className="text-xs font-bold uppercase tracking-[0.12em] text-solva-smart/70">Type</span>
         <select
           className="h-9 rounded-md border border-solva-smart/20 bg-white px-3 text-sm text-solva-smart"
           value={filterType}
@@ -577,7 +582,7 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
       </div>
 
       <div className="flex items-center gap-2">
-        <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-solva-smart/70">Group</span>
+        <span className="text-xs font-bold uppercase tracking-[0.12em] text-solva-smart/70">Group</span>
         <select
           className="h-9 rounded-md border border-solva-smart/20 bg-white px-3 text-sm text-solva-smart"
           value={filterGroup}
@@ -590,7 +595,7 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
       </div>
 
       <div className="flex items-center gap-2">
-        <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-solva-smart/70">Status</span>
+        <span className="text-xs font-bold uppercase tracking-[0.12em] text-solva-smart/70">Status</span>
         <select
           className="h-9 rounded-md border border-solva-smart/20 bg-white px-3 text-sm text-solva-smart"
           value={filterStatus}
@@ -608,7 +613,7 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
 
       <div className="flex items-center gap-2 rounded-md border border-solva-smart/15 bg-white px-3 py-2">
         <Switch id="filter-urgent" checked={filterUrgent} onCheckedChange={setFilterUrgent} />
-        <Label htmlFor="filter-urgent" className="text-sm text-solva-smart">Urgent</Label>
+        <Label htmlFor="filter-urgent" className="text-sm text-solva-smart">Attention</Label>
       </div>
 
       <div className="flex items-center gap-2 rounded-md border border-solva-smart/15 bg-white px-3 py-2">
@@ -720,7 +725,7 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
               <details className="rounded-lg border border-solva-smart/15 bg-white p-3">
                 <summary className="cursor-pointer font-semibold">Filters</summary>
                 <p className="mt-2 text-sm text-solva-smart/80">
-                  Use Type/Group/Status to narrow the table. Urgent highlights tasks needing attention.
+                  Use Type/Group/Status to narrow the table. Attention shows red and orange date-critical tasks.
                   Workdays only changes scheduling calculations and asks for confirmation.
                 </p>
               </details>
@@ -757,19 +762,12 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
           </div>
         </DialogContent>
       </Dialog>
-      <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
-        <DialogContent className="sm:max-w-[520px]">
-          <DialogHeader>
-            <DialogTitle>Settings</DialogTitle>
-          </DialogHeader>
-          <p className="text-sm text-muted-foreground">Settings isn't active yet in this version.</p>
-          <div className="flex justify-end pt-2">
-            <Button variant="outline" onClick={() => setSettingsOpen(false)}>
-              Close
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <WorkspaceSettingsDialog
+        open={settingsOpen}
+        onOpenChange={setSettingsOpen}
+        excludeWeekends={excludeWeekends}
+        onToggleWorkdaysOnly={handleToggleWorkdaysOnly}
+      />
 
       <LinkTasksModal
         open={linkModalOpen}
@@ -870,12 +868,3 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
 };
 
 export default Index;
-
-
-
-
-
-
-
-
-

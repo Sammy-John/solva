@@ -71,7 +71,7 @@ export function ScheduleHealthSummary() {
   return (
     <div className="px-6 md:px-8 py-3.5 bg-card border-b">
       <div className="flex items-center gap-6">
-        <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-foreground">
+        <span className="text-xs font-bold uppercase tracking-[0.14em] text-foreground">
           Schedule Health
         </span>
         <div className="flex items-center gap-5">
@@ -90,7 +90,7 @@ export function ScheduleHealthSummary() {
       </div>
 
       {missingSupplyDateTasks.length > 0 ? (
-        <div className="mt-2 inline-flex items-center gap-1.5 rounded-md bg-destructive/10 px-2 py-1 text-[11px] text-destructive">
+        <div className="mt-2 inline-flex items-center gap-1.5 rounded-md bg-destructive/10 px-2 py-1 text-xs text-destructive">
           <AlertTriangle className="h-3.5 w-3.5" />
           <span>
             Critical: {missingSupplyDateTasks.length} ordering/delivery task
@@ -102,7 +102,7 @@ export function ScheduleHealthSummary() {
       ) : null}
 
       {overdueSupplyTasks.length > 0 ? (
-        <div className="mt-2 inline-flex items-center gap-1.5 rounded-md bg-destructive/10 px-2 py-1 text-[11px] text-destructive">
+        <div className="mt-2 inline-flex items-center gap-1.5 rounded-md bg-destructive/10 px-2 py-1 text-xs text-destructive">
           <AlertTriangle className="h-3.5 w-3.5" />
           <span>
             Critical: {overdueSupplyTasks.length} ordering/delivery task

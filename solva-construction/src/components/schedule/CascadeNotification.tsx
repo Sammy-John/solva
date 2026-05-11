@@ -26,7 +26,7 @@ export function CascadeNotification() {
       {cascadeNotification.details.length > 0 ? (
         <ul className="space-y-1">
           {cascadeNotification.details.map((detail, idx) => (
-            <li key={`${idx}-${detail}`} className="text-[11px] text-muted-foreground">
+            <li key={`${idx}-${detail}`} className="text-xs text-muted-foreground">
               {detail}
             </li>
           ))}

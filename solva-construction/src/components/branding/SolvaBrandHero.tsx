@@ -13,7 +13,7 @@ export function SolvaBrandHero({ className }: { className?: string }) {
         <div className="flex flex-col gap-3">
           <SolvaBrandMark />
           <div>
-            <div className="font-heading text-2xl text-solva-smart">
+            <div className="text-2xl font-bold text-solva-smart">
               Project planning, made practical
             </div>
             <p className="mt-1 text-sm text-solva-smart/80 max-w-2xl">

@@ -6,6 +6,7 @@ type TemplateTask = {
   taskType: Task['taskType']
   sectionId: string
   duration: number
+  comments?: string[]
 }
 
 type TemplateDependency = {
@@ -33,6 +34,7 @@ export type ScheduleTemplate = {
 }
 
 const TEMPLATES_KEY = 'construction-planner-desktop.templates.v1'
+const BUILT_IN_STARTER_TEMPLATE_ID = 'builtin-construction-starter'
 
 const readTemplates = (): ScheduleTemplate[] => {
   const raw = localStorage.getItem(TEMPLATES_KEY)
@@ -59,6 +61,79 @@ export const getBlankTemplateSeed = (): ScheduleTemplateSeed => ({
   sections: [],
   tasks: [],
   dependencies: [],
+})
+
+export const getStarterTemplateSeed = (): ScheduleTemplateSeed => {
+  const sections: Section[] = [
+    { id: 'starter-prelim', name: 'Preliminaries', order: 0 },
+    { id: 'starter-slab', name: 'Slab', order: 1 },
+    { id: 'starter-frame', name: 'Frame', order: 2 },
+    { id: 'starter-roof', name: 'Roof', order: 3 },
+    { id: 'starter-services', name: 'Services', order: 4 },
+    { id: 'starter-linings', name: 'Linings', order: 5 },
+    { id: 'starter-fitoff', name: 'Fitoff', order: 6 },
+    { id: 'starter-inspections', name: 'Inspections', order: 7 },
+    { id: 'starter-handover', name: 'Handover', order: 8 },
+  ]
+
+  const tasks: TemplateTask[] = [
+    { id: 'starter-site-setup', sectionId: 'starter-prelim', name: 'Site setup and temporary services', taskType: 'Internal', duration: 2, comments: ['Confirm access, fencing, toilet, power, and water before trades start.'] },
+    { id: 'starter-order-concrete', sectionId: 'starter-slab', name: 'Order concrete and reinforcing', taskType: 'Ordering', duration: 1, comments: ['Confirm supplier lead time and delivery window.'] },
+    { id: 'starter-deliver-concrete', sectionId: 'starter-slab', name: 'Concrete and reinforcing delivery', taskType: 'Delivery', duration: 1 },
+    { id: 'starter-pour-slab', sectionId: 'starter-slab', name: 'Pour slab', taskType: 'Internal', duration: 2 },
+    { id: 'starter-slab-inspection', sectionId: 'starter-inspections', name: 'Slab inspection', taskType: 'Inspection', duration: 0 },
+    { id: 'starter-order-frame', sectionId: 'starter-frame', name: 'Order framing timber', taskType: 'Ordering', duration: 1 },
+    { id: 'starter-frame-delivery', sectionId: 'starter-frame', name: 'Framing delivery', taskType: 'Delivery', duration: 1 },
+    { id: 'starter-frame-up', sectionId: 'starter-frame', name: 'Stand frame', taskType: 'Internal', duration: 5 },
+    { id: 'starter-frame-inspection', sectionId: 'starter-inspections', name: 'Frame inspection', taskType: 'Inspection', duration: 0 },
+    { id: 'starter-roof-order', sectionId: 'starter-roof', name: 'Order roofing', taskType: 'Ordering', duration: 1 },
+    { id: 'starter-roof-delivery', sectionId: 'starter-roof', name: 'Roofing delivery', taskType: 'Delivery', duration: 1 },
+    { id: 'starter-roof-install', sectionId: 'starter-roof', name: 'Install roof', taskType: 'Internal', duration: 4 },
+    { id: 'starter-rough-in', sectionId: 'starter-services', name: 'Services rough-in', taskType: 'Internal', duration: 5 },
+    { id: 'starter-linings', sectionId: 'starter-linings', name: 'Install wall and ceiling linings', taskType: 'Internal', duration: 5 },
+    { id: 'starter-fitoff', sectionId: 'starter-fitoff', name: 'Fitoff and fixtures', taskType: 'Internal', duration: 5 },
+    { id: 'starter-final-inspection', sectionId: 'starter-inspections', name: 'Final inspection', taskType: 'Inspection', duration: 0 },
+    { id: 'starter-handover', sectionId: 'starter-handover', name: 'Client handover', taskType: 'Internal', duration: 1 },
+  ]
+
+  const link = (predecessorId: string, successorId: string, index: number): TemplateDependency => ({
+    id: `starter-link-${index}`,
+    predecessorId,
+    successorId,
+    lagDays: 0,
+    autoShift: true,
+    notes: '',
+  })
+
+  const dependencies: TemplateDependency[] = [
+    link('starter-site-setup', 'starter-order-concrete', 1),
+    link('starter-order-concrete', 'starter-deliver-concrete', 2),
+    link('starter-deliver-concrete', 'starter-pour-slab', 3),
+    link('starter-pour-slab', 'starter-slab-inspection', 4),
+    link('starter-slab-inspection', 'starter-order-frame', 5),
+    link('starter-order-frame', 'starter-frame-delivery', 6),
+    link('starter-frame-delivery', 'starter-frame-up', 7),
+    link('starter-frame-up', 'starter-frame-inspection', 8),
+    link('starter-frame-inspection', 'starter-roof-order', 9),
+    link('starter-roof-order', 'starter-roof-delivery', 10),
+    link('starter-roof-delivery', 'starter-roof-install', 11),
+    link('starter-roof-install', 'starter-rough-in', 12),
+    link('starter-rough-in', 'starter-linings', 13),
+    link('starter-linings', 'starter-fitoff', 14),
+    link('starter-fitoff', 'starter-final-inspection', 15),
+    link('starter-final-inspection', 'starter-handover', 16),
+  ]
+
+  return { sections, tasks, dependencies }
+}
+
+const getStarterTemplate = (): ScheduleTemplate => ({
+  id: BUILT_IN_STARTER_TEMPLATE_ID,
+  name: 'Construction Starter Schedule',
+  description: 'A starter residential build sequence with procurement, delivery, internal work, inspections, and handover.',
+  createdAt: '2026-05-08T00:00:00.000Z',
+  updatedAt: '2026-05-08T00:00:00.000Z',
+  seed: getStarterTemplateSeed(),
 })
 
 export const toTemplateSeedFromSchedule = (
@@ -147,7 +222,7 @@ export const instantiateTemplateSeed = (
         assignedTo: [],
         userGroup,
         status: 'Planned',
-        comments: [],
+        comments: task.comments ?? [],
       }
     })
 
@@ -173,7 +248,9 @@ export const instantiateTemplateSeed = (
 
 export const listTemplates = async (): Promise<ScheduleTemplate[]> => {
   const templates = readTemplates()
-  return templates.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+  const hasStarter = templates.some((template) => template.id === BUILT_IN_STARTER_TEMPLATE_ID)
+  const allTemplates = hasStarter ? templates : [getStarterTemplate(), ...templates]
+  return allTemplates.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
 }
 
 export const createTemplate = async (
