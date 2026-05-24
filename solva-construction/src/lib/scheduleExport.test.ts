@@ -4,6 +4,7 @@ import {
   buildScheduleCsv,
   buildScheduleExcelBuffer,
   buildScheduleExportWorkbook,
+  getExportSuccessMessage,
   getScheduleExportFilename,
 } from '@/lib/scheduleExport';
 import ExcelJS from 'exceljs';
@@ -110,9 +111,10 @@ describe('schedule export', () => {
       'Attention',
     ]);
 
-    expect(workbook.sheets[0].rows[0]).toEqual(['Project', 'Brown Town Duplex']);
-    expect(workbook.sheets[0].rows[1]).toEqual(['Export date', '2026-06-15']);
-    expect(workbook.sheets[0].rows[3]).toEqual([
+    expect(workbook.sheets[0].rows[0]).toEqual(['Project Schedule Export']);
+    expect(workbook.sheets[0].rows[1]).toEqual(['Project', 'Brown Town Duplex']);
+    expect(workbook.sheets[0].rows[2]).toEqual(['Export date', '2026-06-15']);
+    expect(workbook.sheets[0].rows[4]).toEqual([
       'Section',
       'Task',
       'Type',
@@ -124,8 +126,8 @@ describe('schedule export', () => {
       'Waiting On',
       'Comments',
     ]);
-    expect(workbook.sheets[0].rows[5]).toContain('Tile Supplier');
-    expect(workbook.sheets[0].rows[5]).toContain(
+    expect(workbook.sheets[0].rows[6]).toContain('Tile Supplier');
+    expect(workbook.sheets[0].rows[6]).toContain(
       'Pour slab finishes first + 2 days; auto-shift on; Confirm slab cure',
     );
 
@@ -158,6 +160,15 @@ describe('schedule export', () => {
     ).toBe('schedule-2026-06-15.xlsx');
   });
 
+  it('builds a clear export success message with the filename and Downloads guidance', () => {
+    expect(getExportSuccessMessage('brown-town-duplex-2026-06-15.xlsx', 'Excel')).toBe(
+      'Excel export created: brown-town-duplex-2026-06-15.xlsx. Check your Downloads folder.',
+    );
+    expect(getExportSuccessMessage('brown-town-duplex-2026-06-15.csv', 'CSV')).toBe(
+      'CSV export created: brown-town-duplex-2026-06-15.csv. Check your Downloads folder.',
+    );
+  });
+
   it('generates a formatted Excel workbook file', async () => {
     const buffer = await buildScheduleExcelBuffer({
       projectName: 'Brown Town Duplex',
@@ -178,13 +189,33 @@ describe('schedule export', () => {
     expect(schedule).toBeDefined();
     expect(peopleSheet).toBeDefined();
     expect(attention).toBeDefined();
-    expect(schedule?.views[0]).toMatchObject({ state: 'frozen', ySplit: 4 });
+    expect(schedule?.views[0]).toMatchObject({ state: 'frozen', ySplit: 5 });
     expect(schedule?.getColumn(1).width).toBeGreaterThan(12);
-    expect(schedule?.getRow(4).font?.bold).toBe(true);
-    expect(schedule?.getCell('B1').value).toBe('Brown Town Duplex');
-    expect(schedule?.getCell('B6').value).toBe('Order tiles, grout and trims');
-    expect(schedule?.getCell('I6').value).toBe('Pour slab finishes first + 2 days; auto-shift on; Confirm slab cure');
+    expect(schedule?.getColumn(2).width).toBeGreaterThan(28);
+    expect(schedule?.getColumn(9).width).toBeGreaterThan(32);
+    expect(schedule?.getRow(1).height).toBe(24);
+    expect(schedule?.getRow(5).font?.bold).toBe(true);
+    expect(schedule?.autoFilter).toBe('A5:J5');
+    expect(schedule?.getCell('A1').value).toBe('Project Schedule Export');
+    expect(schedule?.getCell('B2').value).toBe('Brown Town Duplex');
+    expect(schedule?.getCell('B7').value).toBe('Order tiles, grout and trims');
+    expect(schedule?.getCell('I7').value).toBe('Pour slab finishes first + 2 days; auto-shift on; Confirm slab cure');
+    expect(schedule?.getCell('A7').fill).toMatchObject({
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFF9FAFB' },
+    });
+    expect(schedule?.getCell('D7').fill).toMatchObject({
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFDBEAFE' },
+    });
     expect(peopleSheet?.getCell('A2').value).toBe('Alex Builder');
     expect(attention?.getCell('C2').value).toBe('Order tiles, grout and trims');
+    expect(attention?.getCell('A2').fill).toMatchObject({
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFFFF7ED' },
+    });
   });
 });

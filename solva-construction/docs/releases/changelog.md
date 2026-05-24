@@ -10,8 +10,9 @@ Tracks completed changes by release and task completion.
 ### Completed
 - Added formatted Excel export as the primary schedule export action.
 - Kept CSV export available as a fallback.
+- Added export success feedback with the generated filename and Downloads-folder guidance.
 - Added shared export data shaping for schedule rows, People rows, Attention rows, dependency details, comments, and safe dated filenames.
-- Added Excel workbook formatting with frozen header rows, bold headers, readable column widths, and wrapped cells.
+- Added Excel workbook formatting with title rows, frozen header rows, autofilter, bold headers, readable column widths, wrapped cells, borders, and status/attention highlighting.
 - Added regression coverage for CSV output, workbook model contents, safe filenames, and generated `.xlsx` workbook structure.
 - Synced app/build metadata to `1.2.1`.
 
@@ -20,7 +21,7 @@ Tracks completed changes by release and task completion.
 - `npm run test` PASS (`18` files, `72` tests)
 - `npm run build` PASS with Vite large chunk warning after adding `exceljs`
 - `npm run release:alpha:test` PASS; produced signed test-channel installer and updater signature in `artifacts/test/1.2.1/`
-- `npm run release:manifest:test:github -- --notes "Test release 1.2.1 - Excel export"` PASS; updated `artifacts/test/test-latest.json`
+- `npm run release:manifest:test:github -- --notes "Test release 1.2.1 - Excel export feedback and formatting"` PASS; updated `artifacts/test/test-latest.json`
 
 ### Follow-ups
 - Monitor the on-demand Excel export chunk size after client testing.

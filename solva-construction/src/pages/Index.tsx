@@ -24,6 +24,7 @@ import { getSnapshotRestoreConfirmationMessage } from '@/lib/snapshotCopy';
 import {
   buildScheduleCsv,
   buildScheduleExcelBuffer,
+  getExportSuccessMessage,
   getScheduleExportFilename,
 } from '@/lib/scheduleExport';
 import { WorkspaceSettingsDialog } from '@/components/schedule/WorkspaceSettingsDialog';
@@ -101,6 +102,7 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
   const [snapshotError, setSnapshotError] = useState<string | null>(null);
   const [snapshotInfo, setSnapshotInfo] = useState<string | null>(null);
   const [exportError, setExportError] = useState<string | null>(null);
+  const [exportInfo, setExportInfo] = useState<string | null>(null);
   const [snapshotModalOpen, setSnapshotModalOpen] = useState(false);
   const [snapshots, setSnapshots] = useState<ScheduleSnapshotSummary[]>([]);
   const [snapshotsLoading, setSnapshotsLoading] = useState(false);
@@ -124,6 +126,7 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
     setSnapshotError(null);
     setSnapshotInfo(null);
     setExportError(null);
+    setExportInfo(null);
     setSelectedTaskId(null);
     setDepChainTaskId(null);
     setSnapshotModalOpen(false);
@@ -349,14 +352,17 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
 
   const handleExportCsv = () => {
     setExportError(null);
+    setExportInfo(null);
     const exportedAt = new Date();
     const csv = buildScheduleCsv({ sections, tasks, people, dependencies });
     const filename = getScheduleExportFilename(projectName, exportedAt, 'csv');
     downloadBlob(new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' }), filename);
+    setExportInfo(getExportSuccessMessage(filename, 'CSV'));
   };
 
   const handleExportExcel = async () => {
     setExportError(null);
+    setExportInfo(null);
 
     try {
       const exportedAt = new Date();
@@ -375,9 +381,11 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
         }),
         filename,
       );
+      setExportInfo(getExportSuccessMessage(filename, 'Excel'));
     } catch (error) {
       const message = formatError(error);
       setExportError(message);
+      setExportInfo(null);
       console.error('Failed to export Excel workbook:', error);
     }
   };
@@ -620,6 +628,14 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
             <div className="status-alert status-alert-error">
               <strong>Export Failed</strong>
               <p>{exportError}</p>
+            </div>
+          </section>
+        ) : null}
+        {exportInfo ? (
+          <section className="px-6 pt-4">
+            <div className="status-alert border-emerald-200 bg-emerald-50">
+              <strong className="text-emerald-800">Export Created</strong>
+              <p className="text-emerald-800">{exportInfo}</p>
             </div>
           </section>
         ) : null}

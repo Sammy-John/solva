@@ -68,6 +68,11 @@ export const getScheduleExportFilename = (
   return `${base || 'schedule'}-${formatDateStamp(exportedAt)}.${extension}`;
 };
 
+export const getExportSuccessMessage = (
+  filename: string,
+  format: 'CSV' | 'Excel',
+): string => `${format} export created: ${filename}. Check your Downloads folder.`;
+
 const escapeCsvValue = (value: string): string => {
   if (/[",\n\r]/.test(value)) {
     return `"${value.replace(/"/g, '""')}"`;
@@ -202,6 +207,7 @@ export const buildScheduleExportWorkbook = (
       {
         name: 'Schedule',
         rows: [
+          ['Project Schedule Export'],
           ['Project', projectName],
           ['Export date', formatDateStamp(exportedAt)],
           [],
@@ -222,12 +228,28 @@ export const buildScheduleExportWorkbook = (
 };
 
 const applyWorksheetFormatting = (worksheet: ExcelJS.Worksheet): void => {
-  worksheet.views = [{ state: 'frozen', ySplit: worksheet.name === 'Schedule' ? 4 : 1 }];
+  const isSchedule = worksheet.name === 'Schedule';
+  const headerRowNumber = isSchedule ? 5 : 1;
+
+  worksheet.views = [{ state: 'frozen', ySplit: headerRowNumber }];
+
+  if (isSchedule) {
+    worksheet.mergeCells('A1:J1');
+    worksheet.getRow(1).height = 24;
+    worksheet.getCell('A1').font = {
+      bold: true,
+      size: 16,
+      color: { argb: 'FF23423B' },
+    };
+    worksheet.getCell('A1').alignment = { vertical: 'middle' };
+    worksheet.autoFilter = {
+      from: { row: headerRowNumber, column: 1 },
+      to: { row: headerRowNumber, column: 10 },
+    };
+  }
 
   worksheet.eachRow((row, rowNumber) => {
-    const isHeaderRow =
-      (worksheet.name === 'Schedule' && rowNumber === 4) ||
-      (worksheet.name !== 'Schedule' && rowNumber === 1);
+    const isHeaderRow = rowNumber === headerRowNumber;
 
     if (isHeaderRow) {
       row.font = { bold: true, color: { argb: 'FFFFFFFF' } };
@@ -239,18 +261,88 @@ const applyWorksheetFormatting = (worksheet: ExcelJS.Worksheet): void => {
     }
 
     row.alignment = { vertical: 'top', wrapText: true };
-  });
-
-  worksheet.columns.forEach((column) => {
-    let maxLength = 10;
-
-    column.eachCell?.({ includeEmpty: true }, (cell) => {
-      const value = cell.value == null ? '' : String(cell.value);
-      maxLength = Math.max(maxLength, value.length);
+    row.eachCell((cell) => {
+      cell.border = {
+        top: { style: 'thin', color: { argb: 'FFE5E7EB' } },
+        left: { style: 'thin', color: { argb: 'FFE5E7EB' } },
+        bottom: { style: 'thin', color: { argb: 'FFE5E7EB' } },
+        right: { style: 'thin', color: { argb: 'FFE5E7EB' } },
+      };
     });
 
-    column.width = Math.min(Math.max(maxLength + 2, 12), 42);
+    if (isSchedule && rowNumber > headerRowNumber && rowNumber % 2 === 1) {
+      row.eachCell((cell) => {
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'FFF9FAFB' },
+        };
+      });
+    }
   });
+
+  if (isSchedule) {
+    worksheet.getColumn(1).width = 18;
+    worksheet.getColumn(2).width = 34;
+    worksheet.getColumn(3).width = 14;
+    worksheet.getColumn(4).width = 16;
+    worksheet.getColumn(5).width = 14;
+    worksheet.getColumn(6).width = 14;
+    worksheet.getColumn(7).width = 10;
+    worksheet.getColumn(8).width = 24;
+    worksheet.getColumn(9).width = 38;
+    worksheet.getColumn(10).width = 40;
+  } else {
+    worksheet.columns.forEach((column) => {
+      let maxLength = 10;
+
+      column.eachCell?.({ includeEmpty: true }, (cell) => {
+        const value = cell.value == null ? '' : String(cell.value);
+        maxLength = Math.max(maxLength, value.length);
+      });
+
+      column.width = Math.min(Math.max(maxLength + 2, 12), 42);
+    });
+  }
+
+  if (isSchedule) {
+    worksheet.eachRow((row, rowNumber) => {
+      if (rowNumber <= headerRowNumber) return;
+
+      const statusCell = row.getCell(4);
+      const status = String(statusCell.value ?? '');
+      const fillByStatus: Record<string, string> = {
+        Delayed: 'FFFEE2E2',
+        'Due for Review': 'FFFFF7ED',
+        Booked: 'FFDBEAFE',
+        Completed: 'FFDCFCE7',
+        'In Progress': 'FFE0E7FF',
+      };
+      const fillColor = fillByStatus[status];
+
+      if (fillColor) {
+        statusCell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: fillColor },
+        };
+      }
+    });
+  }
+
+  if (worksheet.name === 'Attention') {
+    worksheet.eachRow((row, rowNumber) => {
+      if (rowNumber === 1) return;
+
+      row.eachCell((cell) => {
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'FFFFF7ED' },
+        };
+      });
+    });
+  }
 };
 
 export const buildScheduleExcelBuffer = async (
