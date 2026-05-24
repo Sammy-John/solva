@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import appCss from '../App.css?raw';
 import appSource from '../App.tsx?raw';
+import workspaceSource from '../pages/Index.tsx?raw';
 import scheduleTableSource from '../components/schedule/ScheduleTable.tsx?raw';
 import indexCss from '../index.css?raw';
 import tailwindConfig from '../../tailwind.config.ts?raw';
@@ -31,5 +32,11 @@ describe('design system cleanup guardrails', () => {
 
   it('keeps Tailwind default text sizing intact', () => {
     expect(tailwindConfig).not.toContain('fontSize:');
+  });
+
+  it('does not expose the old ephemeral sidebar image upload affordance', () => {
+    expect(workspaceSource).not.toContain('sidebarObjectUrl');
+    expect(workspaceSource).not.toContain('handleSidebarImageUpload');
+    expect(workspaceSource).not.toContain('sidebarFileInputRef');
   });
 });

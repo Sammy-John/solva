@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 
 import { TaskDetailPanel } from '@/components/schedule/TaskDetailPanel';
@@ -45,5 +45,18 @@ describe('TaskDetailPanel destructive actions', () => {
 
     expect(window.confirm).toHaveBeenCalledWith('Delete task "Frame inspection"? This cannot be undone.');
     expect(useScheduleStore.getState().tasks.map((entry) => entry.id)).toEqual(['task-1']);
+  });
+
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+  });
+
+  it('warns that setting a task delayed can affect linked following tasks', () => {
+    render(<TaskDetailPanel taskId="task-1" onClose={() => undefined} />);
+
+    expect(
+      screen.getByText(/Setting Delayed can mark linked following tasks as Delayed/i),
+    ).toBeInTheDocument();
   });
 });

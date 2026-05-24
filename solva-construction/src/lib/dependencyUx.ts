@@ -9,7 +9,7 @@ export const dependencyUxLabels = {
 
 export const formatDependencyRule = (lagDays: number): string => {
   if (lagDays <= 0) {
-    return 'Following task starts when first task finishes.';
+    return 'Following task can start the same day the first task finishes.';
   }
   if (lagDays === 1) {
     return 'Following task starts 1 day after first task finishes.';

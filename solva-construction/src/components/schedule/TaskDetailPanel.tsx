@@ -310,6 +310,9 @@ export function TaskDetailPanel({ taskId, onClose, onQuickAddDependency }: TaskD
                   ))}
                 </SelectContent>
               </Select>
+              <p className="mt-1 max-w-[180px] text-[11px] leading-snug text-muted-foreground">
+                Setting Delayed can mark linked following tasks as Delayed.
+              </p>
             </div>
           </div>
 

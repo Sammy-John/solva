@@ -4,6 +4,12 @@ export interface LatestChanges {
 }
 
 const CHANGELOG: Record<string, string[]> = {
+  "1.2.0": [
+    "Construction Starter Schedule template with realistic sections, procurement, delivery, inspections, and handover links.",
+    "Settings now exposes Workdays-only scheduling and storage guidance.",
+    "Safer release polish: delete confirmations, clearer snapshot restore wording, and inspection milestone enforcement.",
+    "Schedule table polish: inline task type editing, Attention filter, and clickable Waiting On dependency details.",
+  ],
   "1.1.0": [
     "Move mode: reliable click-to-reorder tasks (no drag required).",
     "Teams-style project sidebar with snapshots/export + in-app Guide.",

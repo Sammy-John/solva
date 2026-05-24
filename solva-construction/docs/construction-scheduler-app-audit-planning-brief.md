@@ -96,7 +96,7 @@ Weak fit for 1.2:
 - The old "Urgent" filter is now labelled `Attention` and includes orange and red urgency rows.
 - The `Waiting On` cell now opens the dependency chain directly when a predecessor exists.
 - Move mode works, but it remains unusual. Keep the current safe move mode, but reduce overlay heaviness and make the active mode bar calmer.
-- Sidebar image upload is ephemeral object-URL state. Persist it as a project image or remove the upload affordance from release builds.
+- Sidebar image upload has been removed from the release workspace because the previous object-URL upload was not persisted.
 
 ## Functional And Logic Audit
 
@@ -110,10 +110,10 @@ Resolved by 1.1.2:
 
 Remaining risks:
 
-- Finish-to-start with `lagDays: 0` still permits same-day successor starts because the constraint uses predecessor end date plus zero lag. Decide whether 1.2 keeps same-day FS or changes new-link preview/default copy to make this explicit.
-- Confirm-and-override for dependency-violating date edits remains incomplete. Release 1.2 should either implement a real confirmation flow or explicitly keep the current snap/block behavior and update copy accordingly.
+- Finish-to-start with `lagDays: 0` intentionally permits same-day successor starts. The dependency copy now states this explicitly.
+- Confirm-and-override for dependency-violating date edits remains deferred. Release 1.2 keeps the current snap/block behavior with blocked-edit guidance rather than adding a heavier override flow.
 - Inspection milestone behavior is enforced through schedule-store normalization.
-- Explicitly setting a task to `Delayed` still cascades `Delayed` status to successors. This may be right, but 1.2 should make the UI copy clear because it is a high-impact action.
+- Explicitly setting a task to `Delayed` still cascades `Delayed` status to successors, and the task profile now warns about this near the status control.
 - `getConservativeStatusForDate()` uses `new Date()` by default, so day-sensitive UI and tests need controlled-date coverage around midnight/timezone-sensitive cases.
 - Runtime saved JSON validation is still weak. Corrupt schedule blobs can appear as empty fallback data in places, which can feel like data loss.
 
@@ -170,7 +170,7 @@ The workspace still has the right product direction: compact table, strong const
 - [x] Add regression tests for ID generation, Attention filter behavior, and Waiting On dependency-chain access.
 - [x] Consolidate visual tokens and remove stale CSS/duplicate table code.
 - [x] Add design-system guardrail tests for typography drift, Tailwind text sizing, duplicate table removal, and schedule-table micro-type.
-- Add or broaden regression tests for inspection milestones, delete confirmation/undo, snapshot restore wording, and starter template creation.
+- [x] Add or broaden regression tests for inspection milestones, delete confirmation, snapshot restore wording, starter template creation, 1.2 release notes, same-day dependency wording, delayed-cascade warning copy, and sidebar upload removal.
 
 ### P2 - Later Than 1.2
 
@@ -190,6 +190,8 @@ The workspace still has the right product direction: compact table, strong const
 5. Polish table workflow: inline task type, urgency filter naming, dependency detail affordances.
 6. Clarify persistence: template storage decision, storage status language, browser-vs-installed docs, corrupt JSON handling.
 7. Add focused regression tests and run full verification before tagging 1.2.
+
+Current release-finalization status: 1.2 verification, production artifact generation, and production manifest generation have been completed. Remaining handoff is publishing the generated artifacts to GitHub Releases and pushing the release commit/tag.
 
 ## Files Most Likely To Change For 1.2
 

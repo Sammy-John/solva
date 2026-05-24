@@ -15,7 +15,7 @@ describe('dependencyUx', () => {
 
   it('formats finish-to-start rule in plain language', () => {
     expect(formatDependencyRule(0)).toBe(
-      'Following task starts when first task finishes.',
+      'Following task can start the same day the first task finishes.',
     );
     expect(formatDependencyRule(2)).toBe(
       'Following task starts 2 days after first task finishes.',
