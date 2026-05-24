@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ScheduleTable } from '@/components/schedule/ScheduleTable';
 import { ScheduleHealthSummary } from '@/components/schedule/ScheduleHealthSummary';
 import { LinkTasksModal } from '@/components/schedule/LinkTasksModal';
@@ -33,7 +33,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import brownTownDefault from '@/assets/brown-town.jpg';
-import { BookOpen, Download, FileSpreadsheet, Image as ImageIcon, LayoutGrid, Link2, RotateCcw, Save, Settings as SettingsIcon, Users } from 'lucide-react';
+import { BookOpen, Download, FileSpreadsheet, LayoutGrid, Link2, RotateCcw, Save, Settings as SettingsIcon, Users } from 'lucide-react';
 
 interface IndexProps {
   onBackToDashboard: () => void;
@@ -406,23 +406,6 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
   };
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
-  const [sidebarImageUrl, setSidebarImageUrl] = useState<string>(brownTownDefault);
-  const [sidebarObjectUrl, setSidebarObjectUrl] = useState<string | null>(null);
-  const sidebarFileInputRef = useRef<HTMLInputElement | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (sidebarObjectUrl) URL.revokeObjectURL(sidebarObjectUrl);
-    };
-  }, [sidebarObjectUrl]);
-
-  const handleSidebarImageUpload = (file: File | null) => {
-    if (!file) return;
-    if (sidebarObjectUrl) URL.revokeObjectURL(sidebarObjectUrl);
-    const nextUrl = URL.createObjectURL(file);
-    setSidebarObjectUrl(nextUrl);
-    setSidebarImageUrl(nextUrl);
-  };
 
   const handleToggleWorkdaysOnly = (nextValue: boolean) => {
     const message = nextValue
@@ -441,31 +424,14 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
     <div className="flex h-screen w-screen overflow-hidden bg-background">
       <aside className="w-[280px] shrink-0 bg-solva-wine text-solva-porcelain flex flex-col">
         <div className="p-4 border-b border-solva-porcelain/10">
-          <button
-            type="button"
-            className="group relative w-full overflow-hidden rounded-xl border border-solva-porcelain/15 bg-black/10"
-            onClick={() => sidebarFileInputRef.current?.click()}
-          >
+          <div className="relative w-full overflow-hidden rounded-xl border border-solva-porcelain/15 bg-black/10">
             <img
-              src={sidebarImageUrl}
+              src={brownTownDefault}
               alt="Workspace"
-              className="h-[160px] w-full object-cover opacity-90 transition-opacity group-hover:opacity-100"
+              className="h-[160px] w-full object-cover opacity-90"
               draggable={false}
             />
-            <div className="absolute inset-0 flex items-end justify-end p-2">
-              <span className="inline-flex items-center gap-1.5 rounded-md border border-white/15 bg-black/35 px-2 py-1 text-xs font-semibold">
-                <ImageIcon className="h-3.5 w-3.5" />
-                Change
-              </span>
-            </div>
-          </button>
-          <input
-            ref={sidebarFileInputRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={(event) => handleSidebarImageUpload(event.target.files?.[0] ?? null)}
-          />
+          </div>
         </div>
 
         <nav className="flex-1 p-3 space-y-1">

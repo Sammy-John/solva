@@ -2,6 +2,32 @@
 
 Tracks completed changes by release and task completion.
 
+## 2026-05-24 - Release 1.2.0
+
+**Version:** `1.2.0`
+**Plan Task:** `Release 1.2 - construction starter schedule and release polish`
+
+### Completed
+- Added a built-in `Construction Starter Schedule` template with realistic sections, task types, durations, dependency links, ordering/delivery rows, inspection milestones, and starter comments.
+- Activated Settings with Workdays-only scheduling controls plus SQLite/browser/localStorage storage guidance.
+- Enforced Inspection tasks as same-day zero-duration milestones on load and edit.
+- Added safer destructive flows for task/person deletion and clearer snapshot restore overwrite copy.
+- Replaced remaining timestamp runtime IDs with `crypto.randomUUID()` helper usage.
+- Polished schedule workflow with inline task type editing, an `Attention` filter, and clickable `Waiting On` dependency details.
+- Consolidated visual styling, removed the legacy duplicate schedule table, and removed the non-persistent sidebar image upload affordance.
+- Clarified same-day finish-to-start dependency wording and added delayed-cascade warning copy in the task profile.
+- Added 1.2 regression coverage for starter templates, inspection milestones, destructive-action confirmation, snapshot restore copy, design guardrails, release notes, same-day dependency wording, and delayed-cascade warning copy.
+
+### Verification Notes
+- `npm run test` PASS (`17` files, `68` tests)
+- `npm run build` PASS
+- `npm run release:alpha` PASS; produced signed production installer and updater signature in `artifacts/1.2.0/`
+- `npm run release:manifest:github -- --notes "Release 1.2.0 - construction starter schedule and release polish"` PASS; updated `artifacts/latest.json`
+
+### Follow-ups
+- Keep confirm-and-override for dependency-violating date edits as a later UX decision; 1.2 intentionally keeps blocked-edit guidance.
+- Consider full JSON import/export and stronger corrupt schedule JSON validation after 1.2.
+
 
 ## 2026-04-16 - Release 1.1.1
 
