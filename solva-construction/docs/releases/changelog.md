@@ -22,6 +22,8 @@ Tracks completed changes by release and task completion.
 - `npm run build` PASS with Vite large chunk warning after adding `exceljs`
 - `npm run release:alpha:test` PASS; produced signed test-channel installer and updater signature in `artifacts/test/1.2.1/`
 - `npm run release:manifest:test:github -- --notes "Test release 1.2.1 - Excel export feedback and formatting"` PASS; updated `artifacts/test/test-latest.json`
+- `npm run release:alpha` PASS; produced signed production installer and updater signature in `artifacts/1.2.1/`
+- `npm run release:manifest:github -- --notes "Release 1.2.1 - Excel export feedback and formatting"` PASS; updated `artifacts/latest.json`
 
 ### Follow-ups
 - Monitor the on-demand Excel export chunk size after client testing.
