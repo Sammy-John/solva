@@ -2,6 +2,30 @@
 
 Tracks completed changes by release and task completion.
 
+## 2026-05-24 - Release 1.2.1
+
+**Version:** `1.2.1`
+**Plan Task:** `Release 1.2.1 - export fixes and Excel export`
+
+### Completed
+- Added formatted Excel export as the primary schedule export action.
+- Kept CSV export available as a fallback.
+- Added shared export data shaping for schedule rows, People rows, Attention rows, dependency details, comments, and safe dated filenames.
+- Added Excel workbook formatting with frozen header rows, bold headers, readable column widths, and wrapped cells.
+- Added regression coverage for CSV output, workbook model contents, safe filenames, and generated `.xlsx` workbook structure.
+- Synced app/build metadata to `1.2.1`.
+
+### Verification Notes
+- `npm run test -- src/lib/scheduleExport.test.ts` PASS (`4` tests)
+- `npm run test` PASS (`18` files, `72` tests)
+- `npm run build` PASS with Vite large chunk warning after adding `exceljs`
+- `npm run release:alpha:test` PASS; produced signed test-channel installer and updater signature in `artifacts/test/1.2.1/`
+- `npm run release:manifest:test:github -- --notes "Test release 1.2.1 - Excel export"` PASS; updated `artifacts/test/test-latest.json`
+
+### Follow-ups
+- Monitor the on-demand Excel export chunk size after client testing.
+- Continue People master directory and People UI work in 1.2.2.
+
 ## 2026-05-24 - Release 1.2.0
 
 **Version:** `1.2.0`
