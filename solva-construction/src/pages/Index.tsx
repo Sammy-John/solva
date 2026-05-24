@@ -21,6 +21,12 @@ import { TaskType, UserGroup, TaskStatus } from '@/types/scheduling';
 import { getConservativeStatusForDate } from '@/lib/scheduling';
 import { dependencyQuickGuide } from '@/lib/dependencyGuide';
 import { getSnapshotRestoreConfirmationMessage } from '@/lib/snapshotCopy';
+import {
+  buildScheduleCsv,
+  buildScheduleExcelBuffer,
+  getExportSuccessMessage,
+  getScheduleExportFilename,
+} from '@/lib/scheduleExport';
 import { WorkspaceSettingsDialog } from '@/components/schedule/WorkspaceSettingsDialog';
 import {
   Dialog,
@@ -58,19 +64,23 @@ const formatError = (error: unknown): string => {
   }
 };
 
-const escapeCsvValue = (value: string): string => {
-  if (/[",\n\r]/.test(value)) {
-    return `"${value.replace(/"/g, '""')}"`;
-  }
-  return value;
-};
-
 const formatSnapshotTimestamp = (value: string): string => {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) {
     return value;
   }
   return date.toLocaleString();
+};
+
+const downloadBlob = (blob: Blob, filename: string): void => {
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  document.body.removeChild(anchor);
+  URL.revokeObjectURL(url);
 };
 
 const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }: IndexProps) => {
@@ -91,6 +101,8 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
   const [scheduleSaveError, setScheduleSaveError] = useState<string | null>(null);
   const [snapshotError, setSnapshotError] = useState<string | null>(null);
   const [snapshotInfo, setSnapshotInfo] = useState<string | null>(null);
+  const [exportError, setExportError] = useState<string | null>(null);
+  const [exportInfo, setExportInfo] = useState<string | null>(null);
   const [snapshotModalOpen, setSnapshotModalOpen] = useState(false);
   const [snapshots, setSnapshots] = useState<ScheduleSnapshotSummary[]>([]);
   const [snapshotsLoading, setSnapshotsLoading] = useState(false);
@@ -113,6 +125,8 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
     setScheduleSaveError(null);
     setSnapshotError(null);
     setSnapshotInfo(null);
+    setExportError(null);
+    setExportInfo(null);
     setSelectedTaskId(null);
     setDepChainTaskId(null);
     setSnapshotModalOpen(false);
@@ -337,72 +351,43 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
   };
 
   const handleExportCsv = () => {
-    const sortedSections = [...sections].sort((a, b) => a.order - b.order);
-    const peopleById = new Map(people.map((person) => [person.id, person.name]));
+    setExportError(null);
+    setExportInfo(null);
+    const exportedAt = new Date();
+    const csv = buildScheduleCsv({ sections, tasks, people, dependencies });
+    const filename = getScheduleExportFilename(projectName, exportedAt, 'csv');
+    downloadBlob(new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' }), filename);
+    setExportInfo(getExportSuccessMessage(filename, 'CSV'));
+  };
 
-    const lines: string[] = [];
-    lines.push([
-      'Section',
-      'Task',
-      'Start',
-      'Days',
-      'End',
-      'Assigned',
-      'Status',
-      'Comment',
-    ].join(','));
+  const handleExportExcel = async () => {
+    setExportError(null);
+    setExportInfo(null);
 
-    sortedSections.forEach((section) => {
-      const sectionTasks = tasks.filter((task) => task.sectionId === section.id);
-
-      lines.push([
-        escapeCsvValue(section.name),
-        escapeCsvValue('[Section]'),
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-      ].join(','));
-
-      sectionTasks.forEach((task) => {
-        const assignedNames = task.assignedTo
-          .map((id) => peopleById.get(id) ?? id)
-          .join('; ');
-
-        const row = [
-          section.name,
-          task.name,
-          task.startDate || '',
-          String(task.duration ?? 0),
-          task.endDate || '',
-          assignedNames,
-          task.status,
-          task.comments.join(' | '),
-        ].map((value) => escapeCsvValue(value));
-
-        lines.push(row.join(','));
+    try {
+      const exportedAt = new Date();
+      const buffer = await buildScheduleExcelBuffer({
+        projectName,
+        exportedAt,
+        sections,
+        tasks,
+        people,
+        dependencies,
       });
-    });
-
-    const csv = lines.join('\r\n');
-    const dateStamp = new Date().toISOString().slice(0, 10);
-    const base = (projectName || 'schedule')
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
-    const filename = `${base || 'schedule'}-${dateStamp}.csv`;
-
-    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = filename;
-    document.body.appendChild(anchor);
-    anchor.click();
-    document.body.removeChild(anchor);
-    URL.revokeObjectURL(url);
+      const filename = getScheduleExportFilename(projectName, exportedAt, 'xlsx');
+      downloadBlob(
+        new Blob([buffer], {
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        }),
+        filename,
+      );
+      setExportInfo(getExportSuccessMessage(filename, 'Excel'));
+    } catch (error) {
+      const message = formatError(error);
+      setExportError(message);
+      setExportInfo(null);
+      console.error('Failed to export Excel workbook:', error);
+    }
   };
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
@@ -472,9 +457,17 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
             <button
               type="button"
               className="w-full flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold hover:bg-white/10"
-              onClick={handleExportCsv}
+              onClick={handleExportExcel}
             >
               <FileSpreadsheet className="h-4 w-4" />
+              Export Excel
+            </button>
+            <button
+              type="button"
+              className="w-full flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold hover:bg-white/10"
+              onClick={handleExportCsv}
+            >
+              <Download className="h-4 w-4" />
               Export CSV
             </button>
           </div>
@@ -630,6 +623,22 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
             </div>
           </section>
         ) : null}
+        {exportError ? (
+          <section className="px-6 pt-4">
+            <div className="status-alert status-alert-error">
+              <strong>Export Failed</strong>
+              <p>{exportError}</p>
+            </div>
+          </section>
+        ) : null}
+        {exportInfo ? (
+          <section className="px-6 pt-4">
+            <div className="status-alert border-emerald-200 bg-emerald-50">
+              <strong className="text-emerald-800">Export Created</strong>
+              <p className="text-emerald-800">{exportInfo}</p>
+            </div>
+          </section>
+        ) : null}
 
         <div className="flex-1 overflow-auto px-6 pb-6 pt-4">
           <ScheduleTable
@@ -697,9 +706,9 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
               </details>
 
               <details className="rounded-lg border border-solva-smart/15 bg-white p-3">
-                <summary className="cursor-pointer font-semibold">Export CSV</summary>
+                <summary className="cursor-pointer font-semibold">Export</summary>
                 <p className="mt-2 text-sm text-solva-smart/80">
-                  Export CSV downloads your schedule as a spreadsheet-friendly file.
+                  Export Excel downloads a formatted workbook with Schedule, People, and Attention sheets. Export CSV remains available as a simple fallback.
                 </p>
               </details>
             </div>
