@@ -1,5 +1,13 @@
 export type TaskType = "Internal" | "Ordering" | "Delivery" | "Inspection";
 export type UserGroup = "Internal" | "Suppliers";
+export type PersonType =
+  | "Internal"
+  | "Supplier"
+  | "Subcontractor"
+  | "Inspector"
+  | "Client"
+  | "Consultant"
+  | "Other";
 export type TaskStatus =
   | "Planned"
   | "Booked"
@@ -18,11 +26,15 @@ export interface Person {
   id: string;
   name: string;
   userGroup: UserGroup;
+  personType?: PersonType;
   company?: string;
   trade?: string;
   phone?: string;
   email?: string;
   notes?: string;
+  masterPersonId?: string;
+  projectActive?: boolean;
+  archived?: boolean;
 }
 
 export interface Task {

@@ -32,6 +32,11 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
+  getAssignedPeople,
+  getProjectAssignablePeople,
+  isActiveProjectPerson,
+} from "@/lib/peopleDirectory";
+import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -636,16 +641,12 @@ function TaskRow({
   const waitingOnText = waitingOnNames.join(", ");
   const isMoveOver =
     moveOverId === task.id && moveSourceTaskId !== null && moveSourceTaskId !== task.id;
-  const assignedPeople = people.filter((p: any) =>
-    task.assignedTo.includes(p.id),
-  );
+  const assignedPeople = getAssignedPeople(people, task.assignedTo);
   const blockedStartEdit =
     blockedTaskEdit && blockedTaskEdit.taskId === task.id && blockedTaskEdit.field === "startDate"
       ? blockedTaskEdit
       : null;
-  const assignablePeople = people.filter(
-    (p: any) => !task.assignedTo.includes(p.id),
-  );
+  const assignablePeople = getProjectAssignablePeople(people, task.assignedTo);
   return (
     <tr
       className={cn(
@@ -924,7 +925,10 @@ function TaskRow({
           {assignedPeople.length > 0 ? (
             assignedPeople.map((p: any, idx: number) => (
               <span key={p.id} className="inline-flex items-center gap-[2px] text-xs text-foreground/90">
-                <span>{p.name}</span>
+                <span>
+                  {p.name}
+                  {!isActiveProjectPerson(p) ? " (inactive)" : ""}
+                </span>
                 <button
                   type="button"
                   className="text-xs leading-none text-muted-foreground hover:text-destructive"

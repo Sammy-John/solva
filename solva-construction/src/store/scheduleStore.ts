@@ -17,6 +17,7 @@ import {
   getStrongestAutoShiftConstraint,
 } from "@/lib/scheduling";
 import { createEntityId } from "@/lib/ids";
+import { normalizeProjectPerson } from "@/lib/peopleDirectory";
 
 interface DependencyMutationResult {
   ok: boolean;
@@ -68,6 +69,7 @@ interface ScheduleState {
   addPerson: (person: Person) => void;
   updatePerson: (id: string, updates: Partial<Person>) => void;
   removePerson: (id: string) => void;
+  archivePerson: (id: string) => void;
 
   addDependency: (dep: Dependency) => DependencyMutationResult;
   updateDependency: (
@@ -406,7 +408,7 @@ export const useScheduleStore = create<ScheduleState>((set, get) => ({
   },
 
   addPerson: (person) =>
-    set((state) => ({ people: [...state.people, person] })),
+    set((state) => ({ people: [...state.people, normalizeProjectPerson(person)] })),
 
   updatePerson: (id, updates) =>
     set((state) => ({
@@ -417,11 +419,18 @@ export const useScheduleStore = create<ScheduleState>((set, get) => ({
 
   removePerson: (id) =>
     set((state) => ({
-      people: state.people.filter((person) => person.id !== id),
-      tasks: state.tasks.map((task) => ({
-        ...task,
-        assignedTo: task.assignedTo.filter((assignedId) => assignedId !== id),
-      })),
+      people: state.people.map((person) =>
+        person.id === id ? { ...person, projectActive: false } : person,
+      ),
+    })),
+
+  archivePerson: (id) =>
+    set((state) => ({
+      people: state.people.map((person) =>
+        person.id === id
+          ? { ...person, archived: true, projectActive: false }
+          : person,
+      ),
     })),
 
   addDependency: (dep) => {

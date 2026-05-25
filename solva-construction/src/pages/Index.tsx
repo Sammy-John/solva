@@ -17,10 +17,15 @@ import {
   type ScheduleSnapshotSummary,
 } from '@/lib/scheduleDb';
 import { useScheduleStore } from '@/store/scheduleStore';
-import { TaskType, UserGroup, TaskStatus } from '@/types/scheduling';
+import { TaskType, UserGroup, TaskStatus, type Person } from '@/types/scheduling';
 import { getConservativeStatusForDate } from '@/lib/scheduling';
 import { dependencyQuickGuide } from '@/lib/dependencyGuide';
 import { getSnapshotRestoreConfirmationMessage } from '@/lib/snapshotCopy';
+import {
+  applyLegacyPeopleUpgrade,
+  planLegacyPeopleUpgrade,
+  type LegacyPeopleUpgradePlan,
+} from '@/lib/peopleDirectory';
 import {
   buildScheduleCsv,
   buildScheduleExcelBuffer,
@@ -46,6 +51,8 @@ interface IndexProps {
   projectId: string;
   projectName: string;
   projectDescription?: string;
+  masterPeople?: Person[];
+  onAddMasterPerson?: (person: Person) => void;
 }
 
 const formatError = (error: unknown): string => {
@@ -83,7 +90,14 @@ const downloadBlob = (blob: Blob, filename: string): void => {
   URL.revokeObjectURL(url);
 };
 
-const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }: IndexProps) => {
+const Index = ({
+  onBackToDashboard,
+  projectId,
+  projectName,
+  projectDescription,
+  masterPeople = [],
+  onAddMasterPerson,
+}: IndexProps) => {
   const [linkModalOpen, setLinkModalOpen] = useState(false);
   const [linkModalContext, setLinkModalContext] = useState<{ taskId: string | null; role: 'predecessor' | 'successor' }>({
     taskId: null,
@@ -104,6 +118,8 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
   const [exportError, setExportError] = useState<string | null>(null);
   const [exportInfo, setExportInfo] = useState<string | null>(null);
   const [snapshotModalOpen, setSnapshotModalOpen] = useState(false);
+  const [peopleUpgradeOpen, setPeopleUpgradeOpen] = useState(false);
+  const [peopleUpgradePlan, setPeopleUpgradePlan] = useState<LegacyPeopleUpgradePlan | null>(null);
   const [snapshots, setSnapshots] = useState<ScheduleSnapshotSummary[]>([]);
   const [snapshotsLoading, setSnapshotsLoading] = useState(false);
   const [selectedSnapshotId, setSelectedSnapshotId] = useState('');
@@ -130,6 +146,8 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
     setSelectedTaskId(null);
     setDepChainTaskId(null);
     setSnapshotModalOpen(false);
+    setPeopleUpgradeOpen(false);
+    setPeopleUpgradePlan(null);
     setScheduleHelpOpen(false);
     setSnapshots([]);
     setSelectedSnapshotId('');
@@ -141,6 +159,8 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
       try {
         const schedule = await loadProjectSchedule(projectId);
         if (isCancelled) return;
+        const legacyPeoplePlan = planLegacyPeopleUpgrade(schedule.people);
+        setPeopleUpgradePlan(legacyPeoplePlan.requiresUpgrade ? legacyPeoplePlan : null);
         setScheduleData(
           schedule.tasks,
           schedule.sections,
@@ -389,6 +409,14 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
       console.error('Failed to export Excel workbook:', error);
     }
   };
+
+  const handleApprovePeopleUpgrade = () => {
+    const upgradedPeople = applyLegacyPeopleUpgrade(people);
+    setScheduleData(tasks, sections, dependencies, upgradedPeople);
+    setPeopleUpgradePlan(null);
+    setPeopleUpgradeOpen(false);
+    setSnapshotInfo('People directory upgrade applied for this project.');
+  };
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
 
@@ -591,6 +619,45 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
           <ScheduleHealthSummary />
         </div>
 
+        {peopleUpgradePlan ? (
+          <section className="px-6 pt-4">
+            <div className="status-alert border-amber-200 bg-amber-50">
+              <strong className="text-amber-900">People Directory Upgrade Available</strong>
+              <p className="text-amber-900">
+                Current project people can be added to the new People directory model. Save a snapshot before approving if you want a restore point.
+              </p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="h-7 text-xs"
+                  onClick={handleSaveSnapshot}
+                >
+                  Save Snapshot First
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  className="h-7 text-xs"
+                  onClick={() => setPeopleUpgradeOpen(true)}
+                >
+                  Review People Upgrade
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 text-xs"
+                  onClick={() => setPeopleUpgradePlan(null)}
+                >
+                  Not Now
+                </Button>
+              </div>
+            </div>
+          </section>
+        ) : null}
+
         {scheduleLoadError ? (
           <section className="px-6 pt-4">
             <div className="status-alert status-alert-error">
@@ -750,7 +817,53 @@ const Index = ({ onBackToDashboard, projectId, projectName, projectDescription }
         initialTaskId={linkModalContext.taskId}
         initialRole={linkModalContext.role}
       />
-      <PeopleModal open={peopleModalOpen} onOpenChange={setPeopleModalOpen} />
+      <PeopleModal
+        open={peopleModalOpen}
+        onOpenChange={setPeopleModalOpen}
+        masterPeople={masterPeople}
+        onAddMasterPerson={onAddMasterPerson}
+      />
+      <Dialog open={peopleUpgradeOpen} onOpenChange={setPeopleUpgradeOpen}>
+        <DialogContent className="sm:max-w-[520px]">
+          <DialogHeader>
+            <DialogTitle>Review People Upgrade</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 text-sm">
+            <p className="text-muted-foreground">
+              This will mark the current project people as directory-backed and active for this project. Existing task assignments are kept.
+            </p>
+            <div className="rounded-md border bg-muted/30 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Preview
+              </p>
+              <p className="mt-1">
+                {peopleUpgradePlan?.peopleToCreate.length ?? 0} people will be prepared for the master directory model.
+              </p>
+              <p>
+                {peopleUpgradePlan?.peopleToActivate.length ?? 0} people will be active for this project.
+              </p>
+            </div>
+            <div className="max-h-44 overflow-y-auto rounded-md border">
+              {(peopleUpgradePlan?.peopleToCreate ?? []).map((person) => (
+                <div key={person.id} className="flex items-center justify-between border-b px-3 py-2 last:border-0">
+                  <span className="font-medium">{person.name}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {person.personType ?? person.userGroup}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" size="sm" onClick={() => setPeopleUpgradeOpen(false)}>
+                Not Now
+              </Button>
+              <Button size="sm" onClick={handleApprovePeopleUpgrade}>
+                Approve Upgrade
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
       <CascadeNotification />
       <TaskDetailPanel
         taskId={selectedTaskId}

@@ -4,6 +4,12 @@ export interface LatestChanges {
 }
 
 const CHANGELOG: Record<string, string[]> = {
+  "1.2.2": [
+    "Top-level People directory for internal people and suppliers, saved in SQLite in the installed app.",
+    "New projects can select active project people from the master directory.",
+    "People removed from a project are deactivated for future assignment while existing task assignments stay visible.",
+    "Legacy People upgrade warning with review, approval, and snapshot-first guidance.",
+  ],
   "1.2.0": [
     "Construction Starter Schedule template with realistic sections, procurement, delivery, inspections, and handover links.",
     "Settings now exposes Workdays-only scheduling and storage guidance.",
