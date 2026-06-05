@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
+import type { Person, UserGroup } from '@/types/scheduling'
 import WorkspacePage from '@/pages/Index'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { ProjectToolsPanel } from '@/components/ProjectToolsPanel'
@@ -16,6 +17,7 @@ import {
 } from '@/lib/projectsDb'
 import type { Project } from '@/lib/projectsDb'
 import { loadProjectSchedule, saveProjectSchedule } from '@/lib/scheduleDb'
+import { listMasterPeople, saveMasterPeople } from '@/lib/masterPeopleDb'
 import {
   createTemplate,
   deleteTemplate,
@@ -35,6 +37,7 @@ import {
   type UpdateInstallResult,
 } from '@/lib/updater'
 import './App.css'
+import { createEntityId } from '@/lib/ids'
 
 const formatError = (error: unknown): string => {
   if (error instanceof Error) {
@@ -68,6 +71,13 @@ function App() {
   const [isCheckingUpdates, setIsCheckingUpdates] = useState(false)
   const [isInstallingUpdate, setIsInstallingUpdate] = useState(false)
   const [backupBeforeInstall, setBackupBeforeInstall] = useState(true)
+  const [masterPeople, setMasterPeople] = useState<Person[]>([])
+  const [masterPeopleLoaded, setMasterPeopleLoaded] = useState(false)
+  const [masterPersonName, setMasterPersonName] = useState('')
+  const [masterPersonGroup, setMasterPersonGroup] = useState<UserGroup>('Internal')
+  const [masterPersonCompany, setMasterPersonCompany] = useState('')
+  const [masterPersonTrade, setMasterPersonTrade] = useState('')
+  const [selectedProjectPeopleIds, setSelectedProjectPeopleIds] = useState<string[]>([])
 
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [projectName, setProjectName] = useState('')
@@ -97,6 +107,16 @@ function App() {
     [projects],
   )
 
+  const activeMasterPeople = useMemo(
+    () => masterPeople.filter((person) => person.archived !== true),
+    [masterPeople],
+  )
+
+  useEffect(() => {
+    if (!masterPeopleLoaded) return
+    void saveMasterPeople(masterPeople)
+  }, [masterPeople, masterPeopleLoaded])
+
   useEffect(() => {
     const load = async () => {
       try {
@@ -110,13 +130,16 @@ function App() {
           console.error('LocalStorage to SQLite migration failed:', error)
         }
 
-        const [dbProjects, savedTemplates] = await Promise.all([
+        const [dbProjects, savedTemplates, savedMasterPeople] = await Promise.all([
           listProjects(),
           listTemplates(),
+          listMasterPeople(),
         ])
 
         setProjects(dbProjects)
         setTemplates(savedTemplates)
+        setMasterPeople(savedMasterPeople)
+        setMasterPeopleLoaded(true)
         setStorageError(null)
       } catch (error) {
         const message = formatError(error)
@@ -147,7 +170,52 @@ function App() {
     setCreateSourceType('blank')
     setCreateFromTemplateId('')
     setCreateFromProjectId('')
+    setSelectedProjectPeopleIds([])
     setSubmitAttempted(false)
+  }
+
+  const handleAddMasterPerson = () => {
+    const name = masterPersonName.trim()
+    if (!name) return
+
+    const nextPerson: Person = {
+      id: createEntityId('person'),
+      name,
+      userGroup: masterPersonGroup,
+      personType: masterPersonGroup === 'Suppliers' ? 'Supplier' : 'Internal',
+      company: masterPersonCompany.trim() || undefined,
+      trade: masterPersonTrade.trim() || undefined,
+      masterPersonId: undefined,
+      projectActive: true,
+      archived: false,
+    }
+    nextPerson.masterPersonId = nextPerson.id
+
+    setMasterPeople((current) => [...current, nextPerson])
+    setSelectedProjectPeopleIds((current) => [...current, nextPerson.id])
+    setMasterPersonName('')
+    setMasterPersonCompany('')
+    setMasterPersonTrade('')
+  }
+
+  const addPersonToMasterDirectory = (person: Person) => {
+    setMasterPeople((current) => {
+      const masterId = person.masterPersonId ?? person.id
+      if (current.some((entry) => (entry.masterPersonId ?? entry.id) === masterId)) {
+        return current
+      }
+
+      return [
+        ...current,
+        {
+          ...person,
+          id: masterId,
+          masterPersonId: masterId,
+          projectActive: true,
+          archived: false,
+        },
+      ]
+    })
   }
 
   const closeCreateTemplateModal = () => {
@@ -305,13 +373,20 @@ function App() {
 
       const seed = await resolveProjectSeed()
       const schedule = instantiateTemplateSeed(seed)
+      const selectedPeople = masterPeople
+        .filter((person) => selectedProjectPeopleIds.includes(person.id))
+        .map((person) => ({
+          ...person,
+          masterPersonId: person.masterPersonId ?? person.id,
+          projectActive: true,
+        }))
 
       await saveProjectSchedule(
         nextProject.id,
         schedule.tasks,
         schedule.sections,
         schedule.dependencies,
-        [],
+        selectedPeople,
       )
 
       setProjects((current) => [nextProject, ...current])
@@ -442,6 +517,8 @@ function App() {
           projectId={activeProjectId}
           projectName={activeProject?.name ?? 'Project Details'}
           projectDescription={activeProject?.description ?? ''}
+          masterPeople={masterPeople}
+          onAddMasterPerson={addPersonToMasterDirectory}
         />
       </TooltipProvider>
     )
@@ -545,6 +622,80 @@ function App() {
     </div>
   )}
 </section>
+
+        <section className="dashboard-people">
+          <div className="dashboard-templates-header">
+            <div>
+              <h2 className="dashboard-section-title">People</h2>
+              <p className="dashboard-right-subtitle">
+                Master list for internal people and suppliers.
+              </p>
+            </div>
+          </div>
+          <div className="people-directory-panel">
+            <div className="people-directory-list">
+              {activeMasterPeople.length === 0 ? (
+                <div className="empty-state compact">
+                  <p>No master people yet.</p>
+                </div>
+              ) : (
+                activeMasterPeople.map((person) => (
+                  <div key={person.id} className="people-directory-row">
+                    <div>
+                      <strong>{person.name}</strong>
+                      <span>{person.company || person.trade || person.userGroup}</span>
+                    </div>
+                    <button
+                      type="button"
+                      className="secondary-button"
+                      onClick={() =>
+                        setMasterPeople((current) =>
+                          current.map((entry) =>
+                            entry.id === person.id ? { ...entry, archived: true } : entry,
+                          ),
+                        )
+                      }
+                    >
+                      Archive
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+            <div className="people-directory-form">
+              <input
+                placeholder="Name"
+                value={masterPersonName}
+                onChange={(event) => setMasterPersonName(event.target.value)}
+              />
+              <select
+                value={masterPersonGroup}
+                onChange={(event) => setMasterPersonGroup(event.target.value as UserGroup)}
+              >
+                <option value="Internal">Internal</option>
+                <option value="Suppliers">Supplier</option>
+              </select>
+              <input
+                placeholder="Company"
+                value={masterPersonCompany}
+                onChange={(event) => setMasterPersonCompany(event.target.value)}
+              />
+              <input
+                placeholder="Role / trade"
+                value={masterPersonTrade}
+                onChange={(event) => setMasterPersonTrade(event.target.value)}
+              />
+              <button
+                type="button"
+                className="primary-button"
+                onClick={handleAddMasterPerson}
+                disabled={!masterPersonName.trim()}
+              >
+                Add Person
+              </button>
+            </div>
+          </div>
+        </section>
 
 <section className="dashboard-templates">
   <div className="dashboard-templates-header">
@@ -699,6 +850,36 @@ function App() {
                   ) : null}
                 </>
               ) : null}
+
+              <fieldset className="project-people-select">
+                <legend>Project People</legend>
+                <p className="field-help">Select who should be available for new tasks in this project.</p>
+                {activeMasterPeople.length === 0 ? (
+                  <div className="project-people-empty">
+                    No master people yet. Add people from the dashboard People section, then select them here for the project.
+                  </div>
+                ) : (
+                  <div className="project-people-options">
+                    {activeMasterPeople.map((person) => (
+                      <label key={person.id} className="project-people-option">
+                        <input
+                          type="checkbox"
+                          checked={selectedProjectPeopleIds.includes(person.id)}
+                          onChange={(event) => {
+                            setSelectedProjectPeopleIds((current) =>
+                              event.target.checked
+                                ? [...new Set([...current, person.id])]
+                                : current.filter((id) => id !== person.id),
+                            )
+                          }}
+                        />
+                        <span>{person.name}</span>
+                        <small>{person.company || person.trade || person.userGroup}</small>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </fieldset>
 
               <div className="modal-actions">
                 <button type="submit" className="primary-button">

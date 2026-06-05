@@ -9,24 +9,35 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import {
-  Trash2,
   ChevronDown,
   ChevronRight,
   Phone,
   Mail,
   Pencil,
   X,
+  UserMinus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createEntityId } from "@/lib/ids";
+import {
+  analyzeProjectPersonDeactivation,
+  normalizeProjectPerson,
+} from "@/lib/peopleDirectory";
 
 interface PeopleModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  masterPeople?: Person[];
+  onAddMasterPerson?: (person: Person) => void;
 }
 
-export function PeopleModal({ open, onOpenChange }: PeopleModalProps) {
-  const { people, addPerson, updatePerson, removePerson } = useScheduleStore();
+export function PeopleModal({
+  open,
+  onOpenChange,
+  masterPeople = [],
+  onAddMasterPerson,
+}: PeopleModalProps) {
+  const { people, tasks, addPerson, updatePerson, removePerson } = useScheduleStore();
   const [tab, setTab] = useState<UserGroup>("Internal");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -38,7 +49,14 @@ export function PeopleModal({ open, onOpenChange }: PeopleModalProps) {
   const [email, setEmail] = useState("");
   const [notes, setNotes] = useState("");
 
+  const projectMasterIds = new Set(people.map((person) => person.masterPersonId ?? person.id));
   const filtered = people.filter((p) => p.userGroup === tab);
+  const availableMasterPeople = masterPeople.filter(
+    (person) =>
+      person.userGroup === tab &&
+      person.archived !== true &&
+      !projectMasterIds.has(person.masterPersonId ?? person.id),
+  );
 
   const resetForm = () => {
     setName("");
@@ -75,13 +93,43 @@ export function PeopleModal({ open, onOpenChange }: PeopleModalProps) {
     if (editingId) {
       updatePerson(editingId, data);
     } else {
-      addPerson({
-        id: createEntityId("person"),
+      const id = createEntityId("person");
+      const person: Person = {
+        id,
         userGroup: tab,
+        masterPersonId: id,
+        projectActive: true,
         ...data,
-      } as Person);
+      };
+      addPerson(person);
+      onAddMasterPerson?.(person);
     }
     resetForm();
+  };
+
+  const handleAddMasterToProject = (person: Person) => {
+    addPerson({
+      ...person,
+      masterPersonId: person.masterPersonId ?? person.id,
+      projectActive: true,
+      archived: false,
+    });
+  };
+
+  const handleRemoveFromProject = (person: Person) => {
+    const impact = analyzeProjectPersonDeactivation(person.id, tasks);
+    const activeCopy = impact.activeTasks.length > 0
+      ? ` They are assigned to active tasks: ${impact.activeTasks.join(", ")}.`
+      : "";
+    const completedCopy = impact.completedTasks.length > 0
+      ? ` They will remain on completed tasks: ${impact.completedTasks.join(", ")}.`
+      : "";
+    const confirmed = window.confirm(
+      `Remove "${person.name}" from future project assignment?${activeCopy}${completedCopy} Existing task assignments will be kept.`,
+    );
+
+    if (!confirmed) return;
+    removePerson(person.id);
   };
 
   return (
@@ -114,8 +162,20 @@ export function PeopleModal({ open, onOpenChange }: PeopleModalProps) {
         </div>
 
         <div className="space-y-1 max-h-[300px] overflow-y-auto">
-          {filtered.map((p) => (
-            <div key={p.id} className="rounded-lg border bg-card group">
+          {filtered.length === 0 ? (
+            <div className="rounded-lg border border-dashed bg-muted/25 px-3 py-4">
+              <p className="text-sm font-medium text-foreground">
+                No people selected for this project yet.
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Add from the master directory below or create a new project person.
+              </p>
+            </div>
+          ) : null}
+          {filtered.map((rawPerson) => {
+            const p = normalizeProjectPerson(rawPerson);
+            return (
+            <div key={p.id} className={cn("rounded-lg border bg-card group", p.projectActive === false && "opacity-75")}>
               <div
                 className="flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-accent/30 transition-colors"
                 onClick={() => setExpandedId(expandedId === p.id ? null : p.id)}
@@ -132,6 +192,11 @@ export function PeopleModal({ open, onOpenChange }: PeopleModalProps) {
                       {p.trade}
                     </span>
                   )}
+                  {p.projectActive === false ? (
+                    <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                      Inactive
+                    </span>
+                  ) : null}
                 </div>
                 <div className="flex items-center gap-1">
                   <Button
@@ -149,15 +214,14 @@ export function PeopleModal({ open, onOpenChange }: PeopleModalProps) {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-6 w-6 p-0 text-destructive opacity-0 group-hover:opacity-100"
-                    aria-label={`Delete ${p.name}`}
+                    className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100"
+                    aria-label={`Remove ${p.name} from project`}
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (!window.confirm(`Delete person "${p.name}"? This will remove them from any assigned tasks.`)) return;
-                      removePerson(p.id);
+                      handleRemoveFromProject(p);
                     }}
                   >
-                    <Trash2 className="h-3 w-3" />
+                    <UserMinus className="h-3 w-3" />
                   </Button>
                 </div>
               </div>
@@ -184,8 +248,41 @@ export function PeopleModal({ open, onOpenChange }: PeopleModalProps) {
                 </div>
               )}
             </div>
-          ))}
+            );
+          })}
         </div>
+
+        {availableMasterPeople.length > 0 ? (
+          <div className="border-t pt-3 space-y-2">
+            <p className="text-xs font-medium text-muted-foreground">
+              Add from Master Directory
+            </p>
+            <div className="space-y-1 max-h-[120px] overflow-y-auto">
+              {availableMasterPeople.map((person) => (
+                <div
+                  key={person.id}
+                  className="flex items-center justify-between gap-2 rounded-lg border bg-card px-3 py-2"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium">{person.name}</p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {person.company || person.trade || person.userGroup}
+                    </p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-7 text-xs"
+                    onClick={() => handleAddMasterToProject(person)}
+                  >
+                    Add
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
 
         <div className="border-t pt-3 space-y-2">
           <div className="flex items-center justify-between">

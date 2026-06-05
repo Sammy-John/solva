@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 
 import { PeopleModal } from '@/components/schedule/PeopleModal';
@@ -12,6 +12,9 @@ const person: Person = {
   name: 'Alex Supplier',
   userGroup: 'Suppliers',
   company: 'Alex Supply Co',
+  masterPersonId: 'person-1',
+  personType: 'Supplier',
+  projectActive: true,
 };
 
 const task: Task = {
@@ -29,6 +32,10 @@ const task: Task = {
 };
 
 describe('PeopleModal destructive actions', () => {
+  afterEach(() => {
+    cleanup();
+  });
+
   beforeEach(() => {
     useScheduleStore.setState({
       excludeWeekends: true,
@@ -41,18 +48,82 @@ describe('PeopleModal destructive actions', () => {
     });
   });
 
-  it('does not remove a person or assignments when delete confirmation is cancelled', () => {
+  it('does not deactivate a person when removal confirmation is cancelled', () => {
     vi.spyOn(window, 'confirm').mockReturnValueOnce(false);
 
     render(<PeopleModal open onOpenChange={() => undefined} />);
 
     fireEvent.click(screen.getByRole('button', { name: 'Suppliers' }));
-    fireEvent.click(screen.getByRole('button', { name: /Delete Alex Supplier/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Remove Alex Supplier from project/i }));
 
     expect(window.confirm).toHaveBeenCalledWith(
-      'Delete person "Alex Supplier"? This will remove them from any assigned tasks.',
+      'Remove "Alex Supplier" from future project assignment? They are assigned to active tasks: Order framing timber. Existing task assignments will be kept.',
     );
     expect(useScheduleStore.getState().people.map((entry) => entry.id)).toEqual(['person-1']);
+    expect(useScheduleStore.getState().people[0].projectActive).toBe(true);
     expect(useScheduleStore.getState().tasks[0].assignedTo).toEqual(['person-1']);
+  });
+
+  it('deactivates a person for future project assignment while keeping task assignments', () => {
+    vi.spyOn(window, 'confirm').mockReturnValueOnce(true);
+
+    render(<PeopleModal open onOpenChange={() => undefined} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Suppliers' }));
+    fireEvent.click(screen.getByRole('button', { name: /Remove Alex Supplier from project/i }));
+
+    expect(useScheduleStore.getState().people[0]).toMatchObject({
+      id: 'person-1',
+      projectActive: false,
+    });
+    expect(useScheduleStore.getState().tasks[0].assignedTo).toEqual(['person-1']);
+  });
+
+  it('adds an available master-directory person to the current project', () => {
+    const masterPerson: Person = {
+      id: 'master-1',
+      name: 'Sam Builder',
+      userGroup: 'Internal',
+      company: 'Solva',
+      masterPersonId: 'master-1',
+      projectActive: true,
+    };
+
+    render(
+      <PeopleModal
+        open
+        onOpenChange={() => undefined}
+        masterPeople={[masterPerson]}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Add' }));
+
+    expect(useScheduleStore.getState().people).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'master-1',
+          name: 'Sam Builder',
+          masterPersonId: 'master-1',
+          projectActive: true,
+        }),
+      ]),
+    );
+  });
+
+  it('shows an empty project people state when the current tab has no project people', () => {
+    useScheduleStore.setState({
+      excludeWeekends: true,
+      tasks: [],
+      sections: [],
+      dependencies: [],
+      people: [],
+      cascadeNotification: null,
+      blockedTaskEdit: null,
+    });
+
+    render(<PeopleModal open onOpenChange={() => undefined} />);
+
+    expect(screen.getByText('No people selected for this project yet.')).toBeInTheDocument();
   });
 });

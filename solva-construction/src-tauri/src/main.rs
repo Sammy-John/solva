@@ -37,6 +37,12 @@ struct ScheduleSnapshotRecord {
 }
 
 #[derive(Serialize)]
+struct MasterPeopleRecord {
+    people_json: String,
+    updated_at: String,
+}
+
+#[derive(Serialize)]
 struct StorageStatusRecord {
     runtime: String,
     storage_mode: String,
@@ -149,6 +155,12 @@ fn ensure_schema(conn: &Connection) -> Result<(), String> {
           people_json TEXT NOT NULL DEFAULT '[]',
           created_at TEXT NOT NULL,
           FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
+        );
+
+        CREATE TABLE IF NOT EXISTS master_people_directory (
+          id TEXT PRIMARY KEY,
+          people_json TEXT NOT NULL DEFAULT '[]',
+          updated_at TEXT NOT NULL
         );
         ",
     )
@@ -485,6 +497,56 @@ fn delete_project(app: AppHandle, project_id: String) -> Result<(), String> {
 }
 
 #[tauri::command]
+fn list_master_people(app: AppHandle) -> Result<MasterPeopleRecord, String> {
+    let conn = open_db(&app)?;
+    let row = conn
+        .query_row(
+            "
+            SELECT people_json, updated_at
+            FROM master_people_directory
+            WHERE id = 'default'
+            ",
+            [],
+            |row| {
+                Ok(MasterPeopleRecord {
+                    people_json: row.get(0)?,
+                    updated_at: row.get(1)?,
+                })
+            },
+        )
+        .optional()
+        .map_err(|e| format!("Failed to load master people: {e}"))?;
+
+    Ok(row.unwrap_or_else(|| MasterPeopleRecord {
+        people_json: "[]".to_string(),
+        updated_at: Utc::now().to_rfc3339(),
+    }))
+}
+
+#[tauri::command]
+fn save_master_people(app: AppHandle, people_json: String) -> Result<MasterPeopleRecord, String> {
+    let conn = open_db(&app)?;
+    let now = Utc::now().to_rfc3339();
+
+    conn.execute(
+        "
+        INSERT INTO master_people_directory (id, people_json, updated_at)
+        VALUES ('default', ?1, ?2)
+        ON CONFLICT(id) DO UPDATE SET
+          people_json = excluded.people_json,
+          updated_at = excluded.updated_at
+        ",
+        params![people_json, now],
+    )
+    .map_err(|e| format!("Failed to save master people: {e}"))?;
+
+    Ok(MasterPeopleRecord {
+        people_json,
+        updated_at: now,
+    })
+}
+
+#[tauri::command]
 fn get_project_schedule(
     app: AppHandle,
     project_id: String,
@@ -812,6 +874,8 @@ fn main() {
             import_project_with_id,
             update_project,
             delete_project,
+            list_master_people,
+            save_master_people,
             get_project_schedule,
             save_project_schedule,
             clear_project_people,

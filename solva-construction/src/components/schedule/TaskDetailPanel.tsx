@@ -33,6 +33,11 @@ import {
 } from "@/lib/dependencyUx";
 import { getDependencyConflictDetails } from "@/lib/scheduling";
 import { createEntityId } from "@/lib/ids";
+import {
+  getAssignedPeople,
+  getProjectAssignablePeople,
+  isActiveProjectPerson,
+} from "@/lib/peopleDirectory";
 
 interface TaskDetailPanelProps {
   taskId: string | null;
@@ -105,9 +110,10 @@ export function TaskDetailPanel({ taskId, onClose, onQuickAddDependency }: TaskD
 
   if (!task) return null;
 
-  const assignedPeople = people.filter((p) => task.assignedTo.includes(p.id));
-  const assignablePeople = people.filter(
-    (p) => !task.assignedTo.includes(p.id),
+  const assignedPeople = getAssignedPeople(people, task.assignedTo);
+  const assignablePeople = getProjectAssignablePeople(people, task.assignedTo);
+  const inactiveAssignedPeople = assignedPeople.filter(
+    (person) => !isActiveProjectPerson(person),
   );
 
   const predecessorLinks = dependencies
@@ -393,6 +399,9 @@ export function TaskDetailPanel({ taskId, onClose, onQuickAddDependency }: TaskD
                       }
                     >
                       {person.name}
+                      {!isActiveProjectPerson(person) ? (
+                        <span className="text-muted-foreground">(inactive)</span>
+                      ) : null}
                       <span className="text-muted-foreground">×</span>
                     </button>
                   ))}
@@ -426,6 +435,11 @@ export function TaskDetailPanel({ taskId, onClose, onQuickAddDependency }: TaskD
                   )}
                 </SelectContent>
               </Select>
+              {inactiveAssignedPeople.length > 0 ? (
+                <p className="text-xs text-amber-700">
+                  {inactiveAssignedPeople.map((person) => person.name).join(", ")} remain assigned here but are inactive for new project tasks.
+                </p>
+              ) : null}
             </div>
           </div>
 
